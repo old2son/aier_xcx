@@ -2,12 +2,12 @@
   <view class="time-slot-picker">
     <view 
       class="time-slot-item" 
-      v-for="(item, index) in combinedTimeSlotList" 
+      v-for="(item, index) in processedTimeSlotList" 
       :key="index"
     >
       <view
         class="time-slot-wrap"
-        :class="{ disabled: item.status === 0, 'time-slot-selected': selectedTimeSlotIndex === index }"
+        :class="{ disabled: item.disabled, 'time-slot-selected': selectedTimeSlotIndex === index && !item.disabled }"
         @tap="selectTimeSlot(item.name, index)"
       >
         <view class="time-slot-part">{{ item.name }}</view>
@@ -24,6 +24,7 @@
 
 <script>
 import dayjs from 'dayjs'
+
 export default {
   name: 'TimeSlotPicker',
   props: {
@@ -33,7 +34,7 @@ export default {
     },
     timeSlotNumbers: {
       type: Object,
-      default: () => ({}), // 默认空对象
+      default: () => ({}),
     },
     selectedTimeSlotIndex: {
       type: Number,
@@ -48,91 +49,70 @@ export default {
       require: false,
     }
   },
-  // computed: {
-  //   // 合并时段数据和预约人数
-  //   combinedTimeSlotList() {
-  //     return this.timeSlotList.map((slot, index) => {
-  //       console.log('slot：', slot)
-  //       return {
-  //         ...slot,
-  //         numbers: this.timeSlotNumbers[`numbers${index + 1}`] || 0,
-  //       }
-  //     })
-  //   },
-  // },
   computed: {
+    // 原始合并人数
     combinedTimeSlotList() {
-      const now = dayjs() // 当前时间
       return this.timeSlotList.map((slot, index) => {
-        const numbers = this.timeSlotNumbers[`numbers${index + 1}`] || 0
-        // 提取该时间段的结束时间（如 "09:00-10:00" -> "10:00"）
-        const timeRange = slot.name.split('-')
-        const endTime = timeRange[1]
-        // 拼接完整日期时间，假设 slot 属于今天
-        const endDateTime = dayjs(`${now.format('YYYY-MM-DD')} ${endTime}`)
-        // 判断是否禁用：已过结束时间或人数 ≥ 40
-        const isDisabled = now.isAfter(endDateTime) || numbers >= 40
-        console.log('slot>>>>>：', slot)
         return {
           ...slot,
-          numbers,
-          disableStatus: isDisabled ? 0 : 1, // 0 表示禁用
-        }
-      })
-        console.log('✅ 最终处理好的 combinedTimeSlotList：', result)
-        return result
-    },
-  },
-  computed: {
-    combinedTimeSlotList() {
-      const now = dayjs() // 当前时间
-  
-      return this.timeSlotList.map((slot, index) => {
-        const reservationNumber = this.timeSlotNumbers[`numbers${index + 1}`] || 0
-  
-        // 提取该时间段的结束时间（如 "09:00-10:00" -> "10:00"）
-        const timeRange = slot.name.split('-')
-        const endTime = timeRange[1]
-  
-        // 拼接完整日期时间，假设 slot 属于今天
-        const endDateTime = dayjs(`${now.format('YYYY-MM-DD')} ${endTime}`)
-  
-        // 判断是否禁用：已过结束时间或人数 ≥ 40
-        const isDisabled = now.isAfter(endDateTime) || reservationNumber >= 40
-  
-        return {
-          ...slot,
-          reservationNumber,
-          status: isDisabled ? 0 : 1, // 0 表示禁用
+          numbers: this.timeSlotNumbers[`numbers${index + 1}`] || 0,
         }
       })
     },
-  },
+    // 处理禁用逻辑
+    processedTimeSlotList() {
+      const now = dayjs()
 
+      return this.combinedTimeSlotList.map(slot => {
+        let disabled = false
+
+        // 条件1: 人数 >= 40
+        if (slot.numbers >= 40) {
+          disabled = true
+        }
+
+        // 条件2: 当前时间超过该时段的结束时间
+        const [start, end] = slot.name.split('-')
+        const endTimeToday = dayjs().hour(Number(end.split(':')[0])).minute(Number(end.split(':')[1]))
+        if (now.isAfter(endTimeToday)) {
+          disabled = true
+        }
+
+        return {
+          ...slot,
+          disabled
+        }
+      })
+    }
+  },
   watch: {
-    timeSlotList(newVal) {
-      if (newVal && newVal.length > 0) {
-        const defaultIndex = newVal.findIndex((slot) => Number(slot.status) !== 0)
-        if (defaultIndex !== -1) {
-          this.selectTimeSlot(newVal[defaultIndex].name, defaultIndex)
+    timeSlotList: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal && newVal.length > 0) {
+          // 自动顺延到下一个未禁用的时段
+          const availableIndex = this.processedTimeSlotList.findIndex(slot => !slot.disabled)
+          if (availableIndex !== -1) {
+            this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex)
+          }
         }
       }
-    },
+    }
   },
   mounted() {
     this.$nextTick(() => {
-      if (this.timeSlotList && this.timeSlotList.length > 0) {
-        const defaultIndex = this.timeSlotList.findIndex((slot) => Number(slot.status) !== 0)
-        if (defaultIndex !== -1) {
-          this.selectTimeSlot(this.timeSlotList[defaultIndex].name, defaultIndex)
+      if (this.processedTimeSlotList.length > 0) {
+        const availableIndex = this.processedTimeSlotList.findIndex(slot => !slot.disabled)
+        if (availableIndex !== -1) {
+          this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex)
         }
       }
     })
   },
   methods: {
     selectTimeSlot(name, index) {
-      if (this.timeSlotList[index].status !== 0) {
-        this.$emit('timeSlotSelected', name, index) // 发出选择事件
+      if (!this.processedTimeSlotList[index].disabled) { // 禁用状态不能选择
+        this.$emit('timeSlotSelected', name, index)
       }
     },
   },
@@ -182,7 +162,7 @@ export default {
       color: #fff;
     }
   }
-  .time-slot-wrap.disabled {
+  .time-slot-wrap.disabled { 
     background-color: #e7e7e7;
     color: #7f7f7f;
     .reservation-num {

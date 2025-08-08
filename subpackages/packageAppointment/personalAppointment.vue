@@ -197,7 +197,6 @@ export default {
     },
     // 选择四个时间段
     handleTimeSlotSelected(slot, index) {
-      console.log('触发了吗??????????????????????', slot, index)
       this.selectedTimeSlot = slot
       this.selectedTimeSlotIndex = index
       if (this.date && this.selectedTimeSlot) {
@@ -330,7 +329,7 @@ export default {
               beforeClose: (action) => new Promise((resolve) => {
                 if (action === 'confirm') {
                   console.log('跳转至消息中心')
-                  uni.navigateTo({
+                  uni.reLaunch({ 
                     url: '/subpackages/packageMine/messageCenter/index'
                   })
                 }

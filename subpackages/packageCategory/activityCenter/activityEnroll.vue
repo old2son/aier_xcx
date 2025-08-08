@@ -324,7 +324,7 @@ export default {
             beforeClose: (action) => new Promise((resolve) => {
               if (action === 'confirm') {
                 console.log('跳转至积分')
-                uni.navigateTo({
+                uni.reLaunch({
                   url: `/subpackages/packageMine/points/index?remind=true`
                 })
               }
