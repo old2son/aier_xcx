@@ -1,0 +1,16 @@
+{
+  "loginLogo": {
+    "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/login-image.png"
+  },
+  "loginPanelIcon": [
+    {
+      "id": 0,
+      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-phone-icon.svg"
+    },
+    {
+      "id": 1,
+      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-verification%20-code-icon.svg"
+    }
+  ],
+  "appletPrivacyPolicyImage": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/4146c63eeaef4b4c7e4bc8d8df65ffb.png"
+}

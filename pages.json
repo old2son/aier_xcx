@@ -1,0 +1,340 @@
+{
+  "pages": [{
+      "path": "pages/tabBar/home/home",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/tabBar/science/science",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/tabBar/guide/guide",
+      "style": {
+        "navigationBarTitleText": "导览",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
+      "path": "pages/tabBar/mine/mine",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": false
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "subpackages/packageLogin",
+      "pages": [
+        {
+          "path": "login",
+          "style": {
+            "navigationBarTitleText": "登录"
+          }
+        },
+        {
+          "path": "appletPrivacyPolicy",
+          "style": {
+            "navigationBarTitleText": "爱尔眼健康科普教育基地隐私政策"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/packageHomeDetail",
+      "pages": [
+        {
+          "path": "recommendation",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "精选推荐"
+          }
+        },
+        {
+          "path": "baseUpdates",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "基地动态"
+          }
+        },
+        {
+          "path": "search",
+          "style": {
+            "navigationBarTitleText": "搜索"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/packageAppointment",
+      "pages": [
+        {
+          "path": "appointmentEntrance",
+          "style": {
+            "navigationBarTitleText": "预约"
+          }
+        },
+        {
+          "path": "personalAppointment",
+          "style": {
+            "navigationBarTitleText": "个人预约"
+          }
+        },
+        {
+          "path": "teamAppointment",
+          "style": {
+            "navigationBarTitleText": "团队预约"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/packageCategory",
+      "pages": [
+        {
+          "path": "hotScience/categoryIconInner",
+          "style": {
+            "navigationBarTitleText": "categoryInit",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "hotScience/originalCollection",
+          "style": {
+            "navigationBarTitleText": "基地原创",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "hotScience/originalCollectionDetail",
+          "style": {
+            "navigationBarTitleText": "基地原创视频",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "hotScience/recommendation",
+          "style": {
+            "navigationBarTitleText": "热门推荐",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "activityCenter/index",
+          "style": {
+            "navigationBarTitleText": "活动中心",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "activityCenter/activityDetail",
+          "style": {
+            "navigationBarTitleText": "活动详情",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "activityCenter/activityEnroll",
+          "style": {
+            "navigationBarTitleText": "活动报名",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "baseOverview/index",
+          "style": {
+            "navigationBarTitleText": "基地概况",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": false
+          }
+        },
+        {
+          "path": "visitKnow/index",
+          "style": {
+            "navigationBarTitleText": "参观须知",
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": false
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/packageMine",
+      "pages": [
+        {
+          "path": "editProfile",
+          "style": {
+            "navigationBarTitleText": "修改资料",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "onlineConsultation",
+          "style": {
+            "navigationBarTitleText": "在线咨询",
+            "enablePullDownRefresh": true,
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "feedback",
+          "style": {
+            "navigationBarTitleText": "意见反馈",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "appointment/myAppointment",
+          "style": {
+            "navigationBarTitleText": "我的预约",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "appointment/appointmentDetail",
+          "style": {
+            "navigationBarTitleText": "预约详情",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "audience/audienceManage",
+          "style": {
+            "navigationBarTitleText": "常用观众",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "audience/addAudience",
+          "style": {
+            "navigationBarTitleText": "添加成员",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "collect",
+          "style": {
+            "navigationBarTitleText": "我的收藏",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "browsingHistory",
+          "style": {
+            "navigationBarTitleText": "浏览记录",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "points/index",
+          "style": {
+            "navigationBarTitleText": "EYE积分",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "points/pointsRecord",
+          "style": {
+            "navigationBarTitleText": "积分记录",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "points/exchangeRecord",
+          "style": {
+            "navigationBarTitleText": "兑换记录",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "messageCenter/index",
+          "style": {
+            "navigationBarTitleText": "消息中心",
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path" : "messageCenter/messageDetail",
+          "style" : 
+          {
+            "navigationBarTitleText" : "消息详情",
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "爱尔眼健康科普教育基地",
+    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#F8F8F8",
+    "app-plus": {
+      "background": "#efeff4"
+    },
+    "usingComponents": { // 全局引入
+      "van-button": "/wxcomponents/vant/button/index",
+      "van-cell": "/wxcomponents/vant/cell/index",
+      "van-cell-group": "/wxcomponents/vant/cell-group/index",
+      "van-field": "/wxcomponents/vant/field/index",
+      "van-checkbox": "/wxcomponents/vant/checkbox/index",
+      "van-checkbox-group": "/wxcomponents/vant/checkbox-group/index",
+      "van-toast": "/wxcomponents/vant/toast/index",
+      "van-dropdown-menu": "/wxcomponents/vant/dropdown-menu/index",
+      "van-dropdown-item": "/wxcomponents/vant/dropdown-item/index",
+      "van-radio": "/wxcomponents/vant/radio/index",
+      "van-radio-group": "/wxcomponents/vant/radio-group/index",
+      "van-dialog": "/wxcomponents/vant/dialog/index",
+      "van-popup": "/wxcomponents/vant/popup/index",
+      "van-tabs": "/wxcomponents/vant/tabs/index",
+      "van-tab": "/wxcomponents/vant/tab/index",
+      "van-tabbar": "/wxcomponents/vant/tabbar/index",
+      "van-area": "/wxcomponents/vant/area/index",
+      "van-tabbar-item": "/wxcomponents/vant/tabbar-item/index",
+      "van-picker": "/wxcomponents/vant/picker/index",
+      "van-datetime-picker": "/wxcomponents/vant/datetime-picker/index",
+       "van-search": "/wxcomponents/vant/search/index"
+    }
+  },
+  "tabBar": {
+    "color": "#a8a8a8", // 默认文字颜色
+    "selectedColor": "#32569b", // 选中文字颜色
+    "backgroundColor": "#fff", // 背景颜色
+    "borderStyle": "white", // 边框颜色
+    "list": [{
+        "pagePath": "pages/tabBar/home/home",
+        "iconPath": "static/tab-icons/home.png",
+        "selectedIconPath": "static/tab-icons/home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/tabBar/science/science",
+        "iconPath": "static/tab-icons/science.png",
+        "selectedIconPath": "static/tab-icons/science-active.png",
+        "text": "科普"
+      },
+      {
+        "pagePath": "pages/tabBar/guide/guide",
+        "iconPath": "static/tab-icons/guide.png",
+        "selectedIconPath": "static/tab-icons/guide-active.png",
+        "text": "导览"
+      },
+      {
+        "pagePath": "pages/tabBar/mine/mine",
+        "iconPath": "static/tab-icons/mine.png",
+        "selectedIconPath": "static/tab-icons/mine-active.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,231 @@
+<template>
+  <view class="member-manage-container">
+    <CustomNavInner
+      title="常用观众" 
+    />
+    <view 
+      class="member-manage-main"
+      :style="{ top: (menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20) + 'px' }">
+      <template v-if="memberList && memberList.length > 0">
+        <view class="member-item" v-for="(item, index) in memberList" :key="item.id">
+          <view class="col-1">
+            <text>成员</text>
+            <text @click="deleteMember(item.id)">删除成员</text>
+          </view>
+          <view class="col-2">
+            <text>姓名</text>
+            <text>{{ item.name }}</text>
+          </view>
+          <view class="col-2">
+            <text>性别</text>
+            <view class="gender-value">
+              <image :src="getBoyImg(item.sex)" mode="widthFix"></image>
+              <text class="boy-txt" :class="item.sex === 1 ? 'boy-color' : 'boy-default-color'">男</text>
+              <image :src="getGirlImg(item.sex)" mode="widthFix"></image>
+              <text :class="item.sex === 0 ? 'girl-color' : 'girl-default-color'">女</text>
+            </view>
+          </view>
+          <view class="col-2">
+            <text>生日</text>
+            <text>{{ item.birthday }}</text>
+          </view>
+        </view>
+      </template>
+      <view class="add-member-btn">
+        <button 
+          class="custom-button"
+          :disabled="memberList && memberList.length >= 5"
+          @click="toAddmember()">+ 添加成员</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import myData from '@/data/mine.json'
+import { mapState } from "vuex"
+import { getMembers, deleteMember } from '@/api'
+
+export default {
+  data() {
+    return {
+      memberList: [],
+    }
+  },
+  computed: {
+    ...mapState("moduleLayout", ['menuInfo']),
+  },
+  onLoad() {
+    this.$store.dispatch('moduleLayout/getNavigationBarStyle')
+    this.getMemberInfo()
+  },
+  methods: {
+    getBoyImg(sex) {
+      return sex === 0 ? myData.editGenderIcon[0].boyIcon[0].url : myData.editGenderIcon[0].boyIcon[1].url
+    },
+    getGirlImg(sex) {
+      return sex === 1 ? myData.editGenderIcon[1].girlIcon[0].url : myData.editGenderIcon[1].girlIcon[1].url
+    },
+    getMemberInfo() {
+      uni.showLoading({
+        title: '加载中'
+      })
+      getMembers()
+        .then((res) => {
+          this.memberList = res.data
+        })
+        .finally(() => {
+          uni.hideLoading()
+        })
+    },
+    deleteMember(id) {
+      uni.showModal({
+        title: '温馨提示',
+        content: '您是否确定删除该成员信息',
+        confirmText: '确定',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            uni.showLoading({
+              title: '删除中'
+            })
+            deleteMember({
+              id: id,
+            }).then((res) => {
+              if (res.code === 200 && res.message == '删除成功') {
+                this.getMemberInfo()
+                uni.showToast({
+                  title: '删除成功',
+                  duration: 3000,
+                  icon: 'none'
+                })
+              }
+            })
+          }
+        }
+      })
+    },
+    toAddmember() {
+      uni.navigateTo({
+        url: '/subpackages/packageMine/audience/addAudience'
+      })
+    },
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.member-manage-container {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.member-manage-main {
+  position: absolute;
+  width: 92%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.member-item {
+  background: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  margin: 30px auto;
+}
+
+.member-item .col-1 {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 22px;
+  box-sizing: border-box;
+  font-weight: 550;
+}
+
+.member-item .col-1 text:nth-child(1) {
+  color: #32579c;
+}
+
+.member-item .col-1 text:nth-child(2) {
+  color: #fd7d7d;
+}
+
+.boy-color {
+  color: #4395ff;
+}
+
+.girl-color {
+  color: #ff3ec9;
+}
+
+.boy-default-color,
+.girl-default-color {
+  color: #595757;
+}
+
+.member-item .col-2 {
+  padding: 22px 0;
+  box-sizing: border-box;
+  border-bottom: 1px solid #bbbbbb;
+  color: #333;
+  font-weight: 550;
+  display: flex;
+  align-items: center;
+}
+
+.member-item .col-2 text:nth-child(1) {
+  margin-right: 30px;
+}
+
+.member-item .col-2 .gender-value {
+  display: flex;
+  align-items: center;
+}
+
+.member-item .col-2 .gender-value .boy-txt {
+  margin-right: 25px;
+}
+
+.member-item .col-2 .gender-value image {
+  display: inline-block;
+  margin-right: 10px;
+  width: 13px;
+  height: 13px;
+}
+
+.member-item .col-2:last-child {
+  border: none;
+}
+
+.add-member-btn {
+  margin-top: 30px;
+  font-size: 14px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 550;
+  border-radius: 12px;
+  overflow: hidden;
+}
+button::after {
+  display: none;
+}
+
+.custom-button {
+  background-color: #fff;
+  color: #32579c;
+  width: 100%;
+}
+
+.delete-dialog {
+  font-size: 14px;
+}
+</style>
