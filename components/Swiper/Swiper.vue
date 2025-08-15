@@ -12,7 +12,12 @@
     > 
     <swiper-item v-for="(item,index) in receiveData" :key="index">
       <view class="swiper-item" v-if="showType === 'swiper'">
-        <image class="swiper-image" :src="item.h5FileUrl" mode="widthFix"></image>
+        <image 
+          class="swiper-image" 
+          :src="item.h5FileUrl" 
+          mode="widthFix"
+          @load="handleImageLoad"
+        ></image>
       </view>
       <view class="noticebar-item" v-if="showType === 'noticeBar'">
         <image class="noticebar-image" src="https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/homePage/homepage-bar.png" mode="widthFix"></image>
@@ -79,14 +84,36 @@
       dotsActiveColor: {
         type: String,
         default: '#4a71fd'
+      },
+      // 是否需要检查图片加载完成
+      needCheckLoaded: { 
+        type: Boolean, 
+        default: false
       }
     },
     data(){
       return{
+        loadedCount: 0 // 记录已加载的图片数量
+      }
+    },
+    watch: {
+      // 当轮播数据变化时，重新计数
+      receiveData(newVal) {
+        if (this.needCheckLoaded && Array.isArray(newVal) && newVal.length) {
+          this.loadedCount = 0
+        }
       }
     },
     methods: {
-      
+      // 处理图片加载
+      handleImageLoad() {
+        if (!this.needCheckLoaded) return
+        this.loadedCount++
+        console.log(`已加载 ${this.loadedCount}/${this.receiveData.length}`)
+        if (this.loadedCount >= this.receiveData.length) {
+          this.$emit('allImagesLoaded')
+        }
+      }
     }
   }
 </script>

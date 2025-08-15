@@ -1,12 +1,12 @@
 <template>
   <view class="home-container">
     <LoadingAnimation 
-      v-if="showLoading || isError"
+      v-if="showLoading || isError || !bannerImagesLoaded"
       :loadError="isError" 
       :visible="showLoading && !isError" 
       @retry="requestHomeData"
     ></LoadingAnimation>
-    <view class="home-content" v-else>
+    <view class="home-content" :style="{ opacity: showLoading ? 0 : 1 }">
       <!-- 自定义导航栏 -->
       <CustomNav :opacity="opacity" title="爱尔眼健康科普教育基地" />
     
@@ -17,6 +17,8 @@
           :receiveData="bannerSwiperList"
           :swiperHeight="'402px'"
           :dots="false"
+          :needCheckLoaded="true"
+          @allImagesLoaded="onBannerImagesLoaded"
         ></Swiper>
         <image 
           class="search-icon" 
@@ -102,8 +104,10 @@ export default {
       opacity: 0,
       searchIcon: tabBarData.searchIcon,
       homeData: homeData,
-      showLoading: true
-    };
+      showLoading: true,
+      
+      bannerImagesLoaded: false // 轮播图图片是否加载完成
+    }
   },
   computed: {
     ...mapState("moduleLayout", ['menuInfo']), // 给搜索icon提供布局数据
@@ -151,35 +155,74 @@ export default {
   },
   methods: {
     ...mapActions('moduleHome', ['fetchHomeData']),
-    async requestHomeData () {
-      // 如果已加载过数据，不再请求，也不显示 loading
-      if (this.isLoaded) {
-        this.showLoading = false
-        uni.showTabBar()
-        return
-      }
+    // async requestHomeData () {
+    //   // 如果已加载过数据，不再请求，也不显示 loading
+    //   if (this.isLoaded) {
+    //     this.showLoading = false
+    //     uni.showTabBar()
+    //     return
+    //   }
     
-      this.showLoading = true // 每次重新请求时，显示加载动画
-      uni.hideTabBar() // 页面进来时隐藏
+    //   this.showLoading = true // 每次重新请求时，显示加载动画
+    //   uni.hideTabBar() // 页面进来时隐藏
     
-      try {
-        const start = Date.now()
-        await this.fetchHomeData()
-        const duration = Date.now() - start
-        const remain = 3500 - duration
-        if (remain > 0) {
-          await new Promise(resolve => setTimeout(resolve, remain))
+    //   try {
+    //     const start = Date.now()
+    //     await this.fetchHomeData()
+    //     const duration = Date.now() - start
+    //     const remain = 3500 - duration
+    //     if (remain > 0) {
+    //       await new Promise(resolve => setTimeout(resolve, remain))
+    //     }
+    
+    //     if (!this.isError) { // 如果没有出错，再关闭加载动画
+    //       this.showLoading = false
+    //       uni.showTabBar()
+    //     }
+    //   } catch (e) {
+    //     console.warn('首页请求失败', e)
+    //     // showLoading 保持为 true，让错误状态展示
+    //   }
+    // },
+    // onBannerImagesLoaded() { 
+    //   console.log("子组件轮播图加载完毕了！")
+    //   this.bannerImagesLoaded = true
+    // },
+    
+    
+    
+      async requestHomeData() {
+        this.showLoading = true
+        uni.hideTabBar()
+        try {
+          const start = Date.now()
+          await this.fetchHomeData()
+          const duration = Date.now() - start
+          const remain = 3500 - duration
+          if (remain > 0) {
+            await new Promise(resolve => setTimeout(resolve, remain))
+          }
+          if (!this.isError) {
+            this.homeDataLoaded = true
+            this.tryCloseLoading()
+          }
+        } catch (e) {
+          console.warn('首页请求失败', e)
         }
-    
-        if (!this.isError) { // 如果没有出错，再关闭加载动画
+      },
+      onBannerImagesLoaded() {
+        console.log("子组件轮播图加载完毕了！")
+        this.bannerImagesLoaded = true
+        this.tryCloseLoading()
+      },
+      tryCloseLoading() {
+        if (this.homeDataLoaded && this.bannerImagesLoaded) {
           this.showLoading = false
           uni.showTabBar()
         }
-      } catch (e) {
-        console.warn('首页请求失败', e)
-        // showLoading 保持为 true，让错误状态展示
-      }
-    },
+      },
+    
+    
     toSubpackagePage(url, index) {
       if (index === 0) {
         uni.switchTab({ url: '/' + url })
