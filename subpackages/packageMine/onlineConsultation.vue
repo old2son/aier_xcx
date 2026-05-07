@@ -87,6 +87,7 @@
       </view>
 
       <!-- 流式输出的答案 -->
+      <!-- ？？？ -->
       <view v-if="isStreaming" class="chat-item streaming">
         <text class="question">{{ selectedQuestions }}</text>
         <text class="answer">{{ answerStreaming }}</text>
