@@ -2,7 +2,15 @@
 	<view class="personal-appointment-container">
 		<view class="date-picker-title">日期选择</view>
 
-		<DatePicker :disabled-weekdays="[1]" :needTimeSlotRequest="needTimeSlotRequest" @date-selected="handleDateSelected" @time-slot-numbers="updateTimeSlotNumbers" />
+		<view>
+			<DatePicker :disabled-weekdays="[1]" :needTimeSlotRequest="needTimeSlotRequest" @date-selected="handleDateSelected" @time-slot-numbers="updateTimeSlotNumbers" />
+
+			<view @click="showCalendar = true">
+				<van-icon name="calendar-o" />
+				<van-icon name="arrow-down" />
+			</view>
+			<CalendarPick :showPopup="showCalendar" @closePopup="handleCalendarClose"/>
+		</view>
 
 		<view class="divider" />
 		<view class="time-slot-title">时段选择</view>
@@ -15,7 +23,13 @@
 			:needTimeSlotRequest="needTimeSlotRequest"
 			@timeSlotSelected="handleTimeSlotSelected"
 		/>
-
+		
+		<view class="menber-title">成员信息</view>
+		<view class="add-member-btns">
+			<van-button block round size="normal" icon="plus" color="#32579c" type="primary" @click="showAddMemberPopup(0)">添加儿童</van-button>
+			<van-button block round size="normal" icon="plus" color="#32579c" type="primary" @click="showAddMemberPopup(1)">添加成人</van-button>
+		</view>
+		
 		<view class="name-title">姓名</view>
 		<van-field type="text" maxlength="8" :value="reservationName" placeholder="请输入您的姓名" :error-message="reservationNameError" @input="reservationName = $event.detail" />
 
@@ -50,7 +64,8 @@
 		<view class="submit-btn">
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
-
+		
+		<!-- debug -->
 		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
 		<van-dialog id="van-dialog" />
 	</view>
@@ -94,7 +109,9 @@ export default {
 
 			reservationNameError: '',
 			ageError: '',
-			phoneNumberError: ''
+			phoneNumberError: '',
+
+			showCalendar: false
 		};
 	},
 	computed: {
@@ -304,6 +321,26 @@ export default {
 				.finally(() => {
 					uni.hideLoading();
 				});
+		},
+		showAddMemberPopup(type) {
+			if (type===0) {
+				
+			}
+			
+			if (type === 1) {
+				
+			}
+		},
+		onSelectDate(event) {
+			// debug
+			console.log(event);
+		},
+		confirmDate() {
+			// debug
+			this.showCalendar = false;
+		},
+		handleCalendarClose() {
+			this.showCalendar = false;
 		}
 	}
 };
@@ -317,13 +354,14 @@ export default {
 }
 
 .time-slot-title,
+.member-title,
 .name-title,
 .age-title,
 .phone-title,
 .partner-title,
 .explain-service-title {
-	font-size: 38rpx;
 	margin: 40rpx 0 20rpx 0;
+	font-size: 38rpx;
 }
 .date-picker-title {
 	font-size: 38rpx;
@@ -338,6 +376,12 @@ export default {
 .morning-title {
 	font-size: 38rpx;
 	color: #2a2a2a;
+}
+
+.add-member-btns {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
 }
 
 .divider {
@@ -434,4 +478,5 @@ export default {
 	font-size: 18px;
 	color: #fff !important;
 }
+
 </style>
