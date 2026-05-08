@@ -11,7 +11,7 @@
 
 		<view class="calendar-footer">
 			<van-button round size="large" color="#32579c" type="primary" @click="confirmDate">确定报名</van-button>
-			<van-button round size="large"  @click="closePopup">返回</van-button>
+			<van-button round size="large" color="#b3d6ff" plain @click="closePopup">返回</van-button>
 		</view>
 	</van-popup>
 </template>
@@ -34,6 +34,9 @@ export default {
 		};
 	},
 	methods: {
+		onSelectDate(event){
+			console.log(event)
+		},
 		closePopup() {
 			this.$emit('closePopup', false);
 		}
@@ -41,7 +44,7 @@ export default {
 	mounted() {
 		const now = dayjs();
 		this.minDate = now.valueOf();
-		this.maxDate = now.add(300, 'day').valueOf();
+		this.maxDate = now.add(30, 'day').valueOf();
 	}
 };
 </script>
