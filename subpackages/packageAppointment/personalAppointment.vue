@@ -16,7 +16,7 @@
 				<van-icon name="arrow-down" />
 			</view>
 			<CalendarPick
-				:showPopup="isShowCal"
+				:show-popup="isShowCal"
 				:what-a-day="date"
 				@closePopup="handleCalendarClose"
 				@selectCal="handleSelectCal"
@@ -32,6 +32,7 @@
 			:timeSlotList="combinedTimeSlotList"
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
 			:needTimeSlotRequest="needTimeSlotRequest"
+			:select-day="date"
 			@timeSlotSelected="handleTimeSlotSelected"
 		/>
 

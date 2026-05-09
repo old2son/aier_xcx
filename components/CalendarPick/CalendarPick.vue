@@ -22,7 +22,7 @@
 		<view class="calendar-footer">
 			<!-- <van-button round size="large" color="#32579c" type="primary" @click="confirmDate">前往报名</van-button> -->
 			<van-button round size="large" color="#32579c" plain @click="closePopup">返回</van-button>
-			<van-button round size="large" color="#32579c" plain @click="resetDate">重置</van-button>
+			<!-- <van-button round size="large" color="#32579c" plain @click="resetDate">重置</van-button> -->
 		</view>
 	</van-popup>
 </template>
@@ -123,7 +123,6 @@ export default {
 		this.minDate = now.valueOf();
 		this.maxDate = now.add(30, 'day').valueOf();
 
-		console.log(7777);
 		this.defaultDate = dayjs().startOf('day');
 		this.$nextTick(() => {
 			const calendar = this.selectComponent('#calendar');

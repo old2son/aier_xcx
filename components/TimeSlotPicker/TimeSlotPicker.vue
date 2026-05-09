@@ -39,6 +39,10 @@ export default {
 		weight: {
 			type: Boolean,
 			require: false
+		},
+		selectDay: {
+			type: String,
+			require: true
 		}
 	},
 	computed: {
@@ -55,6 +59,8 @@ export default {
 		processedTimeSlotList() {
 			const now = dayjs();
 
+			const isToday = dayjs(this.selectDay.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).isSame(dayjs(), 'day');
+
 			return this.combinedTimeSlotList.map((slot) => {
 				let disabled = false;
 
@@ -64,12 +70,14 @@ export default {
 				}
 
 				// 条件2: 当前时间超过该时段的结束时间
-				const [start, end] = slot.name.split('-');
-				const endTimeToday = dayjs()
-					.hour(Number(end.split(':')[0]))
-					.minute(Number(end.split(':')[1]));
-				if (now.isAfter(endTimeToday)) {
-					disabled = true;
+				if (isToday) {
+					const [start, end] = slot.name.split('-');
+					const endTimeToday = dayjs()
+						.hour(Number(end.split(':')[0]))
+						.minute(Number(end.split(':')[1]));
+					if (now.isAfter(endTimeToday)) {
+						disabled = true;
+					}
 				}
 
 				return {
