@@ -32,6 +32,17 @@ export default {
 		isActivity: {
 			type: Boolean,
 			require: false
+		},
+		selectedCal: {
+			type: Object,
+			default: {
+				date: String,
+				disabled: Boolean,
+				week: String,
+				year: Number,
+				index: Number
+			},
+			require: false
 		}
 	},
 	data() {
@@ -48,6 +59,19 @@ export default {
 	},
 	beforeDestroy() {
 		this.clearMidnightTimer(); // 在组件销毁时清理定时器
+	},
+	watch: {
+		selectedCal(newVal) {
+			if (!newVal) return;
+
+			// DatePicker 已经有的日期无需再请求
+			const isExist = this.days.findIndex((item) => item.date === newVal.date);
+
+			if (isExist !== -1) return;
+
+			const { index, ...day } = newVal;
+			this.selectDay(day, index);
+		}
 	},
 	methods: {
 		// 生成当天和接下来的六天的日期信息
@@ -97,6 +121,7 @@ export default {
 			}
 		},
 		selectDay(day, index) {
+			console.log('selectDay', day, index);
 			if (day.disabled) return;
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;

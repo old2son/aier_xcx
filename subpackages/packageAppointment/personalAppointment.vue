@@ -3,13 +3,24 @@
 		<view class="date-picker-title">日期选择</view>
 
 		<view>
-			<DatePicker :disabled-weekdays="[1]" :needTimeSlotRequest="needTimeSlotRequest" @date-selected="handleDateSelected" @time-slot-numbers="updateTimeSlotNumbers" />
+			<DatePicker
+				:disabled-weekdays="[1]"
+				:needTimeSlotRequest="needTimeSlotRequest"
+				:selected-cal="selectedCal"
+				@date-selected="handleDateSelected"
+				@time-slot-numbers="updateTimeSlotNumbers"
+			/>
 
-			<view @click="showCalendar = true">
+			<view @click="isShowCal = true">
 				<van-icon name="calendar-o" />
 				<van-icon name="arrow-down" />
 			</view>
-			<CalendarPick :showPopup="showCalendar" @closePopup="handleCalendarClose"/>
+			<CalendarPick
+				:showPopup="isShowCal"
+				:what-a-day="date"
+				@closePopup="handleCalendarClose"
+				@selectCal="handleSelectCal"
+			/>
 		</view>
 
 		<view class="divider" />
@@ -23,29 +34,134 @@
 			:needTimeSlotRequest="needTimeSlotRequest"
 			@timeSlotSelected="handleTimeSlotSelected"
 		/>
-		
-		<view class="menber-title">成员信息</view>
-		<view class="add-member-btns">
-			<van-button block round size="normal" icon="plus" color="#32579c" type="primary" @click="showAddMemberPopup(0)">添加儿童</van-button>
-			<van-button block round size="normal" icon="plus" color="#32579c" type="primary" @click="showAddMemberPopup(1)">添加成人</van-button>
+
+		<view class="member-title">
+			<view class="main-msg">成员信息</view>
+			<view class="tips">最多可添加5人</view>
 		</view>
-		
-		<view class="name-title">姓名</view>
-		<van-field type="text" maxlength="8" :value="reservationName" placeholder="请输入您的姓名" :error-message="reservationNameError" @input="reservationName = $event.detail" />
+		<view class="member-list" v-if="!!memberList.length">
+			<view class="member-detail" v-for="(item, index) in memberList" :key="index">
+				<view class="delete-btn" @click="deleteMember(index)">
+					<van-icon name="cross" size="25rpx" color="#fff" />
+				</view>
 
-		<view class="age-title">年龄</view>
-		<van-field :value="age" type="digit" maxlength="4" placeholder="0-14 岁需填写陪同人员" :error-message="ageError" @input="age = $event.detail" />
+				<view class="member-info">
+					<view class="member-top">
+						<text class="member-name">{{ item.name }}</text>
+						<text class="member-phone" v-if="!!item.phone">{{ item.phone }}</text>
+					</view>
 
-		<view class="phone-title">联系方式</view>
-		<van-field :value="phoneNumber" type="tel" maxlength="11" placeholder="请输入您的手机号码" :error-message="phoneNumberError" @input="phoneNumber = $event.detail" />
+					<view class="member-bottom" v-if="!!item.idCard">身份证：{{ item.idCard }}</view>
+				</view>
+			</view>
+		</view>
+		<view class="add-member-btns">
+			<van-button
+				block
+				round
+				size="normal"
+				icon="plus"
+				color="#32579c"
+				type="primary"
+				@click="showAddMemberPopup(0)"
+				>添加儿童</van-button
+			>
+			<van-button
+				block
+				round
+				size="normal"
+				icon="plus"
+				color="#32579c"
+				type="primary"
+				@click="showAddMemberPopup(1)"
+				>添加成人</van-button
+			>
+		</view>
 
-		<view class="partner-title">同行人员</view>
-		<van-dropdown-menu>
-			<van-dropdown-item :value="value" :options="partnerOption" @change="handleDropdownChange" />
-		</van-dropdown-menu>
+		<van-popup class="add-popup" round position="bottom" :show="isShowAdd" @close="isShowAdd = false">
+			<view class="add-wrap">
+				<view class="add-title">新增成员</view>
+
+				<view class="name-title">姓名</view>
+				<van-field
+					custom-class="custom-field"
+					input-class="custom-input"
+					type="text"
+					maxlength="8"
+					:value="reservationName"
+					placeholder="请输入您的姓名"
+					:error-message="reservationNameError"
+					@input="reservationName = $event.detail"
+				/>
+
+				<!-- <view class="age-title">年龄</view>
+				<van-field
+					custom-class="custom-field"
+					input-class="custom-input"
+					:value="age"
+					type="digit"
+					maxlength="4"
+					placeholder="0-14 岁需填写陪同人员"
+					:error-message="ageError"
+					@input="age = $event.detail"
+				/> -->
+				
+				<view v-if="memberType !== 0">
+					<view class="phone-title">联系方式</view>
+					<van-field
+						custom-class="custom-field"
+						input-class="custom-input"
+						:value="phoneNumber"
+						type="tel"
+						maxlength="11"
+						placeholder="请输入您的手机号码"
+						:error-message="phoneNumberError"
+						@input="phoneNumber = $event.detail"
+					/>
+
+					<view class="idtype-title">证件类型</view>
+					<van-radio-group :value="idRadio" bind:change="onChange">
+						<van-radio name="1">身份证 1</van-radio>
+						<van-radio name="2">护照 2</van-radio>
+					</van-radio-group>
+
+					<view class="id-title">证件号码</view>
+					<van-field
+						custom-class="custom-field"
+						input-class="custom-input"
+						:value="idCard"
+						type="idcard"
+						maxlength="18"
+						placeholder="请输入身份证号"
+						@input="idCard = $event.detail"
+					/>
+				</view>
+
+				<!-- <view class="partner-title">同行人员</view>
+				<van-dropdown-menu>
+					<van-dropdown-item :value="value" :options="partnerOption" @change="handleDropdownChange" />
+				</van-dropdown-menu> -->
+
+				<view class="act-btns">
+					<van-button block round size="normal" color="#32579c" plain @click="isShowAdd = false"
+						>返回</van-button
+					>
+					<van-button block round size="normal" color="#32579c" type="primary" @click="confirmAdd"
+						>确认</van-button
+					>
+				</view>
+			</view>
+		</van-popup>
 
 		<block v-for="(field, index) in companionFields" :key="index">
-			<van-field custom-class="travel-field" :value="field.name" type="text" placeholder="请输入同行人员的姓名" maxlength="8" @input="validateField(index, $event)" />
+			<van-field
+				custom-class="travel-field"
+				:value="field.name"
+				type="text"
+				placeholder="请输入同行人员的姓名"
+				maxlength="8"
+				@input="validateField(index, $event)"
+			/>
 		</block>
 
 		<view class="explain-service-title">是否需要讲解服务</view>
@@ -64,9 +180,10 @@
 		<view class="submit-btn">
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
-		
+
 		<!-- debug -->
-		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
+		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
+
 		<van-dialog id="van-dialog" />
 	</view>
 </template>
@@ -92,6 +209,7 @@ export default {
 			reservationName: null,
 			age: null,
 			phoneNumber: null,
+			idCard: null,
 			colleagues: 0, // 同行人员
 			companionNames: '', // 收集的同行人员姓名字符串
 			// 下拉框
@@ -111,7 +229,26 @@ export default {
 			ageError: '',
 			phoneNumberError: '',
 
-			showCalendar: false
+			idRadio: '1',
+
+			isShowCal: false,
+			isShowAdd: false,
+
+			memberType: null,
+			memberList: [
+				{
+					name: '彩页',
+					phone: '136',
+					idCard: '440'
+				},
+				{
+					name: '碟吊灯',
+					phone: '137',
+					idCard: '441'
+				}
+			],
+
+			selectedCal: null
 		};
 	},
 	computed: {
@@ -133,9 +270,7 @@ export default {
 			return this.timeSlotList;
 		}
 	},
-	mounted() {
-		this.getReservationTimeSlotData();
-	},
+	
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
@@ -200,6 +335,12 @@ export default {
 				// 减少字段
 				this.companionFields.splice(numFields);
 			}
+		},
+		handleCalendarClose() {
+			this.isShowCal = false;
+		},
+		handleSelectCal(res) {
+			this.selectedCal = res;
 		},
 		validateField(index, value) {
 			const regex = /^[a-zA-Z\u4e00-\u9fa5\s]*$/; // 正则匹配中文英文空格
@@ -323,13 +464,8 @@ export default {
 				});
 		},
 		showAddMemberPopup(type) {
-			if (type===0) {
-				
-			}
-			
-			if (type === 1) {
-				
-			}
+			this.memberType = type;
+			this.isShowAdd = true;
 		},
 		onSelectDate(event) {
 			// debug
@@ -337,11 +473,29 @@ export default {
 		},
 		confirmDate() {
 			// debug
-			this.showCalendar = false;
+			this.isShowCal = false;
 		},
-		handleCalendarClose() {
-			this.showCalendar = false;
+		confirmAdd() {
+			if (this.memberList.length > 5) {
+				this.$toast({
+					duration: 3000,
+					message: '最多可添加 5 人'
+				});
+				return;
+			}
+
+			this.memberList.push({
+				name: this.reservationName,
+				phone: this.phoneNumber,
+				idCard: this.idCard
+			});
+		},
+		deleteMember(index) {
+			this.memberList.splice(index, 1);
 		}
+	},
+	mounted() {
+		this.getReservationTimeSlotData();
 	}
 };
 </script>
@@ -363,31 +517,151 @@ export default {
 	margin: 40rpx 0 20rpx 0;
 	font-size: 38rpx;
 }
+.member-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	.tips {
+		color: #999;
+		font-size: 30rpx;
+	}
+}
 .date-picker-title {
-	font-size: 38rpx;
 	margin-bottom: 20rpx;
+	font-size: 38rpx;
 }
 .tip-title-1,
 .tip-title-2 {
-	font-size: 24rpx;
-	color: #999;
 	margin: 20rpx 0 40rpx 0;
+	color: #999;
+	font-size: 24rpx;
 }
 .morning-title {
-	font-size: 38rpx;
 	color: #2a2a2a;
+	font-size: 38rpx;
 }
 
 .add-member-btns {
 	display: flex;
 	justify-content: space-between;
 	gap: 20px;
+	margin-top: 30rpx;
+
+	van-button {
+		flex: 1;
+	}
 }
 
 .divider {
 	height: 1px;
-	background-color: #eaeaea;
 	margin: 30rpx 0;
+	background-color: #eaeaea;
+}
+
+.add-wrap {
+	padding: 30rpx;
+
+	.add-title {
+		font-size: 38rpx;
+	}
+
+	.time-slot-title,
+	.member-title,
+	.name-title,
+	.age-title,
+	.phone-title,
+	.partner-title,
+	.idtype-title,
+	.id-title,
+	.explain-service-title {
+		margin: 50rpx 0 20rpx 0;
+		font-size: 32rpx;
+	}
+
+	::v-deep .custom-field {
+		padding: 8rpx 24rpx;
+		border: 2rpx solid #dcdfe6;
+		border-radius: 16rpx;
+		background: #ebf1ff;
+	}
+
+	::v-deep .custom-input {
+		color: #333;
+		font-size: 28rpx;
+	}
+
+	::v-deep .act-btns {
+		display: flex;
+		justify-content: space-between;
+		gap: 0 20rpx;
+		padding: 50rpx 0 20rpx;
+
+		van-button {
+			flex: 1;
+			width: 100%;
+		}
+	}
+}
+
+.member-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12rpx;
+
+	.member-detail {
+		display: flex;
+		align-items: center;
+		padding: 0 20rpx;
+		overflow: hidden;
+		border-bottom: 1px solid #eaeaea;
+		// border-radius: 24rpx;
+		// box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+		// background: #fff;
+	}
+
+	.delete-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 48rpx;
+		height: 48rpx;
+		border-radius: 50%;
+		background-color: red;
+	}
+
+	.member-info {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex: 1;
+		padding: 24rpx 30rpx;
+		background: #f8f9fc;
+	}
+
+	.member-top {
+		display: flex;
+		align-items: center;
+		gap: 0 20rpx;
+	}
+
+	.member-name {
+		color: #333;
+		font-size: 32rpx;
+		font-weight: 600;
+	}
+
+	.member-phone {
+		color: #666;
+		font-size: 28rpx;
+	}
+
+	.member-bottom {
+		margin-top: 16rpx;
+		word-break: break-all;
+		color: #999;
+		font-size: 26rpx;
+	}
 }
 
 .submit-btn {
@@ -478,5 +752,4 @@ export default {
 	font-size: 18px;
 	color: #fff !important;
 }
-
 </style>
