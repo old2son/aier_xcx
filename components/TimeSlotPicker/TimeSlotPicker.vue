@@ -3,13 +3,21 @@
 		<view class="time-slot-item" v-for="(item, index) in processedTimeSlotList" :key="index">
 			<view
 				class="time-slot-wrap"
-				:class="{ disabled: item.disabled, 'time-slot-selected': selectedTimeSlotIndex === index && !item.disabled }"
+				:class="{
+					disabled: item.disabled,
+					'time-slot-selected': selectedTimeSlotIndex === index && !item.disabled
+				}"
 				@tap="selectTimeSlot(item.name, index)"
 			>
 				<view class="time-slot-part">{{ item.name }}</view>
 				<view class="reservation-num" v-if="needTimeSlotRequest">已报名：{{ item.reservationNumber }}人</view>
 			</view>
-			<view :style="weight ? 'font-weight: bold; font-size: 32rpx;' : ''" class="afternoon-title" v-if="index === 1">下午时段</view>
+			<view
+				:style="weight ? 'font-weight: bold; font-size: 32rpx;' : ''"
+				class="afternoon-title"
+				v-if="index === 1"
+				>下午时段</view
+			>
 		</view>
 	</view>
 </template>
@@ -45,6 +53,11 @@ export default {
 			require: true
 		}
 	},
+	data() {
+		return {
+			hasInit: false
+		}
+	},
 	computed: {
 		// 原始合并人数
 		combinedTimeSlotList() {
@@ -59,7 +72,10 @@ export default {
 		processedTimeSlotList() {
 			const now = dayjs();
 
-			const isToday = dayjs(this.selectDay.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).isSame(dayjs(), 'day');
+			const isToday = dayjs(this.selectDay.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).isSame(
+				dayjs(),
+				'day'
+			);
 
 			return this.combinedTimeSlotList.map((slot) => {
 				let disabled = false;
@@ -80,6 +96,15 @@ export default {
 					}
 				}
 
+				// 增加测试，无需判断isToday
+				// const [start, end] = slot.name.split('-');
+				// const endTimeToday = dayjs()
+				// 	.hour(Number(end.split(':')[0]))
+				// 	.minute(Number(end.split(':')[1]));
+				// if (now.isAfter(endTimeToday)) {
+				// 	disabled = true;
+				// }
+
 				return {
 					...slot,
 					disabled
@@ -88,15 +113,22 @@ export default {
 		}
 	},
 	watch: {
+		// 初始化
 		timeSlotList: {
 			immediate: true,
 			handler(newVal) {
+				if (this.hasInit) return
+
 				if (newVal && newVal.length > 0) {
-					// 自动顺延到下一个未禁用的时段
-					const availableIndex = this.processedTimeSlotList.findIndex((slot) => !slot.disabled);
-					if (availableIndex !== -1) {
-						this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex);
-					}
+					this.renderSlotTimeList();
+					this.hasInit = true
+				}
+			}
+		},
+		selectDay: {
+			handler(newVal) {
+				if (newVal && newVal.length > 0) {
+					this.renderSlotTimeList();
 				}
 			}
 		}
@@ -104,10 +136,7 @@ export default {
 	mounted() {
 		this.$nextTick(() => {
 			if (this.processedTimeSlotList.length > 0) {
-				const availableIndex = this.processedTimeSlotList.findIndex((slot) => !slot.disabled);
-				if (availableIndex !== -1) {
-					this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex);
-				}
+				this.renderSlotTimeList();
 			}
 		});
 	},
@@ -116,6 +145,13 @@ export default {
 			if (!this.processedTimeSlotList[index].disabled) {
 				// 禁用状态不能选择
 				this.$emit('timeSlotSelected', name, index);
+			}
+		},
+		renderSlotTimeList() {
+			// 自动顺延到下一个未禁用的时段
+			const availableIndex = this.processedTimeSlotList.findIndex((slot) => !slot.disabled);
+			if (availableIndex !== -1) {
+				this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex);
 			}
 		}
 	}
