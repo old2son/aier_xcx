@@ -5,20 +5,60 @@
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
 		</view>
 
+		<!-- https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx -->
+		<!-- debug -->
+		<view class="download-card">
+			<view class="download-left">
+				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
+			</view>
+
+			<van-button size="small" round type="primary" color="#32579c" @click="isShowFilePopup = true">
+				下载
+			</van-button>
+		</view>
+		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
+			<view class="file-popup">
+				<view class="popup-title"> 文件下载 </view>
+
+				<view class="popup-tip"> 预览文件，发送到微信文件传输助手 </view>
+
+				<van-button block round type="primary" color="#32579c" @click="previewFile"> 预览文件 </van-button>
+
+				<!-- <van-button block round plain color="#32579c" @click="downloadFile"> 下载文件 </van-button> -->
+
+				<van-button block round @click="isShowFilePopup = false"> 返回 </van-button>
+			</view>
+		</van-popup>
+
 		<view class="divider" />
 		<view class="date-picker-title">日期选择</view>
 
-		<DatePicker :disabled-weekdays="[1]" @date-selected="handleDateSelected" />
+		<view class="date-picker-wrap">
+			<!-- debug -->
+			<DatePicker :disabled-weekdays="[1]" :selected-cal="selectedCal" @date-selected="handleDateSelected" />
+			<view class="calendar-trigger" @click="isShowCal = true">
+				<van-icon name="calendar-o" />
+				<van-icon name="arrow-down" />
+			</view>
+		</view>
+		<CalendarPick
+			:show-popup="isShowCal"
+			:what-a-day="date"
+			@closePopup="handleCalendarClose"
+			@selectCal="handleSelectCal"
+		/>
 
 		<view class="divider" />
 		<view class="time-slot-title">时段选择</view>
 		<view class="tip-title-2">每时段报名满15人将自动成团，我馆提供科普讲解服务。</view>
 		<view class="morning-title">上午时段</view>
 
+		<!-- debug -->
 		<TimeSlotPicker
 			:timeSlotList="timeSlotList"
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
 			:needTimeSlotRequest="false"
+			:select-day="date"
 			@timeSlotSelected="handleTimeSlotSelected"
 		/>
 
@@ -67,7 +107,9 @@
 			<button class="custom-button" @click="submit()">确认提交</button>
 		</view>
 
-		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
+		<!-- debug -->
+		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
+
 		<van-dialog id="van-dialog" />
 	</view>
 </template>
@@ -92,11 +134,18 @@ export default {
 			visitorsNumber: null,
 			askInfo: myData[1],
 
+			isShowCal: false,
+			isShowFilePopup: false,
+
 			// 错误提示字段
 			leaderNameError: '',
 			phoneNumberError: '',
 			unitNameError: '',
-			visitorsNumberError: ''
+			visitorsNumberError: '',
+
+			selectedCal: null,
+
+			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
 	onLoad() {
@@ -113,6 +162,92 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
+		},
+		handleCalendarClose() {
+			this.isShowCal = false;
+		},
+		handleSelectCal(res) {
+			this.selectedCal = res;
+		},
+		// 预览文件
+		// previewFile() {
+		// 	uni.downloadFile({
+		// 		url: this.templateUrl,
+
+		// 		success: (res) => {
+		// 			if (res.statusCode === 200) {
+		// 				uni.openDocument({
+		// 					filePath: res.tempFilePath,
+		// 					showMenu: true
+		// 				});
+		// 			}
+		// 		}
+		// 	});
+		// },
+		previewFile() {
+			uni.showLoading({
+				title: '加载中'
+			});
+
+			const fileName = '爱尔眼健康科普教育基地团队预约填写模板.xlsx';
+
+			uni.downloadFile({
+				url: this.templateUrl,
+
+				success: (res) => {
+					if (res.statusCode === 200) {
+						const fs = uni.getFileSystemManager();
+
+						// 小程序本地路径
+						const newPath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+
+						// 复制并重命名
+						fs.copyFile({
+							srcPath: res.tempFilePath,
+							destPath: newPath,
+
+							success: () => {
+								uni.openDocument({
+									filePath: newPath,
+									showMenu: true
+								});
+							}
+						});
+					}
+				},
+
+				complete: () => {
+					uni.hideLoading();
+				}
+			});
+		},
+		// 下载文件
+		downloadFile() {
+			uni.showLoading({
+				title: '下载中'
+			});
+
+			uni.downloadFile({
+				url: this.templateUrl,
+
+				success: (res) => {
+					if (res.statusCode === 200) {
+						uni.saveFile({
+							tempFilePath: res.tempFilePath,
+
+							success: () => {
+								this.$toast({
+									message: '文件下载成功'
+								});
+							}
+						});
+					}
+				},
+
+				complete: () => {
+					uni.hideLoading();
+				}
+			});
 		},
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
@@ -251,8 +386,9 @@ export default {
 	width: 94%;
 	margin: 30rpx auto 0 auto;
 	box-sizing: border-box;
-	font-size: 28rpx;
 	color: #7f7f7f;
+	font-size: 28rpx;
+
 	view:first-child {
 		margin-bottom: 20rpx;
 	}
@@ -273,6 +409,66 @@ export default {
 	width: 94%;
 	margin: 40rpx auto;
 	border: 1rpx solid #cfcfcf;
+}
+
+.download-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 24rpx;
+	margin-top: 24rpx;
+	border-radius: 24rpx;
+	background: #f5f7fb;
+}
+
+.download-left {
+	flex: 1;
+	margin-right: 20rpx;
+}
+
+.download-title {
+	line-height: 1.5;
+	color: #2a2a2a;
+	font-size: 28rpx;
+	font-weight: bold;
+}
+
+.file-popup {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+	padding: 40rpx 32rpx calc(env(safe-area-inset-bottom) + 32rpx);
+}
+
+.popup-title {
+	margin-bottom: 12rpx;
+	color: #2a2a2a;
+	text-align: center;
+	font-size: 32rpx;
+	font-weight: bold;
+}
+
+.popup-tip {
+	line-height: 1.7;
+	margin: 12rpx 0 28rpx;
+	color: #888;
+	text-align: center;
+	font-size: 24rpx;
+}
+
+.date-picker-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	gap: 20rpx;
+}
+
+.calendar-trigger {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .time-slot-title {
