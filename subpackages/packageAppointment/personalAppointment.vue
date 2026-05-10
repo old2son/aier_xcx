@@ -2,28 +2,25 @@
 	<view class="personal-appointment-container">
 		<view class="date-picker-title">日期选择</view>
 
-		<view>
-			<view class="date-picker-wrap">
-				<DatePicker
-					:disabled-weekdays="[1]"
-					:needTimeSlotRequest="needTimeSlotRequest"
-					:selected-cal="selectedCal"
-					@date-selected="handleDateSelected"
-					@time-slot-numbers="updateTimeSlotNumbers"
-				/>
-				<view class="calendar-trigger" @click="isShowCal = true">
-					<van-icon name="calendar-o" />
-					<van-icon name="arrow-down" />
-				</view>
-			</view>
-
-			<CalendarPick
-				:show-popup="isShowCal"
-				:what-a-day="date"
-				@closePopup="handleCalendarClose"
-				@selectCal="handleSelectCal"
+		<view class="date-picker-wrap">
+			<DatePicker
+				:disabled-weekdays="[1]"
+				:needTimeSlotRequest="needTimeSlotRequest"
+				:selected-cal="selectedCal"
+				@date-selected="handleDateSelected"
+				@time-slot-numbers="updateTimeSlotNumbers"
 			/>
+			<view class="calendar-trigger" @click="isShowCal = true">
+				<van-icon name="calendar-o" />
+				<van-icon name="arrow-down" />
+			</view>
 		</view>
+		<CalendarPick
+			:show-popup="isShowCal"
+			:what-a-day="date"
+			@closePopup="handleCalendarClose"
+			@selectCal="handleSelectCal"
+		/>
 
 		<view class="divider" />
 		<view class="time-slot-title">时段选择</view>
