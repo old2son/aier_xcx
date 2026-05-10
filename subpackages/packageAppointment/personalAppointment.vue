@@ -3,18 +3,20 @@
 		<view class="date-picker-title">日期选择</view>
 
 		<view>
-			<DatePicker
-				:disabled-weekdays="[1]"
-				:needTimeSlotRequest="needTimeSlotRequest"
-				:selected-cal="selectedCal"
-				@date-selected="handleDateSelected"
-				@time-slot-numbers="updateTimeSlotNumbers"
-			/>
-
-			<view @click="isShowCal = true">
-				<van-icon name="calendar-o" />
-				<van-icon name="arrow-down" />
+			<view class="date-picker-wrap">
+				<DatePicker
+					:disabled-weekdays="[1]"
+					:needTimeSlotRequest="needTimeSlotRequest"
+					:selected-cal="selectedCal"
+					@date-selected="handleDateSelected"
+					@time-slot-numbers="updateTimeSlotNumbers"
+				/>
+				<view class="calendar-trigger" @click="isShowCal = true">
+					<van-icon name="calendar-o" />
+					<van-icon name="arrow-down" />
+				</view>
 			</view>
+
 			<CalendarPick
 				:show-popup="isShowCal"
 				:what-a-day="date"
@@ -80,7 +82,7 @@
 		</view>
 
 		<van-popup class="add-popup" round position="bottom" :show="isShowAdd" @close="isShowAdd = false">
-			<view class="add-wrap">
+			<view class="add-detail-wrap">
 				<view class="add-title">新增成员</view>
 
 				<view class="name-title">姓名</view>
@@ -106,7 +108,7 @@
 					:error-message="ageError"
 					@input="age = $event.detail"
 				/> -->
-				
+
 				<view v-if="memberType !== 0">
 					<view class="phone-title">联系方式</view>
 					<van-field
@@ -271,7 +273,7 @@ export default {
 			return this.timeSlotList;
 		}
 	},
-	
+
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
@@ -314,7 +316,6 @@ export default {
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot
 				}).then((res) => {
-					console.log('TimeSlotPicker组件组件组件组件组件');
 					console.log('选择讲解服务的人数', res);
 					if (res.code === 200 && res.message == '查询成功') {
 						this.needExplainServiceNum = res.data.numbers;
@@ -364,6 +365,10 @@ export default {
 			const nameRegex = /^[a-zA-Z\u4e00-\u9fa5\s]{1,20}$/; // 中英文+空格
 			const phoneRegex = /^1[3-9]\d{9}$/; // 手机号校验
 			const ageNumber = Number(this.age);
+
+			// debug
+			console.log('提交预约时间', this.selectedTimeSlot);
+
 			// 校验预约者姓名
 			if (!this.reservationName) {
 				this.reservationNameError = '预约者姓名不能为空';
@@ -545,6 +550,27 @@ export default {
 	font-size: 38rpx;
 }
 
+.divider {
+	height: 1px;
+	margin: 30rpx 0;
+	background-color: #eaeaea;
+}
+
+.date-picker-wrap {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	gap: 20rpx;
+}
+
+.calendar-trigger {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 .add-member-btns {
 	display: flex;
 	justify-content: space-between;
@@ -556,13 +582,7 @@ export default {
 	}
 }
 
-.divider {
-	height: 1px;
-	margin: 30rpx 0;
-	background-color: #eaeaea;
-}
-
-.add-wrap {
+.add-detail-wrap {
 	padding: 30rpx;
 
 	.add-title {

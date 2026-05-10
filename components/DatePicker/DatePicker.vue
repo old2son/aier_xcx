@@ -157,10 +157,10 @@ export default {
 
 <style lang="scss" scoped>
 .date-picker {
-	width: 100%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	width: 100%;
 	font-size: 28rpx;
 
 	.weekdays {
