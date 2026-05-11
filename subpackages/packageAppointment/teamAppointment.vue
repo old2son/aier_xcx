@@ -101,6 +101,15 @@
 			/>
 		</view>
 
+		<view class="upload-card">
+			<view class="upload-title"> 预约上传文件 </view>
+			<view class="upload-desc"> 仅支持 Excel 文件（xls、xlsx） </view>
+			<view class="upload-desc"> 文件大小不超过 20MB </view>
+			<view class="upload-btn" @click="chooseExcelFile"> 点击上传文件 </view>
+			<view @click="chooseImageNew"> 选择图片 </view>
+			<view v-if="uploadedFileName" class="uploaded-file"> 已上传：{{ uploadedFileName }} </view>
+		</view>
+
 		<OnlineAsk :askInfo="askInfo" />
 
 		<view class="submit-btn">
@@ -145,6 +154,8 @@ export default {
 
 			selectedCal: null,
 
+			uploadedFile: null,
+			uploadedFileName: '',
 			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
@@ -169,21 +180,6 @@ export default {
 		handleSelectCal(res) {
 			this.selectedCal = res;
 		},
-		// 预览文件
-		// previewFile() {
-		// 	uni.downloadFile({
-		// 		url: this.templateUrl,
-
-		// 		success: (res) => {
-		// 			if (res.statusCode === 200) {
-		// 				uni.openDocument({
-		// 					filePath: res.tempFilePath,
-		// 					showMenu: true
-		// 				});
-		// 			}
-		// 		}
-		// 	});
-		// },
 		previewFile() {
 			uni.showLoading({
 				title: '加载中'
@@ -221,31 +217,60 @@ export default {
 				}
 			});
 		},
-		// 下载文件
-		downloadFile() {
-			uni.showLoading({
-				title: '下载中'
-			});
+		chooseExcelFile() {
+			console.log('chooseExcelFile');
 
-			uni.downloadFile({
-				url: this.templateUrl,
+			wx.chooseMessageFile({
+				count: 1,
+				type: 'file',
+				extension: ['xls', 'xlsx'],
 
 				success: (res) => {
-					if (res.statusCode === 200) {
-						uni.saveFile({
-							tempFilePath: res.tempFilePath,
+					const file = res.tempFiles[0];
 
-							success: () => {
-								this.$toast({
-									message: '文件下载成功'
-								});
-							}
+					const maxSize = 20 * 1024 * 1024;
+
+					if (file.size > maxSize) {
+						this.$toast({
+							message: '文件不能超过20MB'
 						});
-					}
-				},
 
-				complete: () => {
-					uni.hideLoading();
+						return;
+					}
+
+					const fileName = file.name.toLowerCase();
+
+					const isExcel = fileName.endsWith('.xls') || fileName.endsWith('.xlsx');
+
+					if (!isExcel) {
+						this.$toast({
+							message: '仅支持Excel文件'
+						});
+
+						return;
+					}
+
+					this.uploadedFile = file;
+
+					this.uploadedFileName = file.name;
+
+					this.$toast({
+						message: '上传成功'
+					});
+				},
+				fail: (err) => {
+					console.log(err);
+				}
+			});
+		},
+		chooseImageNew() {
+			console.log('chooseImageNew');
+			uni.chooseImage({
+				success(res) {
+					console.log(res);
+				},
+				fail(err) {
+					console.log(err);
 				}
 			});
 		},
@@ -454,6 +479,52 @@ export default {
 	color: #888;
 	text-align: center;
 	font-size: 24rpx;
+}
+
+.upload-card {
+	margin: 24rpx 0;
+	padding: 28rpx;
+
+	background: #f5f7fb;
+	border-radius: 24rpx;
+}
+
+.upload-title {
+	font-size: 30rpx;
+	font-weight: bold;
+	color: #2a2a2a;
+}
+
+.upload-desc {
+	margin-top: 12rpx;
+	font-size: 24rpx;
+	color: #888;
+	line-height: 1.6;
+}
+
+.upload-btn {
+	margin-top: 24rpx;
+
+	height: 84rpx;
+	line-height: 84rpx;
+
+	text-align: center;
+
+	border-radius: 999rpx;
+
+	background: #32579c;
+	color: #fff;
+
+	font-size: 28rpx;
+}
+
+.uploaded-file {
+	margin-top: 20rpx;
+
+	font-size: 24rpx;
+	color: #32579c;
+
+	word-break: break-all;
 }
 
 .date-picker-wrap {
