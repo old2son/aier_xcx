@@ -63,12 +63,6 @@ export default {
 	watch: {
 		selectedCal(newVal) {
 			if (!newVal) return;
-
-			// DatePicker 已经有的日期无需再请求
-			const isExist = this.days.findIndex((item) => item.date === newVal.date);
-
-			if (isExist !== -1) return;
-
 			const { index, ...day } = newVal;
 			this.selectDay(day, index);
 		}
@@ -121,7 +115,6 @@ export default {
 			}
 		},
 		selectDay(day, index) {
-			console.log('selectDay', day, index);
 			if (day.disabled) return;
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
