@@ -288,16 +288,17 @@ export default {
 		handleDateSelected({ date, week }) {
 			this.date = date;
 			this.week = week;
-			if (this.date && this.selectedTimeSlot) {
-				getReservationWeekNumbers({
-					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot
-				}).then((res) => {
-					if (res.code === 200 && res.message == '查询成功') {
-						this.needExplainServiceNum = res.data.numbers;
-					}
-				});
-			}
+			// if (this.date && this.selectedTimeSlot) {
+			// 	getReservationWeekNumbers({
+			// 		dateTime: this.date,
+			// 		timeSlot: this.selectedTimeSlot
+			// 	}).then((res) => {
+			// 		console.log('DatePickerDatePickerDatePickerDatePickerDatePicker');
+			// 		if (res.code === 200 && res.message == '查询成功') {
+			// 			this.needExplainServiceNum = res.data.numbers;
+			// 		}
+			// 	});
+			// }
 		},
 		// 接收子组件返回的预约人数数据
 		updateTimeSlotNumbers(numbers) {
@@ -313,6 +314,7 @@ export default {
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot
 				}).then((res) => {
+					console.log('TimeSlotPicker组件组件组件组件组件');
 					console.log('选择讲解服务的人数', res);
 					if (res.code === 200 && res.message == '查询成功') {
 						this.needExplainServiceNum = res.data.numbers;
