@@ -121,8 +121,11 @@
 
 					<view class="idtype-title">证件类型</view>
 					<van-radio-group :value="idRadio" bind:change="onChange">
-						<van-radio name="1">身份证 1</van-radio>
-						<van-radio name="2">护照 2</van-radio>
+						<van-radio name="1">身份证</van-radio>
+						<van-radio name="2">护照</van-radio>
+						<van-radio name="3">港澳居民往来通行证</van-radio>
+						<van-radio name="4">台湾居民往来内地通行证</van-radio>
+						<van-radio name="5">军官证</van-radio>
 					</van-radio-group>
 
 					<view class="id-title">证件号码</view>
