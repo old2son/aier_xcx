@@ -47,7 +47,7 @@
 									</view>
 									<view class="col-7">
 										<view class="code-btn">
-											<text>入场凭证</text>
+											<text @click="toCredentials(item)">入场凭证</text>
 										</view>
 									</view>
 								</view>
@@ -224,6 +224,11 @@ export default {
 			uni.navigateTo({
 				url: '/subpackages/packageMine/appointment/appointmentDetail'
 			});
+		},
+		toCredentials(item) {
+			console.log('item', item);
+			this.$store.commit('moduleAppointment/setSelectedAppointment', item);
+			uni.navigateTo({ url: '/subpackages/packageMine/appointment/credentials' });
 		},
 		cancelReservationOperate(id) {
 			this.reId = id;

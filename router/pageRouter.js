@@ -9,7 +9,6 @@ const router = createRouter({
 			aliasPath: '/',
 			name: '首页',
 			beforeEnter: (to, from, next) => {
-				console.log('首页');
 				uni.hideTabBar();
 				next();
 			}
@@ -116,6 +115,13 @@ const router = createRouter({
 		{
 			path: '/subpackages/packageMine/appointment/appointmentDetail',
 			name: '预约详情',
+			meta: {
+				needLogin: true
+			}
+		},
+		{
+			path: '/subpackages/packageMine/appointment/credentials',
+			name: '入场凭证',
 			meta: {
 				needLogin: true
 			}

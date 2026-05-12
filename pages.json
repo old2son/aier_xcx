@@ -202,6 +202,13 @@
 					}
 				},
 				{
+					"path": "appointment/credentials",
+					"style": {
+						"navigationBarTitleText": "入场凭证",
+						"navigationStyle": "custom"
+					}
+				},
+				{
 					"path": "audience/audienceManage",
 					"style": {
 						"navigationBarTitleText": "常用观众",
