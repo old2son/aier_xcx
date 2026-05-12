@@ -121,6 +121,7 @@ export default {
 			commit
 		}) {
 			return new Promise((resolve, reject) => {
+				console.log('查询用户是否同意隐私设置', wx.getPrivacySetting)
 				if (wx.getPrivacySetting) {
 					wx.getPrivacySetting({
 						success: res => {
