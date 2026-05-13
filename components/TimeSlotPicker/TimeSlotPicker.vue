@@ -56,7 +56,7 @@ export default {
 	data() {
 		return {
 			hasInit: false
-		}
+		};
 	},
 	computed: {
 		// 原始合并人数
@@ -117,11 +117,11 @@ export default {
 		timeSlotList: {
 			immediate: true,
 			handler(newVal) {
-				if (this.hasInit) return
+				if (this.hasInit) return;
 
 				if (newVal && newVal.length > 0) {
 					this.renderSlotTimeList();
-					this.hasInit = true
+					this.hasInit = true;
 				}
 			}
 		},
@@ -132,13 +132,6 @@ export default {
 				}
 			}
 		}
-	},
-	mounted() {
-		this.$nextTick(() => {
-			if (this.processedTimeSlotList.length > 0) {
-				this.renderSlotTimeList();
-			}
-		});
 	},
 	methods: {
 		selectTimeSlot(name, index) {
@@ -154,6 +147,13 @@ export default {
 				this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex);
 			}
 		}
+	},
+	mounted() {
+		this.$nextTick(() => {
+			if (this.processedTimeSlotList.length > 0) {
+				this.renderSlotTimeList();
+			}
+		});
 	}
 };
 </script>

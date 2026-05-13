@@ -78,9 +78,7 @@ export default {
 			};
 		}
 	},
-	mounted() {
-		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
-	},
+
 	watch: {
 		menuInfo: {
 			handler(newVal) {
@@ -107,6 +105,9 @@ export default {
 				});
 			}
 		}
+	},
+	mounted() {
+		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
 	}
 };
 </script>

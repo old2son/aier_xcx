@@ -1,6 +1,15 @@
 <template>
 	<view class="activity-center-container">
-		<van-tabs swipeable :active="active" :animated="true" title-inactive-color="#7C7E80" title-active-color="#32579C" color="#32579C" line-width="80rpx" line-height="10rpx">
+		<van-tabs
+			swipeable
+			:active="active"
+			:animated="true"
+			title-inactive-color="#7C7E80"
+			title-active-color="#32579C"
+			color="#32579C"
+			line-width="80rpx"
+			line-height="10rpx"
+		>
 			<van-tab v-for="(item, index) in tabList" :title="item.title" :key="index">
 				<view v-for="(inner, idx) in item.data" :key="idx" class="tab-item" @click="toSubpackagePage(item)">
 					<image :src="inner.activityBannerUrl" mode="widthFix"></image>
@@ -17,7 +26,7 @@
 </template>
 
 <script>
-import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api';
+import { mapState, mapActions } from 'vuex';
 export default {
 	data() {
 		return {
@@ -25,18 +34,17 @@ export default {
 			tabList: []
 		};
 	},
-	mounted() {
-		this.getActivityData();
+	computed: {
+		...mapState('moduleActivity', ['starting', 'future']),
 	},
 	methods: {
+		...mapActions('moduleActivity', ['fetchActivities']),
 		async getActivityData() {
 			try {
-				const inProgress = await getScienceActivityInProgress();
-				const preview = await getScienceActivityEvents();
-				console.log('进行中原始数据：', inProgress?.data);
-				console.log('即将开始原始数据：', preview?.data);
+				await this.fetchActivities();
+
 				const formatData = (list) => {
-					return (list?.data || []).map((item) => ({
+					return (list || {}).map((item) => ({
 						activityBannerUrl: item.activityBannerUrl,
 						activityName: item.activityName,
 						endTime: item.endTime
@@ -45,14 +53,13 @@ export default {
 				this.tabList = [
 					{
 						title: '进行中',
-						data: formatData(inProgress)
+						data: formatData(this.starting)
 					},
 					{
 						title: '即将开始',
-						data: formatData(preview)
+						data: formatData(this.future)
 					}
 				];
-				console.log('tabList', this.tabList);
 			} catch (e) {
 				console.error('接口获取失败', e);
 			}
@@ -63,6 +70,9 @@ export default {
 				url: '/subpackages/packageCategory/activityCenter/activityDetail' + `?title=${title}`
 			});
 		}
+	},
+	mounted() {
+		this.getActivityData();
 	}
 };
 </script>

@@ -28,17 +28,38 @@
 		/>
 
 		<view class="name-title">姓名</view>
-		<van-field type="text" maxlength="8" :value="reservationName" placeholder="请输入您的姓名" :error-message="reservationNameError" @input="reservationName = $event.detail" />
+		<van-field
+			type="text"
+			maxlength="8"
+			:value="reservationName"
+			placeholder="请输入您的姓名"
+			:error-message="reservationNameError"
+			@input="reservationName = $event.detail"
+		/>
 
 		<view class="phone-title">联系方式</view>
-		<van-field :value="phoneNumber" type="tel" maxlength="11" placeholder="请输入您的手机号码" :error-message="phoneNumberError" @input="phoneNumber = $event.detail" />
+		<van-field
+			:value="phoneNumber"
+			type="tel"
+			maxlength="11"
+			placeholder="请输入您的手机号码"
+			:error-message="phoneNumberError"
+			@input="phoneNumber = $event.detail"
+		/>
 
 		<view class="partner-title">同行人员</view>
 		<van-dropdown-menu>
 			<van-dropdown-item :value="value" :options="partnerOption" @change="handleDropdownChange" />
 		</van-dropdown-menu>
 		<block v-for="(field, index) in companionFields" :key="index">
-			<van-field custom-class="travel-field" :value="field.name" type="text" placeholder="请输入同行人员的姓名" maxlength="8" @input="validateField(index, $event)" />
+			<van-field
+				custom-class="travel-field"
+				:value="field.name"
+				type="text"
+				placeholder="请输入同行人员的姓名"
+				maxlength="8"
+				@input="validateField(index, $event)"
+			/>
 		</block>
 
 		<view class="partner-title">您了解本次活动的渠道</view>
@@ -57,7 +78,13 @@
 
 <script>
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
-import { getScienceActivityInProgress, getScienceActivityEvents, getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api';
+import {
+	getScienceActivityInProgress,
+	getScienceActivityEvents,
+	getReservationTimeSlot,
+	getReservationWeekNumbers,
+	personalActivityReservation
+} from '@/api';
 export default {
 	data() {
 		return {
@@ -125,11 +152,6 @@ export default {
 			// 如果没有 timeSlotNumbers 数据，直接返回 timeSlotList
 			return this.timeSlotList;
 		}
-	},
-	onLoad(options) {
-		console.log('接收到的参数：', options);
-		this.getDetailData(options);
-		this.getReservationTimeSlotData();
 	},
 	methods: {
 		async getDetailData(options) {
@@ -312,6 +334,11 @@ export default {
 					uni.hideLoading();
 				});
 		}
+	},
+	onLoad(options) {
+		console.log('接收到的参数：', options);
+		this.getDetailData(options);
+		this.getReservationTimeSlotData();
 	}
 };
 </script>
