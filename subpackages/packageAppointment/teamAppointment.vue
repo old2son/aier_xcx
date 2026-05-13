@@ -263,17 +263,6 @@ export default {
 				}
 			});
 		},
-		chooseImageNew() {
-			console.log('chooseImageNew');
-			uni.chooseImage({
-				success(res) {
-					console.log(res);
-				},
-				fail(err) {
-					console.log(err);
-				}
-			});
-		},
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
 				this.timeSlotList = res.data;
