@@ -93,7 +93,6 @@ export default {
 		async getDetailData(options) {
 			// activityItem
 			
-			console.log('接收到父组件的参数：', options);
 			console.log('Vuex的参数：', this.selectedActivity);
 			this.requestResult = this.selectedActivity;
 
@@ -154,6 +153,7 @@ export default {
 		}
 	},
 	onLoad(options) {
+		console.log('接收到父组件的参数：', options);
 		this.getDetailData(options);
 	},
 	// 分享到微信好友

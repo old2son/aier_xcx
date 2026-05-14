@@ -72,8 +72,9 @@ export default {
 				type = 'future';
 			}
 			this.setSelectedActivity(inner);
+			const activityItem = encodeURIComponent(JSON.stringify(this.selectedActivity));
 			uni.navigateTo({
-				url: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${this.selectedActivity}&type=${type}`
+				url: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${activityItem}&type=${type}`
 			});
 		}
 	},
