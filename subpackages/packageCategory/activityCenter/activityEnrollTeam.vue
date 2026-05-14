@@ -125,7 +125,7 @@
 <script>
 import myData from '@/data/appointment.json';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
-import { getReservationTimeSlot, teamReservation } from '@/api';
+import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation, teamReservation } from '@/api/index';
 
 export default {
 	data() {
@@ -282,6 +282,7 @@ export default {
 				this[fieldName] = value;
 			}
 		},
+		// todo: 修改成团队活动的提交
 		submit() {
 			this.leaderNameError = '';
 			this.phoneNumberError = '';

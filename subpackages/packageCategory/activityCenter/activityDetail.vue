@@ -106,7 +106,6 @@ export default {
 			this.$set(this.requestResult, 'endShijian', this.extractTime(this.requestResult.endTime));
 			this.$set(this.requestResult, 'beginFullDate', this.extractFullDate(this.requestResult.activityTime));
 			this.$set(this.requestResult, 'endFullDate', this.extractFullDate(this.requestResult.endTime));
-			console.log('数据：', this.requestResult);
 		},
 		// 处理生成“几月几号”
 		extractDate(dateStr) {
@@ -140,23 +139,19 @@ export default {
 		},
 		goToPersonalSignup() {
 			this.closeSignupPopup();
-			this.toSubpackagePage('/subpackages/packageCategory/activityCenter/activityEnroll');
+			this.toSubpackagePage('/subpackages/packageCategory/activityCenter/activityEnrollPersonal');
 		},
 		goToTeamSignup() {
 			this.closeSignupPopup();
 			uni.navigateTo({
-				url: '/subpackages/packageAppointment/teamAppointment'
+				url: '/subpackages/packageCategory/activityCenter/activityEnrollTeam'
 			});
 		},
 		toSubpackagePage(url) {
-			console.log(url);
-			uni.navigateTo({
-				url: url + `?title=${this.title}`
-			});
+			uni.navigateTo({ url });
 		}
 	},
 	onLoad(options) {
-		console.log('接收到父组件的参数：', options);
 		this.getDetailData(options);
 	},
 	// 分享到微信好友

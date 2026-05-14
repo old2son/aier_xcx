@@ -126,14 +126,12 @@ export default {
 			if (this.needTimeSlotRequest && !this.isActivity) {
 				getReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
-						console.log(`获取${formattedDate}的四个时间段下的预约报名人数`, res);
 						this.$emit('time-slot-numbers', res.data[0]);
 					}
 				});
 			} else if (this.needTimeSlotRequest && this.isActivity) {
 				getActivityReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
-						console.log(`获取${formattedDate}的四个时间段下的预约报名人数ZZZZZZZZZZZZ`, res);
 						this.$emit('time-slot-numbers', res.data[0]);
 					}
 				});

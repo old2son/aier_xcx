@@ -240,14 +240,14 @@ export default {
 			memberType: null,
 			memberList: [
 				{
-					name: '彩页',
-					phone: '136',
-					idCard: '440'
+					name: '用户1',
+					phone: '13632362832',
+					idCard: '440111111111111111'
 				},
 				{
-					name: '碟吊灯',
-					phone: '137',
-					idCard: '441'
+					name: '用户2',
+					phone: '13632362833',
+					idCard: '4411111111111111111'
 				}
 			],
 

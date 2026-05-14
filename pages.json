@@ -139,9 +139,16 @@
 					}
 				},
 				{
-					"path": "activityCenter/activityEnroll",
+					"path": "activityCenter/activityEnrollPersonal",
 					"style": {
-						"navigationBarTitleText": "活动报名",
+						"navigationBarTitleText": "个人活动报名",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "activityCenter/activityEnrollTeam",
+					"style": {
+						"navigationBarTitleText": "团队活动报名",
 						"enablePullDownRefresh": false
 					}
 				},

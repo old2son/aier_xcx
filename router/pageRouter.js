@@ -169,8 +169,15 @@ const router = createRouter({
 			}
 		},
 		{
-			path: '/subpackages/packageCategory/activityCenter/activityEnroll',
-			name: '活动报名',
+			path: '/subpackages/packageCategory/activityCenter/activityEnrollPersonal',
+			name: '个人活动报名',
+			meta: {
+				needLogin: true
+			}
+		},
+		{
+			path: '/subpackages/packageCategory/activityCenter/activityEnrollTeam',
+			name: '团队活动报名',
 			meta: {
 				needLogin: true
 			}
