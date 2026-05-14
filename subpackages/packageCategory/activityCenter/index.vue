@@ -63,18 +63,10 @@ export default {
 				console.error('接口获取失败', e);
 			}
 		},
-		toSubpackagePage(inner, tabIdx) {
-			let type = '';
-			if (tabIdx === 0) {
-				type = 'starting';
-			}
-			if (tabIdx === 1) {
-				type = 'future';
-			}
+		toSubpackagePage(inner) {
 			this.setSelectedActivity(inner);
-			const activityItem = encodeURIComponent(JSON.stringify(this.selectedActivity));
-			uni.navigateTo({
-				url: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${activityItem}&type=${type}`
+				uni.navigateTo({
+				url: '/subpackages/packageCategory/activityCenter/activityDetail'
 			});
 		}
 	},

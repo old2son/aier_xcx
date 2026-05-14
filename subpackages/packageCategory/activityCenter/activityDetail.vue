@@ -65,8 +65,7 @@
 </template>
 
 <script>
-import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import categoryData from '@/data/category.json';
 
 export default {
@@ -82,19 +81,23 @@ export default {
 		...mapState('moduleActivity', ['selectedActivity'])
 	},
 	methods: {
+		...mapMutations('moduleActivity', ['setSelectedActivity']),
 		// 抽离分享配置
 		getShareConfig() {
 			return {
 				title: this.requestResult.activityName,
-				path: `/subpackages/packageCategory/activityCenter/activityDetail?title=${this.title}`,
+				path: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${JSON.stringify(this.selectedActivity)}`,
 				imageUrl: this.requestResult.activityCoverUrl
 			};
 		},
 		async getDetailData(options) {
-			// activityItem
-			
-			console.log('Vuex的参数：', this.selectedActivity);
-			this.requestResult = this.selectedActivity;
+			if (options?.activityItem) {
+				const activityItem = JSON.parse(options.activityItem);
+				this.requestResult = activityItem;
+				this.setSelectedActivity(activityItem);
+			} else {
+				this.requestResult = this.selectedActivity;
+			}
 
 			// 添加新的字段，不影响原字段
 			this.$set(this.requestResult, 'beginDay', this.extractDate(this.requestResult.activityTime));
