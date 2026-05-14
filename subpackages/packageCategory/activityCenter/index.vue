@@ -10,8 +10,13 @@
 			line-width="80rpx"
 			line-height="10rpx"
 		>
-			<van-tab v-for="(item, index) in tabList" :title="item.title" :key="index">
-				<view v-for="(inner, idx) in item.data" :key="idx" class="tab-item" @click="toSubpackagePage(item)">
+			<van-tab v-for="(item, tabIdx) in tabList" :title="item.title" :key="tabIdx">
+				<view
+					v-for="(inner, innerIdx) in item.data"
+					:key="innerIdx"
+					class="tab-item"
+					@click="toSubpackagePage(inner, tabIdx)"
+				>
 					<image :src="inner.activityBannerUrl" mode="widthFix"></image>
 					<view class="txt">
 						{{ inner.activityName }}
@@ -26,7 +31,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 export default {
 	data() {
 		return {
@@ -35,39 +40,40 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['starting', 'future']),
+		...mapState('moduleActivity', ['starting', 'future', 'selectedActivity'])
 	},
 	methods: {
+		...mapMutations('moduleActivity', ['setSelectedActivity']),
 		...mapActions('moduleActivity', ['fetchActivities']),
 		async getActivityData() {
 			try {
 				await this.fetchActivities();
 
-				const formatData = (list) => {
-					return (list || {}).map((item) => ({
-						activityBannerUrl: item.activityBannerUrl,
-						activityName: item.activityName,
-						endTime: item.endTime
-					}));
-				};
 				this.tabList = [
 					{
 						title: '进行中',
-						data: formatData(this.starting)
+						data: this.starting
 					},
 					{
 						title: '即将开始',
-						data: formatData(this.future)
+						data: this.future
 					}
 				];
 			} catch (e) {
 				console.error('接口获取失败', e);
 			}
 		},
-		toSubpackagePage(item) {
-			const title = item.title;
+		toSubpackagePage(inner, tabIdx) {
+			let type = '';
+			if (tabIdx === 0) {
+				type = 'starting';
+			}
+			if (tabIdx === 1) {
+				type = 'future';
+			}
+			this.setSelectedActivity(inner);
 			uni.navigateTo({
-				url: '/subpackages/packageCategory/activityCenter/activityDetail' + `?title=${title}`
+				url: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${this.selectedActivity}&type=${type}`
 			});
 		}
 	},

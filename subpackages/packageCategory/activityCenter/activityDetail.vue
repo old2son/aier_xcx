@@ -31,15 +31,42 @@
 				<image :src="shareIcon" mode="heightFix"></image>
 				<text>分享</text>
 			</van-button>
-			<view class="btn-2" @click="toSubpackagePage('/subpackages/packageCategory/activityCenter/activityEnroll')"
-				>立即报名</view
-			>
+			<view class="btn-2" @click="openSignupPopup">立即报名</view>
 		</view>
+
+		<van-popup
+			:show="showSignupPopup"
+			round
+			position="center"
+			:close-on-click-overlay="true"
+			custom-style="width: 84%; overflow: hidden;"
+			@close="closeSignupPopup"
+		>
+			<view class="sign-box">
+				<view class="sign-title">报名类型</view>
+				<view class="sign-desc">为方便您顺利报名，活动设置两类报名通道：</view>
+				<view class="sign-row">
+					<text class="sign-label">个人预约：</text>
+					<text>社会群众个人报名</text>
+				</view>
+				<view class="sign-row">
+					<text class="sign-label">团队预约：</text>
+					<text>学校/企事业单位/社区/旅行社等团体</text>
+				</view>
+				<view class="sign-act">
+					<view class="sign-btns">
+						<view class="sign-btn btn-person" @click="goToPersonalSignup">个人预约</view>
+						<view class="sign-btn btn-team" @click="goToTeamSignup">团队预约</view>
+					</view>
+				</view>
+			</view>
+		</van-popup>
 	</view>
 </template>
 
 <script>
 import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api';
+import { mapState } from 'vuex';
 import categoryData from '@/data/category.json';
 
 export default {
@@ -47,20 +74,12 @@ export default {
 		return {
 			title: '',
 			requestResult: {},
-			shareIcon: categoryData.shareIcon
+			shareIcon: categoryData.shareIcon,
+			showSignupPopup: false
 		};
 	},
-	onLoad(options) {
-		this.getDetailData(options);
-		console.log('进进进', options.title);
-	},
-	// 分享到微信好友
-	onShareAppMessage() {
-		return this.getShareConfig();
-	},
-	// 分享到朋友圈
-	onShareTimeline() {
-		return this.getShareConfig();
+	computed: {
+		...mapState('moduleActivity', ['selectedActivity'])
 	},
 	methods: {
 		// 抽离分享配置
@@ -72,16 +91,11 @@ export default {
 			};
 		},
 		async getDetailData(options) {
-			const title = decodeURIComponent(options.title);
-			this.title = title;
-			console.log('？？？？', this.title);
-			let requestResult;
-			if (title === '进行中') {
-				requestResult = await getScienceActivityInProgress();
-			} else {
-				requestResult = await getScienceActivityEvents();
-			}
-			this.requestResult = requestResult.data[0];
+			// activityItem
+			
+			console.log('接收到父组件的参数：', options);
+			console.log('Vuex的参数：', this.selectedActivity);
+			this.requestResult = this.selectedActivity;
 
 			// 添加新的字段，不影响原字段
 			this.$set(this.requestResult, 'beginDay', this.extractDate(this.requestResult.activityTime));
@@ -102,7 +116,7 @@ export default {
 		},
 		// 提取“几点几分”
 		extractTime(dateStr) {
-			const match = dateStr.match(/(\d{1,2}):(\d{1,2})/);
+			const match = dateStr.match(/(\d{1,2})[:：](\d{1,2})/);
 			if (match) {
 				return `${match[1]}:${match[2]}`;
 			}
@@ -116,12 +130,39 @@ export default {
 			}
 			return '';
 		},
+		openSignupPopup() {
+			this.showSignupPopup = true;
+		},
+		closeSignupPopup() {
+			this.showSignupPopup = false;
+		},
+		goToPersonalSignup() {
+			this.closeSignupPopup();
+			this.toSubpackagePage('/subpackages/packageCategory/activityCenter/activityEnroll');
+		},
+		goToTeamSignup() {
+			this.closeSignupPopup();
+			uni.navigateTo({
+				url: '/subpackages/packageAppointment/teamAppointment'
+			});
+		},
 		toSubpackagePage(url) {
 			console.log(url);
 			uni.navigateTo({
 				url: url + `?title=${this.title}`
 			});
 		}
+	},
+	onLoad(options) {
+		this.getDetailData(options);
+	},
+	// 分享到微信好友
+	onShareAppMessage() {
+		return this.getShareConfig();
+	},
+	// 分享到朋友圈
+	onShareTimeline() {
+		return this.getShareConfig();
 	}
 };
 </script>
@@ -220,6 +261,61 @@ export default {
 			color: #fff;
 			letter-spacing: 8px;
 		}
+	}
+
+	.sign-box {
+		padding: 48rpx 40rpx 40rpx;
+		box-sizing: border-box;
+		color: #333;
+	}
+
+	.sign-title {
+		font-size: 36rpx;
+		font-weight: 600;
+		text-align: center;
+		margin-bottom: 36rpx;
+	}
+
+	.sign-desc,
+	.sign-row {
+		font-size: 28rpx;
+		line-height: 1.8;
+	}
+
+	.sign-label {
+		font-weight: 600;
+	}
+
+	.sign-act {
+		margin-top: 44rpx;
+	}
+
+	.sign-btns {
+		display: flex;
+		justify-content: space-between;
+		gap: 20rpx;
+	}
+
+	.sign-btn {
+		flex: 1;
+		height: 88rpx;
+		border-radius: 44rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 30rpx;
+		font-weight: 600;
+	}
+
+	.btn-person {
+		background-color: #32579c;
+		color: #fff;
+	}
+
+	.btn-team {
+		background-color: #eef4ff;
+		border: 1px solid #32579c;
+		color: #32579c;
 	}
 }
 </style>

@@ -5,6 +5,7 @@ import moduleLayout from '@/store/modules/moduleLayout.js';
 import moduleHome from '@/store/modules/moduleHome.js';
 import moduleUser from '@/store/modules/moduleUser.js';
 import moduleAppointment from '@/store/modules/moduleAppointment.js';
+import moduleActivity from '@/store/modules/moduleActivity.js';
 
 Vue.use(Vuex);
 
@@ -15,7 +16,8 @@ const store = new Vuex.Store({
 		moduleLayout,
 		moduleHome,
 		moduleUser,
-		moduleAppointment
+		moduleAppointment,
+		moduleActivity
 	}
 });
 

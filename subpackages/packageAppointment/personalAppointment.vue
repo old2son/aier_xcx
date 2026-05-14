@@ -273,7 +273,6 @@ export default {
 			return this.timeSlotList;
 		}
 	},
-
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
