@@ -1,5 +1,11 @@
 <template>
 	<view class="team-reservation-container">
+		<view class="txt-1">{{ requestResult.activityName }}</view>
+		<view class="txt-2">
+			<text class="txt-2-1">进行中</text>
+			<text class="txt-2-2">{{ requestResult.endTime }} 结束</text>
+		</view>
+
 		<view class="tip-title-1">
 			<view>预约说明：</view>
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
@@ -123,13 +129,22 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import myData from '@/data/appointment.json';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
-import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation, teamReservation } from '@/api/index';
+import {
+	getReservationTimeSlot,
+	getReservationWeekNumbers,
+	personalActivityReservation,
+	teamReservation
+} from '@/api/index';
 
 export default {
 	data() {
 		return {
+			title: '',
+			requestResult: {},
+
 			showReservationPopup: true,
 			date: null,
 			week: null,
@@ -158,10 +173,14 @@ export default {
 			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
-	onLoad() {
-		this.getReservationTimeSlotData();
+	computed: {
+		...mapState('moduleActivity', ['selectedActivity'])
 	},
 	methods: {
+		async getDetailData() {
+			console.log('报名详情数据', this.selectedActivity);
+			this.requestResult = this.selectedActivity;
+		},
 		handlePopupClose() {
 			this.showReservationPopup = false;
 		},
@@ -375,6 +394,10 @@ export default {
 					uni.hideLoading();
 				});
 		}
+	},
+	onLoad() {
+		this.getDetailData();
+		this.getReservationTimeSlotData();
 	}
 };
 </script>
@@ -387,18 +410,40 @@ export default {
 	box-sizing: border-box;
 	background-color: #f8f9ff;
 	padding: 40rpx 4% 100rpx 4%;
+
+	.txt-1 {
+		color: #333;
+		font-size: 32rpx;
+		font-weight: 550;
+		margin-top: 20rpx;
+	}
+	.txt-2 {
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		font-size: 20rpx;
+		margin-top: 8rpx;
+		.txt-2-1 {
+			color: #02c6a2;
+		}
+		.txt-2-2 {
+			color: #7c7e80;
+			margin-left: 16rpx;
+			display: inline-block;
+		}
+	}
 }
 
 .date-picker-title {
-	width: 94%;
+	width: 100%;
 	margin: 40rpx auto;
-	font-size: 36rpx;
 	color: #2a2a2a;
+	font-size: 36rpx;
 }
 
 .tip-title-1 {
 	width: 94%;
-	margin: 30rpx auto 0 auto;
+	margin: 30rpx 0 0 0;
 	box-sizing: border-box;
 	color: #7f7f7f;
 	font-size: 28rpx;
@@ -413,23 +458,23 @@ export default {
 
 .tip-title-2 {
 	width: 94%;
-	margin: 0 auto;
-	font-size: 28rpx;
-	color: #32579c;
 	line-height: 1.5;
+	margin: 0 ;
+	color: #32579c;
+	font-size: 28rpx;
 }
 
 .divider {
-	width: 94%;
-	margin: 40rpx auto;
-	border: 1rpx solid #cfcfcf;
+	height: 1px;
+	background-color: #eaeaea;
+	margin: 30rpx 0;
 }
 
 .download-card {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 24rpx;
+	padding: 24rpx 0;
 	margin-top: 24rpx;
 	border-radius: 24rpx;
 	background: #f5f7fb;
@@ -471,11 +516,10 @@ export default {
 }
 
 .upload-card {
+	padding: 28rpx 0;
 	margin: 24rpx 0;
-	padding: 28rpx;
-
-	background: #f5f7fb;
 	border-radius: 24rpx;
+	background: #f5f7fb;
 }
 
 .upload-title {
@@ -533,26 +577,26 @@ export default {
 
 .time-slot-title {
 	width: 94%;
-	margin: 40rpx auto 16rpx auto;
-	font-size: 36rpx;
+	margin: 40rpx 0 16rpx;
 	color: #2a2a2a;
+	font-size: 36rpx;
 }
 
 .morning-title {
 	width: 94%;
-	margin: 40rpx auto;
-	font-size: 36rpx;
+	margin: 40rpx 0;
 	color: #2a2a2a;
+	font-size: 36rpx;
 }
 
 .team-submits-info-box {
-	width: 94%;
-	margin: 40rpx auto;
-	border-radius: 24rpx;
-	overflow: hidden;
-	background-color: #fff;
+	width: 100%;
 	padding: 30rpx;
+	margin: 40rpx 0;
+	overflow: hidden;
+	border-radius: 24rpx;
 	box-sizing: border-box;
+	background-color: #fff;
 
 	.uni-forms-item {
 		margin-bottom: 30rpx;
@@ -570,18 +614,18 @@ export default {
 }
 
 .submit-btn {
-	width: 94%;
+	width: 100%;
 	margin: 60rpx auto 0 auto;
 	padding-bottom: 60rpx;
 	box-sizing: border-box;
 
 	.custom-button {
-		background-color: #32579c;
-		color: #fff;
-		border-radius: 50rpx;
-		font-size: 40rpx;
 		height: 88rpx;
 		line-height: 88rpx;
+		font-size: 40rpx;
+		border-radius: 50rpx;
+		color: #fff;
+		background-color: #32579c;
 	}
 }
 

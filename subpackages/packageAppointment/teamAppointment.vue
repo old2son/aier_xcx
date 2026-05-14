@@ -158,9 +158,6 @@ export default {
 			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
-	onLoad() {
-		this.getReservationTimeSlotData();
-	},
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false;
@@ -374,6 +371,9 @@ export default {
 					uni.hideLoading();
 				});
 		}
+	},
+	onLoad() {
+		this.getReservationTimeSlotData();
 	}
 };
 </script>
