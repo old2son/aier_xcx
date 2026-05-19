@@ -223,6 +223,7 @@ export default {
 
 				success: (res) => {
 					const file = res.tempFiles[0];
+					console.log(res);
 
 					const maxSize = 20 * 1024 * 1024;
 

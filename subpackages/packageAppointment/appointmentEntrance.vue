@@ -27,7 +27,6 @@
 
 <script>
 import appointmentData from '@/data/appointment.json';
-import loginData from '@/data/login.json';
 
 export default {
 	data() {

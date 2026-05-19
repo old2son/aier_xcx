@@ -80,12 +80,12 @@ export default {
 			return this.combinedTimeSlotList.map((slot) => {
 				let disabled = false;
 
-				// 条件1: 人数 >= 40
+				// 人数限制
 				if (slot.numbers >= 40) {
 					disabled = true;
 				}
 
-				// 条件2: 当前时间超过该时段的结束时间
+				// 当前时间超过该时段的结束时间
 				if (isToday) {
 					const [start, end] = slot.name.split('-');
 					const endTimeToday = dayjs()
@@ -95,15 +95,6 @@ export default {
 						disabled = true;
 					}
 				}
-
-				// 增加测试，无需判断isToday
-				// const [start, end] = slot.name.split('-');
-				// const endTimeToday = dayjs()
-				// 	.hour(Number(end.split(':')[0]))
-				// 	.minute(Number(end.split(':')[1]));
-				// if (now.isAfter(endTimeToday)) {
-				// 	disabled = true;
-				// }
 
 				return {
 					...slot,
