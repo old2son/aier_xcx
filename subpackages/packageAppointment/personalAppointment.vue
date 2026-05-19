@@ -153,17 +153,6 @@
 			</view>
 		</van-popup>
 
-		<block v-for="(field, index) in companionFields" :key="index">
-			<van-field
-				custom-class="travel-field"
-				:value="field.name"
-				type="text"
-				placeholder="请输入同行人员的姓名"
-				maxlength="8"
-				@input="validateField(index, $event)"
-			/>
-		</block>
-
 		<view class="explain-service-title">是否需要讲解服务</view>
 
 		<van-radio-group :value="radio" @change="radio = $event.detail">
@@ -334,18 +323,6 @@ export default {
 		},
 		handleSelectCal(res) {
 			this.selectedCal = res;
-		},
-		validateField(index, value) {
-			const regex = /^[a-zA-Z\u4e00-\u9fa5\s]*$/; // 正则匹配中文英文空格
-			let inputValue = value.detail; // 获取 van-field 组件的输入值
-			if (!regex.test(inputValue)) {
-				inputValue = inputValue.replace(/[^a-zA-Z\u4e00-\u9fa5\s]/g, '');
-				this.$toast({
-					duration: 3000,
-					message: '只能输入英文或中文，不允许特殊符号或数字'
-				});
-			}
-			this.$set(this.companionFields, index, { name: inputValue }); // 更新对应项
 		},
 		submit() {
 			if (this.memberList.length === 0) {
@@ -777,9 +754,6 @@ export default {
 	width: 58%;
 	border-radius: 20rpx;
 	margin-bottom: 30rpx;
-}
-::v-deep .travel-field {
-	margin-top: 14rpx;
 }
 ::v-deep .van-dropdown-item {
 	width: 53%;
