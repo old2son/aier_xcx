@@ -78,7 +78,7 @@
 			>
 		</view>
 
-		<van-popup class="add-popup" round position="bottom" :show="isShowAdd" @close="isShowAdd = false">
+		<van-popup class="add-popup" round position="bottom" :show="isShowAdd" @close="closeAddMemberPopup">
 			<view class="add-detail-wrap">
 				<view class="add-title">新增成员</view>
 
@@ -146,7 +146,7 @@
 				</van-dropdown-menu> -->
 
 				<view class="act-btns">
-					<van-button block round size="normal" color="#32579c" plain @click="isShowAdd = false"
+					<van-button block round size="normal" color="#32579c" plain @click="closeAddMemberPopup"
 						>返回</van-button
 					>
 					<van-button block round size="normal" color="#32579c" type="primary" @click="confirmAdd"
@@ -471,8 +471,37 @@ export default {
 				});
 		},
 		showAddMemberPopup(type) {
+			if (this.memberList.length >= 5) {
+				this.$toast({
+					duration: 3000,
+					message: '最多可添加 5 人'
+				});
+				return;
+			}
+
+			if (this.memberList.length >= 4) {
+				// 判断前4人是否全部是儿童，是的话提示用户至少需要添加一位成年人
+				// const isAllChildren = this.memberList.every((item) => item.type === 0);
+				// if (isAllChildren) {
+				// 	this.$toast({
+				// 		duration: 3000,
+				// 		message: '至少需要添加一位成年人'
+				// 	});
+				// 	return;
+				// }
+			}
+
+			
 			this.memberType = type;
 			this.isShowAdd = true;
+		},
+		closeAddMemberPopup() {
+			this.isShowAdd = false;
+			this.resetMemberForm();
+		},
+		resetMemberForm() {
+			this.memberType = null;
+			this.idRadio = '1';
 		},
 		onSelectDate(event) {
 			// debug
@@ -483,19 +512,13 @@ export default {
 			this.isShowCal = false;
 		},
 		confirmAdd() {
-			if (this.memberList.length > 5) {
-				this.$toast({
-					duration: 3000,
-					message: '最多可添加 5 人'
-				});
-				return;
-			}
-
 			this.memberList.push({
 				name: this.reservationName,
 				phone: this.phoneNumber,
 				idCard: this.idCard
 			});
+
+			closeAddMemberPopup();
 		},
 		deleteMember(index) {
 			this.memberList.splice(index, 1);

@@ -5,7 +5,9 @@
 		<view class="details-main" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
 			<view class="details-content">
 				<view class="details-tl">活动预约成功</view>
-				<view class="qrcode">二维码</view>
+				<view class="qrcode">
+					<l-qrcode :value="JSON.stringify(testData)" />
+				</view>
 				<view class="col">
 					<text>活动名称：</text>
 					<text>活动名称</text>
@@ -36,12 +38,31 @@ import { mapState } from 'vuex';
 
 export default {
 	data() {
-		return {};
+		return {
+			testData: [{
+				id: 1,
+				name: 'hello',
+				age: 18
+			}, {
+				id: 2,
+				name: 'world',
+				age: 19
+			}]
+		};
 	},
 	computed: {
 		...mapState('moduleLayout', ['menuInfo']),
 		selectedReservation() {
 			return this.$store.getters['moduleAppointment/selectedAppointment'];
+		}
+	},
+	methods: {
+		saoma() {
+			uni.scanCode({
+			  success(res) {
+			    console.log(res.result)
+			  }
+			})
 		}
 	}
 };
@@ -53,6 +74,21 @@ export default {
 	padding-bottom: 82.5px;
 	overflow-y: auto;
 	box-sizing: border-box;
+}
+
+
+.qrcode {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	margin-bottom: 30rpx;
+}
+
+.details-tl {
+	color: #333333;
+	font-size: 36rpx;
+	font-weight: 550;
+	margin-bottom: 30rpx;
 }
 
 .details-main {

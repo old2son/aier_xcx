@@ -457,6 +457,7 @@ export default {
 }
 
 .tip-title-2 {
+
 	width: 94%;
 	line-height: 1.5;
 	margin: 0 ;
