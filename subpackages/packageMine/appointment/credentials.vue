@@ -26,7 +26,7 @@
 				</view>
 				<view class="col">
 					<text>预约人：</text>
-					<text>{{ getMember(selectedReservation).userName }}</text>
+					<text>{{ !selectedReservation.members.length ? selectedReservation.name : getMember(item).userName }}</text>
 				</view>
 			</view>
 		</view>

@@ -10,9 +10,7 @@
 				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
 			</view>
 
-			<van-button size="small" round type="primary" color="#32579c" @click="isShowFilePopup = true">
-				下载
-			</van-button>
+			<van-button size="small" round type="primary" @click="isShowFilePopup = true"> 下载 </van-button>
 		</view>
 		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
 			<view class="file-popup">
@@ -28,7 +26,6 @@
 			</view>
 		</van-popup>
 
-		<view class="divider" />
 		<view class="date-picker-title">日期选择</view>
 
 		<view class="date-picker-wrap">
@@ -101,8 +98,11 @@
 			<view class="upload-title"> 预约上传文件 </view>
 			<view class="upload-desc"> 仅支持 Excel 文件（xls、xlsx） </view>
 			<view class="upload-desc"> 文件大小不超过 20MB </view>
-			<view class="upload-btn" @click="chooseExcelFile"> 点击上传文件 </view>
-			<view v-if="uploadedFileName" class="uploaded-file"> 已上传：{{ uploadedFileName }} </view>
+			<view v-if="!uploadedFileName" class="upload-btn" @click="chooseExcelFile"> 点击上传文件 </view>
+			<view v-if="uploadedFileName" class="file-row">
+				<view class="delete-btn" @click="removeExcelFile">删除</view>
+				<view class="uploaded-file">已上传：{{ uploadedFileName }}</view>
+			</view>
 		</view>
 
 		<OnlineAsk :askInfo="askInfo" />
@@ -150,6 +150,7 @@ export default {
 
 			uploadedFile: null,
 			uploadedFileName: '',
+			base64File: '',
 			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
@@ -209,8 +210,6 @@ export default {
 			});
 		},
 		chooseExcelFile() {
-			console.log('chooseExcelFile');
-
 			wx.chooseMessageFile({
 				count: 1,
 				type: 'file',
@@ -218,7 +217,6 @@ export default {
 
 				success: (res) => {
 					const file = res.tempFiles[0];
-					console.log(res);
 
 					const maxSize = 20 * 1024 * 1024;
 
@@ -241,13 +239,37 @@ export default {
 
 						return;
 					}
+					uni.showLoading({
+						title: '处理中...',
+						mask: true
+					});
+					const fs = wx.getFileSystemManager();
+					fs.readFile({
+						filePath: file.path,
+						encoding: 'base64',
+						success: (readRes) => {
+							this.uploadedFile = file;
+							this.uploadedFileName = file.name;
+							const ext = file.name.split('.').pop().toLowerCase();
 
-					this.uploadedFile = file;
+							// 非标准 MIME
+							this.base64File = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.${ext};base64,${readRes.data}`;
 
-					this.uploadedFileName = file.name;
-
-					this.$toast({
-						message: '上传成功'
+							this.$toast({
+								message: '上传成功'
+							});
+						},
+						fail: () => {
+							this.uploadedFile = null;
+							this.uploadedFileName = '';
+							this.base64File = '';
+							this.$toast({
+								message: '文件处理失败，请重试'
+							});
+						},
+						complete: () => {
+							uni.hideLoading();
+						}
 					});
 				},
 				fail: (err) => {
@@ -255,10 +277,17 @@ export default {
 				}
 			});
 		},
+		removeExcelFile() {
+			this.uploadedFile = null;
+			this.uploadedFileName = '';
+			this.base64File = '';
+			this.$toast({
+				message: '已删除上传文件'
+			});
+		},
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
 				this.timeSlotList = res.data;
-				console.log('四个时间段的时间数据', this.timeSlotList);
 			});
 		},
 		validateInput(fieldName, event) {
@@ -317,6 +346,15 @@ export default {
 				return;
 			}
 
+			if (!this.base64File) {
+				uni.showToast({
+					title: '请上传预约文件',
+					icon: 'none',
+					duration: 3000
+				});
+				return;
+			}
+
 			uni.showLoading({
 				title: '提交中...',
 				mask: true
@@ -334,7 +372,8 @@ export default {
 					colleagues: this.visitorsNumber,
 					dateTime: this.date,
 					week: this.week,
-					timeSlot: this.selectedTimeSlot
+					timeSlot: this.selectedTimeSlot,
+					excelUrl: this.base64File
 				}),
 				delayPromise
 			])
@@ -426,8 +465,9 @@ export default {
 	justify-content: space-between;
 	padding: 24rpx;
 	margin-top: 24rpx;
-	border-radius: 24rpx;
-	background: #f5f7fb;
+	border-radius: 100rpx;
+	background: #fff;
+	box-shadow: 0 12rpx 32rpx rgba(50, 87, 156, 0.12);
 }
 
 .download-left {
@@ -437,9 +477,17 @@ export default {
 
 .download-title {
 	line-height: 1.5;
-	color: #2a2a2a;
-	font-size: 28rpx;
-	font-weight: bold;
+	color: #5b79ab;
+	font-size: 24rpx;
+	font-weight: 400;
+}
+
+::v-deep .download-card .van-button {
+	padding: 0 28rpx;
+	border-radius: 100rpx !important;
+	color: #fff !important;
+	border-color: #6586bf !important;
+	background: #6586bf !important;
 }
 
 .file-popup {
@@ -466,11 +514,12 @@ export default {
 }
 
 .upload-card {
-	margin: 24rpx 0;
+	width: 94%;
+	margin: 40rpx auto;
 	padding: 28rpx;
-
-	background: #f5f7fb;
 	border-radius: 24rpx;
+	box-sizing: border-box;
+	background: #fafdff;
 }
 
 .upload-title {
@@ -488,26 +537,43 @@ export default {
 
 .upload-btn {
 	margin-top: 24rpx;
-
 	height: 84rpx;
 	line-height: 84rpx;
-
 	text-align: center;
-
 	border-radius: 999rpx;
-
-	background: #32579c;
-	color: #fff;
-
+	border: 2rpx dashed #7fa8ef;
+	background: #eef5ff;
+	color: #5b79ab;
 	font-size: 28rpx;
 }
 
-.uploaded-file {
-	margin-top: 20rpx;
+.delete-btn {
+	width: 96rpx;
+	height: 56rpx;
+	line-height: 56rpx;
+	text-align: center;
+	border-radius: 28rpx;
+	background: #fbe9e9;
+	color: #d85b5b;
+	font-size: 24rpx;
+	flex-shrink: 0;
+}
 
+.file-row {
+	margin-top: 24rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.uploaded-file {
+	flex: 1;
+	min-width: 0;
+	padding: 14rpx 20rpx;
+	border-radius: 16rpx;
+	background: #eef5ff;
 	font-size: 24rpx;
 	color: #32579c;
-
 	word-break: break-all;
 }
 

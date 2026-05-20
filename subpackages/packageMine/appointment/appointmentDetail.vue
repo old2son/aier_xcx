@@ -14,11 +14,12 @@
 				</view>
 				<view class="col-2">
 					<text>游客信息</text>
-					<text>{{ getMember(selectedReservation).userName }}</text>
+
+					<text>{{ !selectedReservation.members.length ? selectedReservation.name : getMember(item).userName }}</text>
 				</view>
 				<view class="col-2">
 					<text>联系电话</text>
-					<text>{{ getMember(selectedReservation).userPhone }}</text>
+					<text>{{ !selectedReservation.members.length ? selectedReservation.phone : getMember(selectedReservation).userPhone }}</text>
 				</view>
 				<view class="col-2">
 					<text>同行人数</text>

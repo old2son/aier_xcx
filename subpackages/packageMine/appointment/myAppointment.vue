@@ -30,11 +30,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getMember(item).userName }}</text>
+											<text>{{ !item.members.length ? item.name : getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ !item.members.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -78,11 +78,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getMember(item).userName }}</text>
+											<text>{{ !item.members.length ? item.name : getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ !item.members.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
