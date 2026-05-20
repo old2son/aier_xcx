@@ -1,7 +1,6 @@
 <template>
 	<view class="home-container">
-		<!-- debug -->
-		<!-- <LoadingAnimation v-if="showLoading || isError || !bannerImagesLoaded" :loadError="isError" :visible="showLoading && !isError" @retry="requestHomeData"></LoadingAnimation> -->
+		<LoadingAnimation v-if="showLoading || isError || !bannerImagesLoaded" :loadError="isError" :visible="showLoading && !isError" @retry="requestHomeData"></LoadingAnimation>
 		
 		<view class="home-content" :style="{ opacity: showLoading ? 0 : 1 }">
 			<!-- 自定义导航栏 -->

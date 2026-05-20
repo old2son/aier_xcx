@@ -165,7 +165,7 @@
 <script>
 import { mapState } from 'vuex';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
-import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api';
+import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api/index';
 
 const certificateTypeSet = [
 	{ label: '身份证', value: 'idcard' },
@@ -803,7 +803,6 @@ export default {
 }
 
 ::v-deep .van-dialog {
-	top: 83% !important;
 	color: #434343;
 	font-size: 56rpx;
 }

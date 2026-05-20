@@ -378,7 +378,7 @@ export default {
 				delayPromise
 			])
 				.then(([res]) => {
-					if (res.code === 200 && res.message == '您已成功预约') {
+					if (res.code === 200 && res.message === '您已成功预约') {
 						Dialog.alert({
 							message: '您已成功预约',
 							theme: 'round-button',
