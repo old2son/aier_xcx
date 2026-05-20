@@ -97,7 +97,7 @@ export default {
 			const now = dayjs(); // 当前时间
 			const midnight = now.add(1, 'day').startOf('day'); // 第二天的凌晨时间
 			const timeUntilMidnight = midnight.diff(now, 'millisecond'); // 距离凌晨的时间差
-			console.log('凌晨', midnight.diff(now, 'millisecond'));
+			// console.log('凌晨', midnight.diff(now, 'millisecond'));
 			// const timeUntilMidnight = 10000 // 可供测试
 			// 设置定时器，在凌晨触发
 			this.midnightTimer = setTimeout(() => {
@@ -111,7 +111,7 @@ export default {
 			if (this.midnightTimer) {
 				clearTimeout(this.midnightTimer);
 				this.midnightTimer = null;
-				console.log('定时器已清除');
+				// console.log('定时器已清除');
 			}
 		},
 		selectDay(day, index) {
@@ -119,7 +119,7 @@ export default {
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
 			const formattedDate = dayjs(fullDate, 'YYYY-MM-DD').format('YYYY年MM月DD日');
-			console.log('formattedDate', formattedDate);
+			// console.log('formattedDate', formattedDate);
 			// 给父组件传递数据（子组件触发父组件方法）
 			this.$emit('date-selected', { date: formattedDate, week: day.week });
 			// 四个时间段下的预约报名人数只有在选择了预约日子后才会查询，所以需要调用

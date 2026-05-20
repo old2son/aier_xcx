@@ -52,7 +52,8 @@
 					</view>
 
 					<view class="member-bottom" v-if="!!item.idNumber"
-						>{{ getCertificateLabel(item.documentType) }}：{{item.documentType}}{{ maskCertificate(item.idNumber) }}</view
+						>{{ getCertificateLabel(item.documentType) }}：{{ item.documentType
+						}}{{ maskCertificate(item.idNumber) }}</view
 					>
 				</view>
 			</view>
@@ -258,7 +259,7 @@ export default {
 					const numbersKey = `numbers${index + 1}`;
 					// 获取对应的预约人数，默认为 0
 					const reservationNumber = this.timeSlotNumbers[numbersKey] || 0;
-					console.log('预约人数：：', reservationNumber);
+					console.log('预约人数：', reservationNumber);
 					return {
 						...slot, // 保留原有时段对象的所有属性
 						reservationNumber // 添加 reservationNumber 字段
@@ -272,7 +273,6 @@ export default {
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
-			console.log('触发', this.showReservationPopup);
 		},
 		// 获取初始的时段数据
 		getReservationTimeSlotData() {
@@ -378,7 +378,6 @@ export default {
 							beforeClose: (action) =>
 								new Promise((resolve) => {
 									if (action === 'confirm') {
-										console.log('跳转至消息中心');
 										uni.reLaunch({
 											url: '/subpackages/packageMine/messageCenter/index'
 										});
@@ -498,7 +497,7 @@ export default {
 			// 校验儿童
 			if (this.memberType === 0) {
 				this.memberList.push({
-					userName: this.reservationName,
+					userName: this.reservationName
 				});
 				this.closeAddMemberPopup();
 				return;
@@ -786,7 +785,6 @@ export default {
 }
 
 ::v-deep .van-dialog {
-	top: 83% !important;
 	color: #434343;
 	font-size: 56rpx;
 }

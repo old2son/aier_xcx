@@ -647,7 +647,6 @@ export default {
 }
 
 ::v-deep .van-dialog {
-	top: 83% !important;
 	color: #434343;
 	font-size: 56rpx;
 }
