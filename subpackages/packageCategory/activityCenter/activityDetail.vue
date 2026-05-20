@@ -280,6 +280,11 @@ export default {
 		line-height: 1.8;
 	}
 
+	.sign-desc {
+		color: #7c7e80;
+		margin-bottom: 20rpx;
+	}
+
 	.sign-label {
 		font-weight: 600;
 	}

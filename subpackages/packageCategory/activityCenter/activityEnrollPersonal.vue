@@ -52,11 +52,14 @@
 				</view>
 				<view class="member-info">
 					<view class="member-top">
-						<text class="member-name">{{ item.name }}</text>
-						<text class="member-tag">{{ item.typeText }}</text>
+						<text class="member-name">{{ item.userName }}</text>
+						<text class="member-phone" v-if="!!item.userPhone">{{ maskPhone(item.userPhone) }}</text>
 					</view>
-					<view class="member-phone" v-if="item.phone">{{ item.phone }}</view>
-					<view class="member-bottom" v-if="item.idCard">证件号码：{{ item.idCard }}</view>
+
+					<view class="member-bottom" v-if="!!item.idNumber"
+						>{{ getCertificateLabel(item.documentType) }}：{{ item.documentType
+						}}{{ maskCertificate(item.idNumber) }}</view
+					>
 				</view>
 			</view>
 		</view>
@@ -93,10 +96,10 @@
 					input-class="custom-input"
 					type="text"
 					maxlength="8"
-					:value="memberName"
-					placeholder="请输入成员姓名"
-					:error-message="memberNameError"
-					@input="memberName = $event.detail"
+					:value="reservationName"
+					placeholder="请输入您的姓名"
+					:error-message="reservationNameError"
+					@input="reservationName = $event.detail"
 				/>
 
 				<view v-if="memberType !== 0">
@@ -104,16 +107,16 @@
 					<van-field
 						custom-class="custom-field"
 						input-class="custom-input"
-						:value="memberPhone"
+						:value="phoneNumber"
 						type="tel"
 						maxlength="11"
-						placeholder="请输入成员手机号码"
-						:error-message="memberPhoneError"
-						@input="memberPhone = $event.detail"
+						placeholder="请输入您的手机号码"
+						:error-message="phoneNumberError"
+						@input="phoneNumber = $event.detail"
 					/>
 
 					<view class="idtype-title">证件类型</view>
-					<van-radio-group :value="idRadio" @change="idRadio = $event.detail">
+					<van-radio-group :value="idTypeRadio" @change="handleIdRadioChange">
 						<van-radio name="1">身份证</van-radio>
 						<van-radio name="2">护照</van-radio>
 						<van-radio name="3">港澳居民往来通行证</van-radio>
@@ -125,12 +128,12 @@
 					<van-field
 						custom-class="custom-field"
 						input-class="custom-input"
-						:value="memberIdCard"
-						type="idcard"
+						:value="idCard"
+						:type="certificateFieldType"
 						maxlength="18"
-						placeholder="请输入证件号码"
-						:error-message="memberIdError"
-						@input="memberIdCard = $event.detail"
+						:placeholder="certificatePlaceholder"
+						:error-message="idCardError"
+						@input="idCard = $event.detail"
 					/>
 				</view>
 
@@ -163,6 +166,15 @@
 import { mapState } from 'vuex';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
 import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api';
+
+const certificateTypeSet = [
+	{ label: '身份证', value: 'idcard' },
+	{ label: '护照', value: 'passport' },
+	{ label: '港澳居民往来通行证', value: 'hkmo' },
+	{ label: '台湾居民往来内地通行证', value: 'taiwan' },
+	{ label: '军官证', value: 'military' }
+];
+
 export default {
 	data() {
 		return {
@@ -197,26 +209,41 @@ export default {
 			reservationNameError: '',
 			ageError: '',
 			phoneNumberError: '',
+			idCardError: '',
 
-			idRadio: '1',
+			idTypeRadio: '1',
 
 			isShowCal: false,
 			isShowAdd: false,
 
 			memberType: null,
 			memberList: [],
-			memberName: '',
-			memberPhone: '',
-			memberIdCard: '',
-			memberNameError: '',
-			memberPhoneError: '',
-			memberIdError: '',
-
+			
 			selectedCal: null
 		};
 	},
 	computed: {
 		...mapState('moduleActivity', ['selectedActivity']),
+		certificateType() {
+			const idTypeMap = {
+				1: 'idcard',
+				2: 'passport',
+				3: 'hkmo',
+				4: 'taiwan',
+				5: 'military'
+			};
+			return idTypeMap[this.idTypeRadio] || 'idcard';
+		},
+		certificatePlaceholder() {
+			const placeholderMap = {
+				idcard: '请输入身份证号',
+				passport: '请输入护照号码',
+				hkmo: '请输入港澳居民往来通行证号码',
+				taiwan: '请输入台湾居民往来内地通行证号码',
+				military: '请输入军官证号码'
+			};
+			return placeholderMap[this.certificateType] || '请输入证件号码';
+		},
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			if (this.timeSlotNumbers) {
@@ -237,12 +264,10 @@ export default {
 	},
 	methods: {
 		async getDetailData() {
-			console.log('报名详情数据', this.selectedActivity);
 			this.requestResult = this.selectedActivity;
 		},
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
-			console.log('触发', this.showReservationPopup);
 		},
 		// 获取初始的时段数据
 		getReservationTimeSlotData() {
@@ -255,16 +280,16 @@ export default {
 		handleDateSelected({ date, week }) {
 			this.date = date;
 			this.week = week;
-			if (this.date && this.selectedTimeSlot) {
-				getReservationWeekNumbers({
-					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot
-				}).then((res) => {
-					if (res.code === 200 && res.message === '查询成功') {
-						this.needExplainServiceNum = res.data.numbers;
-					}
-				});
-			}
+			// if (this.date && this.selectedTimeSlot) {
+			// 	getReservationWeekNumbers({
+			// 		dateTime: this.date,
+			// 		timeSlot: this.selectedTimeSlot
+			// 	}).then((res) => {
+			// 		if (res.code === 200 && res.message === '查询成功') {
+			// 			this.needExplainServiceNum = res.data.numbers;
+			// 		}
+			// 	});
+			// }
 		},
 		// 接收子组件返回的预约人数数据
 		updateTimeSlotNumbers(numbers) {
@@ -298,31 +323,6 @@ export default {
 			this.selectedCal = res;
 		},
 		showAddMemberPopup(type) {
-			this.memberType = type;
-			this.resetMemberForm();
-			this.isShowAdd = true;
-		},
-		closeAddMemberPopup() {
-			this.isShowAdd = false;
-			this.resetMemberForm();
-		},
-		resetMemberForm() {
-			this.memberName = '';
-			this.memberPhone = '';
-			this.memberIdCard = '';
-			this.memberNameError = '';
-			this.memberPhoneError = '';
-			this.memberIdError = '';
-			this.idRadio = '1';
-		},
-		confirmAdd() {
-			const nameRegex = /^[a-zA-Z\u4e00-\u9fa5\s]{1,20}$/;
-			const phoneRegex = /^1[3-9]\d{9}$/;
-
-			this.memberNameError = '';
-			this.memberPhoneError = '';
-			this.memberIdError = '';
-
 			if (this.memberList.length >= 5) {
 				this.$toast({
 					duration: 3000,
@@ -330,49 +330,85 @@ export default {
 				});
 				return;
 			}
-			if (!this.memberName) {
-				this.memberNameError = '成员姓名不能为空';
-				return;
-			}
-			if (!nameRegex.test(this.memberName)) {
-				this.memberNameError = '姓名只能包含中文或英文';
-				return;
-			}
-			if (this.memberType !== 0) {
-				if (!this.memberPhone) {
-					this.memberPhoneError = '手机号不能为空';
-					return;
-				}
-				if (!phoneRegex.test(this.memberPhone)) {
-					this.memberPhoneError = '手机号格式错误';
-					return;
-				}
-				if (!this.memberIdCard) {
-					this.memberIdError = '证件号码不能为空';
+
+			if (this.memberList.length >= 4) {
+				// 判断前4人是否全部是儿童，是的话提示用户至少需要添加一位成年人
+				const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
+				if (!hasAdultMember && type === 0) {
+					this.$toast({
+						duration: 3000,
+						message: '至少需要添加一位成年人'
+					});
 					return;
 				}
 			}
 
-			this.memberList.push({
-				type: this.memberType,
-				typeText: this.memberType === 0 ? '儿童' : '成人',
-				idType: this.idRadio,
-				name: this.memberName.trim(),
-				phone: this.memberType === 0 ? '' : this.memberPhone.trim(),
-				idCard: this.memberType === 0 ? '' : this.memberIdCard.trim()
-			});
-			this.closeAddMemberPopup();
+			this.memberType = type;
+			this.isShowAdd = true;
 		},
-		deleteMember(index) {
-			this.memberList.splice(index, 1);
+		closeAddMemberPopup() {
+			this.isShowAdd = false;
+			this.resetMemberForm();
 		},
-		getMemberSubmitNames() {
-			return this.memberList.map((item) => `${item.name}(${item.typeText})`).join(',');
-		},
-		// todo: 修改成个人活动的提交
-		submit() {
+		resetMemberForm() {
+			this.reservationName = '';
 			this.reservationNameError = '';
+			this.phoneNumber = '';
 			this.phoneNumberError = '';
+			this.idCard = '';
+			this.idCardError = '';
+			this.idTypeRadio = '1';
+			this.idType = '身份证';
+			this.memberType = null;
+		},
+		handleIdRadioChange(event) {
+			this.idTypeRadio = event.detail;
+			this.idCard = '';
+			this.idCardError = '';
+		},
+		validateCertificate(type, value) {
+			switch (type) {
+				case 'idcard':
+					return /^[1-9]\d{16}[\dXx]$/.test(value);
+				case 'passport':
+					return /^[a-zA-Z0-9]{5,17}$/.test(value);
+				case 'hkmo':
+					return /^[A-Z]\d{6,10}$/.test(value);
+				case 'taiwan':
+					return /^\d{8}$|^[A-Z][0-9]{9}$/.test(value);
+				case 'military':
+					return /^[\u4e00-\u9fa5A-Za-z0-9]+$/.test(value);
+				default:
+					return false;
+			}
+		},
+		getCertificateLabel(type) {
+			return certificateTypeSet.find((item) => item.value === type)?.label || '证件';
+		},
+		maskPhone(value) {
+			if (!value) return '';
+			const phone = String(value);
+			if (phone.length <= 7) {
+				return phone;
+			}
+			return `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+		},
+		maskCertificate(value) {
+			if (!value) return '';
+			const text = String(value);
+			if (text.length <= 4) {
+				return text;
+			}
+			if (text.length <= 8) {
+				return `${text.slice(0, 2)}***${text.slice(-2)}`;
+			}
+			return `${text.slice(0, 3)}********${text.slice(-4)}`;
+		},
+		confirmAdd() {
+			this.reservationNameError = '';
+			this.ageError = '';
+			this.phoneNumberError = '';
+			this.idCardError = '';
 			const nameRegex = /^[a-zA-Z\u4e00-\u9fa5\s]{1,20}$/; // 中英文+空格
 			const phoneRegex = /^1[3-9]\d{9}$/; // 手机号校验
 
@@ -384,6 +420,15 @@ export default {
 				this.reservationNameError = '姓名只能包含中文或英文';
 				return;
 			}
+			// 校验儿童
+			console.log(this.memberType);
+			if (this.memberType === 0) {
+				this.memberList.push({
+					userName: this.reservationName
+				});
+				this.closeAddMemberPopup();
+				return;
+			}
 			// 校验手机号
 			if (!this.phoneNumber) {
 				this.phoneNumberError = '手机号不能为空';
@@ -392,9 +437,50 @@ export default {
 				this.phoneNumberError = '手机号格式错误';
 				return;
 			}
-			const memberNames = this.getMemberSubmitNames();
-			const colleagues = this.memberList.length;
-			console.log('提交的成员信息:', memberNames);
+			// 校验证件号
+			if (this.memberType !== 0) {
+				const certificateType = this.certificateType;
+				const certificateLabel =
+					certificateTypeSet.find((item) => item.value === certificateType)?.label || '证件';
+				if (!this.idCard) {
+					this.idCardError = `请输入${certificateLabel}号码`;
+					return;
+				}
+				if (!this.validateCertificate(certificateType, this.idCard.trim())) {
+					this.idCardError = `${certificateLabel}格式不正确`;
+					return;
+				}
+			}
+
+			this.memberList.push({
+				userName: this.reservationName,
+				userPhone: this.phoneNumber,
+				idNumber: this.idCard,
+				documentType: this.getCertificateLabel(this.certificateType)
+			});
+			this.closeAddMemberPopup();
+		},
+		deleteMember(index) {
+			this.memberList.splice(index, 1);
+		},
+		submit() {
+			if (this.memberList.length === 0) {
+				this.$toast({
+					duration: 3000,
+					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
+			const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
+			if (!hasAdultMember) {
+				this.$toast({
+					duration: 3000,
+					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
 			uni.showLoading({
 				title: '提交中...',
 				mask: true
@@ -406,15 +492,12 @@ export default {
 
 			Promise.all([
 				personalActivityReservation({
-					name: this.reservationName,
-					phone: this.phoneNumber,
-					colleagues: colleagues,
-					colleagueName: memberNames,
 					activityId: this.requestResult.activityId,
 					channel: this.channel,
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot,
-					week: this.week
+					week: this.week,
+					members: this.memberList,
 				}),
 				delayPromise
 			])
@@ -427,7 +510,6 @@ export default {
 							beforeClose: (action) =>
 								new Promise((resolve) => {
 									if (action === 'confirm') {
-										console.log('跳转至积分');
 										uni.reLaunch({
 											url: `/subpackages/packageMine/points/index?remind=true`
 										});
@@ -660,14 +742,6 @@ export default {
 		color: #666;
 		font-size: 28rpx;
 		margin-top: 12rpx;
-	}
-
-	.member-tag {
-		padding: 6rpx 16rpx;
-		border-radius: 20rpx;
-		background: #ebf1ff;
-		color: #32579c;
-		font-size: 22rpx;
 	}
 
 	.member-bottom {

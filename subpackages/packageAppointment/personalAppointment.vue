@@ -97,18 +97,6 @@
 					@input="reservationName = $event.detail"
 				/>
 
-				<!-- <view class="age-title">年龄</view>
-				<van-field
-					custom-class="custom-field"
-					input-class="custom-input"
-					:value="age"
-					type="digit"
-					maxlength="4"
-					placeholder="0-14 岁需填写陪同人员"
-					:error-message="ageError"
-					@input="age = $event.detail"
-				/> -->
-
 				<view v-if="memberType !== 0">
 					<view class="phone-title">联系方式</view>
 					<van-field
@@ -324,78 +312,6 @@ export default {
 		handleSelectCal(res) {
 			this.selectedCal = res;
 		},
-		submit() {
-			if (this.memberList.length === 0) {
-				this.$toast({
-					duration: 3000,
-					message: '至少需要添加一位成年人'
-				});
-				return;
-			}
-
-			const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
-			if (!hasAdultMember) {
-				this.$toast({
-					duration: 3000,
-					message: '至少需要添加一位成年人'
-				});
-				return;
-			}
-
-			if (this.radio === '0') {
-				this.$toast({
-					duration: 3000,
-					message: '请勾选您是否需要讲解服务'
-				});
-				return;
-			}
-
-			const startTime = Date.now();
-			uni.showLoading({
-				title: '提交中...',
-				mask: true
-			});
-			// 包装请求和定时器为一个 Promise
-			const delayPromise = new Promise((resolve) => {
-				setTimeout(resolve, 1500); // 至少展示 1500 毫秒
-			});
-			Promise.all([
-				personalReservation({
-					dateTime: this.date,
-					week: this.week,
-					timeSlot: this.selectedTimeSlot,
-					members: this.memberList,
-					expound: this.radio === '1' ? 0 : 1 // √ 是 传0，× 是 传 1
-				}),
-				delayPromise
-			])
-				.then(([res]) => {
-					if (res.code === 200 && res.message === '您已成功预约') {
-						Dialog.alert({
-							message: '您已成功预约',
-							theme: 'round-button',
-							confirmButtonText: '我知道了',
-							beforeClose: (action) =>
-								new Promise((resolve) => {
-									if (action === 'confirm') {
-										uni.reLaunch({
-											url: '/subpackages/packageMine/messageCenter/index'
-										});
-									}
-									resolve(true); // 无论是否跳转都允许关闭
-								})
-						});
-					} else {
-						this.$toast({
-							duration: 3000,
-							message: res.message
-						});
-					}
-				})
-				.finally(() => {
-					uni.hideLoading();
-				});
-		},
 		showAddMemberPopup(type) {
 			if (this.memberList.length >= 5) {
 				this.$toast({
@@ -536,6 +452,77 @@ export default {
 		},
 		deleteMember(index) {
 			this.memberList.splice(index, 1);
+		},
+		submit() {
+			if (this.memberList.length === 0) {
+				this.$toast({
+					duration: 3000,
+					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
+			const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
+			if (!hasAdultMember) {
+				this.$toast({
+					duration: 3000,
+					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
+			if (this.radio === '0') {
+				this.$toast({
+					duration: 3000,
+					message: '请勾选您是否需要讲解服务'
+				});
+				return;
+			}
+
+			uni.showLoading({
+				title: '提交中...',
+				mask: true
+			});
+			// 包装请求和定时器为一个 Promise
+			const delayPromise = new Promise((resolve) => {
+				setTimeout(resolve, 1500); // 至少展示 1500 毫秒
+			});
+			Promise.all([
+				personalReservation({
+					dateTime: this.date,
+					week: this.week,
+					timeSlot: this.selectedTimeSlot,
+					members: this.memberList,
+					expound: this.radio === '1' ? 0 : 1 // √ 是 传0，× 是 传 1
+				}),
+				delayPromise
+			])
+				.then(([res]) => {
+					if (res.code === 200 && res.message === '您已成功预约') {
+						Dialog.alert({
+							message: '您已成功预约',
+							theme: 'round-button',
+							confirmButtonText: '我知道了',
+							beforeClose: (action) =>
+								new Promise((resolve) => {
+									if (action === 'confirm') {
+										uni.reLaunch({
+											url: '/subpackages/packageMine/messageCenter/index'
+										});
+									}
+									resolve(true); // 无论是否跳转都允许关闭
+								})
+						});
+					} else {
+						this.$toast({
+							duration: 3000,
+							message: res.message
+						});
+					}
+				})
+				.finally(() => {
+					uni.hideLoading();
+				});
 		}
 	},
 	mounted() {

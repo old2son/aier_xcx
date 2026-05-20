@@ -398,6 +398,13 @@ export default {
 	onLoad() {
 		this.getDetailData();
 		this.getReservationTimeSlotData();
+
+		// debug
+		uni.getSavedFileList({
+			success: function (res) {
+				console.log(res.fileList);
+			}
+		});
 	}
 };
 </script>
@@ -457,10 +464,9 @@ export default {
 }
 
 .tip-title-2 {
-
 	width: 94%;
 	line-height: 1.5;
-	margin: 0 ;
+	margin: 0;
 	color: #32579c;
 	font-size: 28rpx;
 }
