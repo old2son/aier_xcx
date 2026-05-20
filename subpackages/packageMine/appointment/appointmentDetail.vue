@@ -14,11 +14,11 @@
 				</view>
 				<view class="col-2">
 					<text>游客信息</text>
-					<text>{{ selectedReservation.name }}</text>
+					<text>{{ getMember(selectedReservation).userName }}</text>
 				</view>
 				<view class="col-2">
 					<text>联系电话</text>
-					<text>{{ selectedReservation.phone }}</text>
+					<text>{{ getMember(selectedReservation).userPhone }}</text>
 				</view>
 				<view class="col-2">
 					<text>同行人数</text>
@@ -91,6 +91,9 @@ export default {
 		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
 	},
 	methods: {
+		getMember(item) {
+			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
+		},
 		handleRadioChange(e) {
 			const value = e.detail;
 			// 根据选择的 radio 值获取对应的文本内容

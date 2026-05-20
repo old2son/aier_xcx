@@ -333,6 +333,15 @@ export default {
 				return;
 			}
 
+			const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
+			if (!hasAdultMember) {
+				this.$toast({
+					duration: 3000,
+					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
 			if (this.radio === '0') {
 				this.$toast({
 					duration: 3000,

@@ -5,8 +5,6 @@
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
 		</view>
 
-		<!-- https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx -->
-		<!-- debug -->
 		<view class="download-card">
 			<view class="download-left">
 				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
@@ -34,7 +32,6 @@
 		<view class="date-picker-title">日期选择</view>
 
 		<view class="date-picker-wrap">
-			<!-- debug -->
 			<DatePicker :disabled-weekdays="[1]" :selected-cal="selectedCal" @date-selected="handleDateSelected" />
 			<view class="calendar-trigger" @click="isShowCal = true">
 				<van-icon name="calendar-o" />
@@ -53,7 +50,6 @@
 		<view class="tip-title-2">每时段报名满15人将自动成团，我馆提供科普讲解服务。</view>
 		<view class="morning-title">上午时段</view>
 
-		<!-- debug -->
 		<TimeSlotPicker
 			:timeSlotList="timeSlotList"
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
@@ -115,8 +111,7 @@
 			<button class="custom-button" @click="submit()">确认提交</button>
 		</view>
 
-		<!-- debug -->
-		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
+		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
 
 		<van-dialog id="van-dialog" />
 	</view>

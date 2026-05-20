@@ -2,7 +2,15 @@
 	<view class="my-appointmennt-container">
 		<CustomNavInner title="我的预约" />
 		<view class="tab-area" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
-			<van-tabs swipeable :active="active" title-inactive-color="#7C7E80" title-active-color="#32579C" color="#32579C" line-width="80rpx" line-height="10rpx">
+			<van-tabs
+				swipeable
+				:active="active"
+				title-inactive-color="#7C7E80"
+				title-active-color="#32579C"
+				color="#32579C"
+				line-width="80rpx"
+				line-height="10rpx"
+			>
 				<van-tab v-for="(item, index) in tabList" :title="item.title" :key="index">
 					<view class="list-wrapper">
 						<block v-if="index === 0">
@@ -22,11 +30,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ item.name }}</text>
+											<text>{{ getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(item.phone) }}</text>
+											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -70,11 +78,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ item.name }}</text>
+											<text>{{ getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(item.phone) }}</text>
+											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -113,11 +121,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ item.name }}</text>
+											<text>{{ getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(item.phone) }}</text>
+											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -197,6 +205,9 @@ export default {
 		}
 	},
 	methods: {
+		getMember(item) {
+			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
+		},
 		formatPhone(phone) {
 			if (!phone || phone.length < 7) return phone;
 			// 只保留前三位和后四位，中间用 **** 替代

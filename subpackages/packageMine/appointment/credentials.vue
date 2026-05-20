@@ -6,7 +6,7 @@
 			<view class="details-content">
 				<view class="details-tl">活动预约成功</view>
 				<view class="qrcode">
-					<l-qrcode :value="JSON.stringify(testData)" />
+					<l-qrcode v-if="!!qrcodeData" :value="`https://www.example.com?data=${qrcodeData}`" />
 				</view>
 				<view class="col">
 					<text>活动名称：</text>
@@ -26,7 +26,7 @@
 				</view>
 				<view class="col">
 					<text>预约人：</text>
-					<text>{{ selectedReservation.name }}</text>
+					<text>{{ getMember(selectedReservation).userName }}</text>
 				</view>
 			</view>
 		</view>
@@ -39,15 +39,7 @@ import { mapState } from 'vuex';
 export default {
 	data() {
 		return {
-			testData: [{
-				id: 1,
-				name: 'hello',
-				age: 18
-			}, {
-				id: 2,
-				name: 'world',
-				age: 19
-			}]
+			qrcodeData: '',
 		};
 	},
 	computed: {
@@ -57,6 +49,9 @@ export default {
 		}
 	},
 	methods: {
+		getMember(item) {
+			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
+		},
 		saoma() {
 			uni.scanCode({
 			  success(res) {
@@ -64,6 +59,9 @@ export default {
 			  }
 			})
 		}
+	},
+	mounted() {
+		this.qrcodeData = JSON.stringify(this.selectedReservation);
 	}
 };
 </script>
