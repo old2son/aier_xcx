@@ -1,7 +1,12 @@
 <template>
 	<view class="home-container">
-		<LoadingAnimation v-if="showLoading || isError || !bannerImagesLoaded" :loadError="isError" :visible="showLoading && !isError" @retry="requestHomeData"></LoadingAnimation>
-		
+		<LoadingAnimation
+			v-if="showLoading || isError || !bannerImagesLoaded"
+			:loadError="isError"
+			:visible="showLoading && !isError"
+			@retry="requestHomeData"
+		></LoadingAnimation>
+
 		<view class="home-content" :style="{ opacity: showLoading ? 0 : 1 }">
 			<!-- 自定义导航栏 -->
 			<CustomNav :opacity="opacity" title="爱尔眼健康科普教育基地" />
@@ -43,7 +48,11 @@
 					<view class="category-list">
 						<view class="category-item" v-for="(item, index) in homeData.categoryList" :key="item.id">
 							<view class="image-wrapper">
-								<image :src="item.imgUrl" mode="widthFix" @click="toSubpackagePage(item.toUrl, index)"></image>
+								<image
+									:src="item.imgUrl"
+									mode="widthFix"
+									@click="toSubpackagePage(item.toUrl, index)"
+								></image>
 							</view>
 						</view>
 					</view>
@@ -52,7 +61,11 @@
 						<text @click="toSubpackagePage('packageHomeDetail/recommendation')">查看更多 ></text>
 					</view>
 					<view class="recommendation-box" v-if="recommendationList.length">
-						<view class="recommendation-item" v-for="(item, index) in recommendationList" :key="item.columnId">
+						<view
+							class="recommendation-item"
+							v-for="(item, index) in recommendationList"
+							:key="item.columnId"
+						>
 							<view class="img-box">
 								<image :src="item.h5FileUrl" mode="aspectFill"></image>
 							</view>
@@ -100,7 +113,13 @@ export default {
 	},
 	computed: {
 		...mapState('moduleLayout', ['menuInfo']), // 给搜索icon提供布局数据
-		...mapGetters('moduleHome', ['bannerSwiperList', 'recommendationList', 'baseUpdatesList', 'isLoaded', 'isError']),
+		...mapGetters('moduleHome', [
+			'bannerSwiperList',
+			'recommendationList',
+			'baseUpdatesList',
+			'isLoaded',
+			'isError'
+		]),
 		formattedList() {
 			return this.baseUpdatesList.map((item) => {
 				const safeDateStr = item.createTime.replace(' ', 'T');
