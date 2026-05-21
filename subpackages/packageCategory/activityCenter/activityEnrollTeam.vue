@@ -442,7 +442,6 @@ export default {
 <style lang="scss">
 .team-reservation-container {
 	width: 100%;
-	height: 100%;
 	overflow-y: auto;
 	box-sizing: border-box;
 	background-color: #f8f9ff;

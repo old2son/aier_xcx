@@ -56,42 +56,44 @@
 		/>
 
 		<view class="team-submits-info-box">
-			<van-field
-				label="领队姓名"
-				type="text"
-				maxlength="8"
-				placeholder="请输入领队者姓名"
-				:value="leaderName"
-				:error-message="leaderNameError"
-				@input="validateInput('leaderName', $event)"
-			/>
-			<van-field
-				label="手机号码"
-				type="tel"
-				maxlength="11"
-				placeholder="请输入联系手机号码"
-				:value="phoneNumber"
-				:error-message="phoneNumberError"
-				@input="phoneNumber = $event.detail"
-			/>
-			<van-field
-				label="单位名称"
-				type="text"
-				maxlength="20"
-				placeholder="请输入单位名称"
-				:value="unitName"
-				:error-message="unitNameError"
-				@input="validateInput('unitName', $event)"
-			/>
-			<van-field
-				label="参观人数"
-				type="digit"
-				maxlength="5"
-				placeholder="参观人数宜在15-50之间"
-				:value="visitorsNumber"
-				:error-message="visitorsNumberError"
-				@input="visitorsNumber = $event.detail"
-			/>
+			<view>
+				<van-field
+					label="领队姓名"
+					type="text"
+					maxlength="8"
+					placeholder="请输入领队者姓名"
+					:value="leaderName"
+					:error-message="leaderNameError"
+					@input="validateInput('leaderName', $event)"
+				/>
+				<van-field
+					label="手机号码"
+					type="tel"
+					maxlength="11"
+					placeholder="请输入联系手机号码"
+					:value="phoneNumber"
+					:error-message="phoneNumberError"
+					@input="phoneNumber = $event.detail"
+				/>
+				<van-field
+					label="单位名称"
+					type="text"
+					maxlength="20"
+					placeholder="请输入单位名称"
+					:value="unitName"
+					:error-message="unitNameError"
+					@input="validateInput('unitName', $event)"
+				/>
+				<van-field
+					label="参观人数"
+					type="digit"
+					maxlength="5"
+					placeholder="参观人数宜在15-50之间"
+					:value="visitorsNumber"
+					:error-message="visitorsNumberError"
+					@input="visitorsNumber = $event.detail"
+				/>
+			</view>
 		</view>
 
 		<view class="upload-card">
@@ -419,7 +421,6 @@ export default {
 <style lang="scss">
 .team-reservation-container {
 	width: 100%;
-	height: 100%;
 	overflow-y: auto;
 	box-sizing: border-box;
 	background-color: #f8f9ff;

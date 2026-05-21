@@ -542,7 +542,6 @@ export default {
 <style lang="scss" scoped>
 .activity-enroll-container {
 	width: 100%;
-	height: 100vh;
 	box-sizing: border-box;
 	background-color: #fff;
 	overflow-y: auto;
