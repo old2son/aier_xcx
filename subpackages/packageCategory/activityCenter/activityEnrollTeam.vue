@@ -388,6 +388,7 @@ export default {
 			Promise.all([
 				personalActivityTeamReservation({
 					activityId: this.requestResult.activityId,
+					activityName: this.requestResult.activityName,
 					name: this.leaderName,
 					phone: this.phoneNumber,
 					unitName: this.unitName,

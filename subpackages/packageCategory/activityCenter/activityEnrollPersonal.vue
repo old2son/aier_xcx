@@ -493,6 +493,7 @@ export default {
 			Promise.all([
 				personalActivityReservation({
 					activityId: this.requestResult.activityId,
+					activityName: this.requestResult.activityName,
 					channel: this.channel,
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot,
@@ -725,7 +726,6 @@ export default {
 		justify-content: center;
 		flex: 1;
 		padding: 24rpx 30rpx;
-		background: #f8f9fc;
 	}
 
 	.member-top {
