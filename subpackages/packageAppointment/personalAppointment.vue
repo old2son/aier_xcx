@@ -514,10 +514,14 @@ export default {
 								})
 						});
 					} else {
-						this.$toast({
-							duration: 3000,
-							message: res.message
-						});
+						// wx.hideLoading 实机会同样关闭 wx.showToast
+						uni.hideLoading();
+						setTimeout(() => {
+							this.$toast({
+								duration: 3000,
+								message: res.message
+							});
+						}, 50);
 					}
 				})
 				.finally(() => {

@@ -113,7 +113,6 @@ export default {
 				reId: this.selectedReservation.reId
 			})
 				.then((res) => {
-					console.log(res);
 					uni.showToast({
 						title: res.message,
 						duration: 3000,

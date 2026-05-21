@@ -396,10 +396,13 @@ export default {
 							}
 						});
 					} else {
-						this.$toast({
-							duration: 3000,
-							message: res.message
-						});
+						uni.hideLoading();
+						setTimeout(() => {
+							this.$toast({
+								duration: 3000,
+								message: res.message
+							});
+						}, 50);
 					}
 				})
 				.finally(() => {

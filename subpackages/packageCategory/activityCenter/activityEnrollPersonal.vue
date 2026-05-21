@@ -218,7 +218,7 @@ export default {
 
 			memberType: null,
 			memberList: [],
-			
+
 			selectedCal: null
 		};
 	},
@@ -497,7 +497,7 @@ export default {
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot,
 					week: this.week,
-					members: this.memberList,
+					members: this.memberList
 				}),
 				delayPromise
 			])
@@ -518,10 +518,13 @@ export default {
 								})
 						});
 					} else {
-						this.$toast({
-							duration: 3000,
-							message: res.message
-						});
+						uni.hideLoading();
+						setTimeout(() => {
+							this.$toast({
+								duration: 3000,
+								message: res.message
+							});
+						}, 50);
 					}
 				})
 				.finally(() => {
