@@ -15,7 +15,7 @@
 				<view class="col-2">
 					<text>游客信息</text>
 
-					<text>{{ !selectedReservation.members.length ? selectedReservation.name : getMember(item).userName }}</text>
+					<text>{{ !selectedReservation.members.length ? selectedReservation.name : getMember(selectedReservation).userName }}</text>
 				</view>
 				<view class="col-2">
 					<text>联系电话</text>
