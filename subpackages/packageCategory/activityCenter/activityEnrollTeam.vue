@@ -40,8 +40,8 @@
 		<view class="date-picker-wrap">
 			<DatePicker :disabled-weekdays="[1]" :selected-cal="selectedCal" @date-selected="handleDateSelected" />
 			<view class="calendar-trigger" @click="isShowCal = true">
-				<van-icon name="calendar-o" />
-				<van-icon name="arrow-down" />
+				<van-icon name="calendar-o" :color="calendarIconColor" />
+				<van-icon name="arrow-down" :color="calendarIconColor" />
 			</view>
 		</view>
 		<CalendarPick
@@ -168,9 +168,34 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['selectedActivity'])
+		...mapState('moduleActivity', ['selectedActivity']),
+		calendarIconColor() {
+			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
+		},
 	},
 	methods: {
+		parseDateText(dateText) {
+			if (!dateText) {
+				return null;
+			}
+			const match = String(dateText).match(/^(\d{4})年(\d{2})月(\d{2})日$/);
+			if (!match) {
+				return null;
+			}
+			const [, year, month, day] = match;
+			return new Date(Number(year), Number(month) - 1, Number(day));
+		},
+		isDateInPickerRange(dateText) {
+			const selectedDate = this.parseDateText(dateText);
+			if (!selectedDate) {
+				return true;
+			}
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const endDate = new Date(today);
+			endDate.setDate(today.getDate() + 4);
+			return selectedDate >= today && selectedDate <= endDate;
+		},
 		async getDetailData() {
 			console.log('报名详情数据', this.selectedActivity);
 			this.requestResult = this.selectedActivity;
