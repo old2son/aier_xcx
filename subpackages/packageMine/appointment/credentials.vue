@@ -7,12 +7,12 @@
 				<view class="details-tl">活动预约成功</view>
 
 				<view class="qrcode-box">
-					<view class="qrcode">
+					<view class="qrcode" :style="{ width: image ? 'auto' : '300rpx' }">
 						<view v-if="!image" class="qrcode-loading">
 							<view class="loading-ring"></view>
 							<text class="loading-text">二维码生成中...</text>
 						</view>
-						<image v-if="image" :src="image" style="width: 300rpx" mode="widthFix"></image>
+						<image v-if="image" :src="image" style="width: 380rpx" mode="widthFix"></image>
 					</view>
 				</view>
 				<view class="row" v-if="selectedReservation.activityName">
@@ -245,7 +245,7 @@ export default {
 					const cardHeight = canvasHeight - 20;
 					const left = cardX + 24;
 					const titleY = cardY + 42;
-					const qrSize = 150;
+					const qrSize = 170;
 					const qrX = (canvasWidth - qrSize) / 2;
 					const qrY = titleY + 26;
 					const rows = [];
@@ -274,7 +274,7 @@ export default {
 					ctx.fillText('活动预约成功', left, titleY);
 
 					ctx.setFillStyle('#ffffff');
-					this.drawRoundRect(ctx, qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 12);
+					this.drawRoundRect(ctx, qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
 					ctx.fill();
 					ctx.drawImage(qrcodePath, qrX, qrY, qrSize, qrSize);
 
@@ -399,7 +399,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.qrcodeData = JSON.stringify(this.selectedReservation);
+		this.qrcodeData = JSON.stringify(this.selectedReservation.members || []);
 	},
 	beforeDestroy() {
 		this.clearSavePressTimer();
@@ -423,7 +423,6 @@ export default {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 300rpx;
 		min-height: 300rpx;
 		padding: 16rpx;
 		margin: 0 auto 30rpx;
