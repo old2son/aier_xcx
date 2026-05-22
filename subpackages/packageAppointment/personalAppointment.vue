@@ -97,6 +97,18 @@
 					@input="reservationName = $event.detail"
 				/>
 
+				<view class="age-title">年龄</view>
+				<van-field
+					custom-class="custom-field"
+					input-class="custom-input"
+					type="digit"
+					maxlength="3"
+					:value="age"
+					:placeholder="memberType === 0 ? '请输入0-17岁' : '请输入18-150岁'"
+					:error-message="ageError"
+					@input="age = $event.detail"
+				/>
+
 				<view v-if="memberType !== 0">
 					<view class="phone-title">联系方式</view>
 					<van-field
@@ -343,6 +355,8 @@ export default {
 		resetMemberForm() {
 			this.reservationName = '';
 			this.reservationNameError = '';
+			this.age = '';
+			this.ageError = '';
 			this.phoneNumber = '';
 			this.phoneNumberError = '';
 			this.idCard = '';
@@ -401,6 +415,7 @@ export default {
 			this.idCardError = '';
 			const nameRegex = /^[a-zA-Z\u4e00-\u9fa5\s]{1,20}$/; // 中英文+空格
 			const phoneRegex = /^1[3-9]\d{9}$/; // 手机号校验
+			const ageNumber = Number(this.age);
 
 			// 校验预约者姓名
 			if (!this.reservationName) {
@@ -410,10 +425,28 @@ export default {
 				this.reservationNameError = '姓名只能包含中文或英文';
 				return;
 			}
+			// 校验年龄
+			if (this.age === '' || this.age === null) {
+				this.ageError = '年龄不能为空';
+				return;
+			}
+			if (!/^\d{1,3}$/.test(String(this.age)) || Number.isNaN(ageNumber)) {
+				this.ageError = '年龄格式不正确';
+				return;
+			}
+			if (this.memberType === 0 && (ageNumber < 0 || ageNumber > 17)) {
+				this.ageError = '儿童年龄需在0-17岁之间';
+				return;
+			}
+			if (this.memberType !== 0 && (ageNumber < 18 || ageNumber > 150)) {
+				this.ageError = '成人年龄需在18-150岁之间';
+				return;
+			}
 			// 校验儿童
 			if (this.memberType === 0) {
 				this.memberList.push({
-					userName: this.reservationName
+					userName: this.reservationName,
+					age: ageNumber
 				});
 				this.closeAddMemberPopup();
 				return;
@@ -443,11 +476,11 @@ export default {
 
 			this.memberList.push({
 				userName: this.reservationName,
+				age: ageNumber,
 				userPhone: this.phoneNumber,
 				idNumber: this.idCard,
 				documentType: this.getCertificateLabel(this.certificateType)
 			});
-
 			this.closeAddMemberPopup();
 		},
 		deleteMember(index) {
