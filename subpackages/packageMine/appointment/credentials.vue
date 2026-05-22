@@ -8,6 +8,10 @@
 
 				<view class="qrcode-box">
 					<view class="qrcode">
+						<view v-if="!image" class="qrcode-loading">
+							<view class="loading-ring"></view>
+							<text class="loading-text">二维码生成中...</text>
+						</view>
 						<image v-if="image" :src="image" style="width: 300rpx" mode="widthFix"></image>
 					</view>
 				</view>
@@ -35,7 +39,15 @@
 							: getMember(selectedReservation).userName
 					}}</text>
 				</view>
-				<view class="save-btn" @click="saveCredentialImage">长按保存图片</view>
+				<view
+					class="save-btn"
+					@touchstart="startSavePress"
+					@touchend="endSavePress"
+					@touchcancel="cancelSavePress"
+					@click="tapSaveHint"
+				>
+					长按保存图片
+				</view>
 			</view>
 		</view>
 		<l-qrcode
@@ -64,7 +76,9 @@ export default {
 			canvasWidth: 335,
 			canvasHeight: 560,
 			isSaving: false,
-			image: ''
+			image: '',
+			savePressTimer: null,
+			hasTriggeredLongPress: false
 		};
 	},
 	computed: {
@@ -152,6 +166,37 @@ export default {
 		getDisplayName() {
 			const reservation = this.selectedReservation || {};
 			return !reservation.members?.length ? reservation.name || '' : this.getMember(reservation).userName || '';
+		},
+		clearSavePressTimer() {
+			if (this.savePressTimer) {
+				clearTimeout(this.savePressTimer);
+				this.savePressTimer = null;
+			}
+		},
+		startSavePress() {
+			this.clearSavePressTimer();
+			this.hasTriggeredLongPress = false;
+			this.savePressTimer = setTimeout(() => {
+				this.hasTriggeredLongPress = true;
+				this.saveCredentialImage();
+			}, 600);
+		},
+		endSavePress() {
+			this.clearSavePressTimer();
+		},
+		cancelSavePress() {
+			this.clearSavePressTimer();
+		},
+		tapSaveHint() {
+			if (this.hasTriggeredLongPress) {
+				this.hasTriggeredLongPress = false;
+				return;
+			}
+
+			uni.showToast({
+				title: '请长按按钮保存图片',
+				icon: 'none'
+			});
 		},
 		trimCanvasText(ctx, text, maxWidth) {
 			const value = String(text || '');
@@ -249,16 +294,19 @@ export default {
 					ctx.fillText('请向工作人员出示此入场凭证', left, cardY + cardHeight - 26);
 
 					ctx.draw(false, () => {
-						uni.canvasToTempFilePath(
-							{
-								canvasId: 'credentialCanvas',
-								destWidth: canvasWidth * 2,
-								destHeight: canvasHeight * 2,
-								success: (res) => resolve(res.tempFilePath),
-								fail: reject
-							},
-							this
-						);
+						// 定时器等待绘制完成
+						setTimeout(() => {
+							uni.canvasToTempFilePath(
+								{
+									canvasId: 'credentialCanvas',
+									destWidth: canvasWidth * 2,
+									destHeight: canvasHeight * 2,
+									success: (res) => resolve(res.tempFilePath),
+									fail: reject
+								},
+								this
+							);
+						}, 200);
 					});
 				});
 			});
@@ -268,7 +316,6 @@ export default {
 				try {
 					const filePath = `${wx.env.USER_DATA_PATH}/qrcode_${Date.now()}.png`;
 
-					// 去掉头部
 					const base64Data = base64.replace(/^data:image\/\w+;base64,/, '');
 
 					const fsm = uni.getFileSystemManager();
@@ -283,7 +330,7 @@ export default {
 						},
 
 						fail: (err) => {
-							console.error('base64转文件失败', err);
+							// base64转文件失败
 							reject(err);
 						}
 					});
@@ -336,7 +383,6 @@ export default {
 					icon: 'success'
 				});
 			} catch (error) {
-				console.error('保存失败', error);
 				if (!(error && error.errMsg && error.errMsg.includes('auth deny'))) {
 					uni.showToast({
 						title: '保存失败，请重试',
@@ -354,6 +400,9 @@ export default {
 	},
 	mounted() {
 		this.qrcodeData = JSON.stringify(this.selectedReservation);
+	},
+	beforeDestroy() {
+		this.clearSavePressTimer();
 	}
 };
 </script>
@@ -372,11 +421,39 @@ export default {
 
 	.qrcode {
 		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 300rpx;
+		min-height: 300rpx;
 		padding: 16rpx;
 		margin: 0 auto 30rpx;
 		border-radius: 24rpx;
 		background-color: #fff;
 	}
+}
+
+.qrcode-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 20rpx;
+	width: 100%;
+	height: 300rpx;
+}
+
+.loading-ring {
+	width: 56rpx;
+	height: 56rpx;
+	border: 6rpx solid #d9e5f8;
+	border-top-color: #60a2fe;
+	border-radius: 50%;
+	animation: qrcode-spin 0.9s linear infinite;
+}
+
+.loading-text {
+	font-size: 24rpx;
+	color: #8aa3c9;
 }
 
 .details-tl {
@@ -411,8 +488,6 @@ export default {
 	border-radius: 999rpx;
 	text-align: center;
 	font-size: 28rpx;
-	background-color: #32579c;
-	color: #ffffff;
 }
 
 .personal-card {
@@ -424,6 +499,11 @@ export default {
 
 	.row-cont {
 		color: #ff5959;
+	}
+
+	.save-btn {
+		color: #fff;
+		background-color: #ff5959;
 	}
 }
 
@@ -437,6 +517,11 @@ export default {
 	.row-cont {
 		color: #60a2fe;
 	}
+
+	.save-btn {
+		color: #fff;
+		background-color: #60a2fe;
+	}
 }
 
 .activity-card {
@@ -448,6 +533,11 @@ export default {
 
 	.row-cont {
 		color: #ff9400;
+	}
+
+	.save-btn {
+		color: #fff;
+		background-color: #ff9400;
 	}
 }
 
@@ -468,5 +558,14 @@ export default {
 	left: -9999px;
 	top: -9999px;
 	pointer-events: none;
+}
+
+@keyframes qrcode-spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
 }
 </style>
