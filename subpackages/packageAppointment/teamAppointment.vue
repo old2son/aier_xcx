@@ -26,33 +26,16 @@
 			</view>
 		</van-popup>
 
-		<view class="date-picker-title">日期选择</view>
-
-		<view class="date-picker-wrap">
-			<DatePicker :disabled-weekdays="[1]" :selected-cal="selectedCal" @date-selected="handleDateSelected" />
-			<view class="calendar-trigger" @click="isShowCal = true">
-				<van-icon name="calendar-o" :color="calendarIconColor" />
-				<van-icon name="arrow-down" :color="calendarIconColor" />
-			</view>
-		</view>
-		<CalendarPick
-			:show-popup="isShowCal"
-			:what-a-day="date"
-			@closePopup="handleCalendarClose"
-			@selectCal="handleSelectCal"
-		/>
-
-		<view class="divider" />
-		<view class="time-slot-title">时段选择</view>
-		<view class="tip-title-2">每时段报名满15人将自动成团，我馆提供科普讲解服务。</view>
-		<view class="morning-title">上午时段</view>
-
-		<TimeSlotPicker
+		<ReservationDateTimePanel
+			:selected-cal="selectedCal"
+			:need-time-slot-request="false"
+			:date="date"
 			:timeSlotList="timeSlotList"
-			:selectedTimeSlotIndex="selectedTimeSlotIndex"
-			:needTimeSlotRequest="false"
-			:select-day="date"
-			@timeSlotSelected="handleTimeSlotSelected"
+			:selected-time-slot-index="selectedTimeSlotIndex"
+			time-tip="每时段报名满15人将自动成团，我馆提供科普讲解服务。"
+			@date-selected="handleDateSelected"
+			@time-slot-selected="handleTimeSlotSelected"
+			@select-cal="selectedCal = $event"
 		/>
 
 		<view class="team-submits-info-box">
@@ -157,33 +140,8 @@ export default {
 		};
 	},
 	computed: {
-		calendarIconColor() {
-			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
-		},
 	},
 	methods: {
-		parseDateText(dateText) {
-			if (!dateText) {
-				return null;
-			}
-			const match = String(dateText).match(/^(\d{4})年(\d{2})月(\d{2})日$/);
-			if (!match) {
-				return null;
-			}
-			const [, year, month, day] = match;
-			return new Date(Number(year), Number(month) - 1, Number(day));
-		},
-		isDateInPickerRange(dateText) {
-			const selectedDate = this.parseDateText(dateText);
-			if (!selectedDate) {
-				return true;
-			}
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-			const endDate = new Date(today);
-			endDate.setDate(today.getDate() + 4);
-			return selectedDate >= today && selectedDate <= endDate;
-		},
 		handlePopupClose() {
 			this.showReservationPopup = false;
 		},
@@ -194,12 +152,6 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-		},
-		handleCalendarClose() {
-			this.isShowCal = false;
-		},
-		handleSelectCal(res) {
-			this.selectedCal = res;
 		},
 		previewFile() {
 			uni.showLoading({
@@ -454,13 +406,6 @@ export default {
 	padding: 40rpx 4% 100rpx 4%;
 }
 
-.date-picker-title {
-	width: 94%;
-	margin: 40rpx auto;
-	font-size: 36rpx;
-	color: #2a2a2a;
-}
-
 .tip-title-1 {
 	width: 94%;
 	margin: 30rpx auto 0 auto;
@@ -474,14 +419,6 @@ export default {
 	view:nth-child(2) {
 		line-height: 1.5;
 	}
-}
-
-.tip-title-2 {
-	width: 94%;
-	margin: 0 auto;
-	font-size: 28rpx;
-	color: #32579c;
-	line-height: 1.5;
 }
 
 .divider {
@@ -606,35 +543,6 @@ export default {
 	font-size: 24rpx;
 	color: #32579c;
 	word-break: break-all;
-}
-
-.date-picker-wrap {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-	gap: 20rpx;
-}
-
-.calendar-trigger {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.time-slot-title {
-	width: 94%;
-	margin: 40rpx auto 16rpx auto;
-	font-size: 36rpx;
-	color: #2a2a2a;
-}
-
-.morning-title {
-	width: 94%;
-	margin: 40rpx auto;
-	font-size: 36rpx;
-	color: #2a2a2a;
 }
 
 .team-submits-info-box {

@@ -1,38 +1,16 @@
 <template>
 	<view class="personal-appointment-container">
-		<view class="date-picker-title">日期选择</view>
-
-		<view class="date-picker-wrap">
-			<DatePicker
-				:disabled-weekdays="[1]"
-				:needTimeSlotRequest="needTimeSlotRequest"
-				:selected-cal="selectedCal"
-				@date-selected="handleDateSelected"
-				@time-slot-numbers="updateTimeSlotNumbers"
-			/>
-			<view class="calendar-trigger" @click="isShowCal = true">
-				<van-icon name="calendar-o" :color="calendarIconColor" />
-				<van-icon name="arrow-down" :color="calendarIconColor" />
-			</view>
-		</view>
-		<CalendarPick
-			:show-popup="isShowCal"
-			:what-a-day="date"
-			@closePopup="handleCalendarClose"
-			@selectCal="handleSelectCal"
-		/>
-
-		<view class="divider" />
-		<view class="time-slot-title">时段选择</view>
-		<view class="tip-title-1">每时段报名满15人将自动成团，我馆提供科普讲解服务。</view>
-		<view class="morning-title">上午时段</view>
-
-		<TimeSlotPicker
+		<ReservationDateTimePanel
+			:selected-cal="selectedCal"
+			:need-time-slot-request="needTimeSlotRequest"
+			:date="date"
 			:timeSlotList="combinedTimeSlotList"
-			:selectedTimeSlotIndex="selectedTimeSlotIndex"
-			:needTimeSlotRequest="needTimeSlotRequest"
-			:select-day="date"
-			@timeSlotSelected="handleTimeSlotSelected"
+			:selected-time-slot-index="selectedTimeSlotIndex"
+			time-tip="每时段报名满15人将自动成团，我馆提供科普讲解服务。"
+			@date-selected="handleDateSelected"
+			@time-slot-numbers="updateTimeSlotNumbers"
+			@time-slot-selected="handleTimeSlotSelected"
+			@select-cal="selectedCal = $event"
 		/>
 
 		<ReservationMemberPanel :member-list="memberList" :child-age-max="17" @change="memberList = $event" />
@@ -54,21 +32,18 @@
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
 
-		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
+		<!-- debug -->
+		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
 
 		<van-dialog id="van-dialog" />
 	</view>
 </template>
 
 <script>
-import ReservationMemberPanel from '@/components/ReservationMemberPanel/ReservationMemberPanel.vue';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
 import { getReservationTimeSlot, getReservationWeekNumbers, personalReservation } from '@/api';
 
 export default {
-	components: {
-		ReservationMemberPanel
-	},
 	data() {
 		return {
 			showReservationPopup: true, // 控制弹出层的显示状态
@@ -84,16 +59,12 @@ export default {
 			radio: '0',
 			needExplainServiceNum: 50, // 需要讲解服务的人数，后台获取
 
-			isShowCal: false,
 			memberList: [],
 
 			selectedCal: null
 		};
 	},
 	computed: {
-		calendarIconColor() {
-			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
-		},
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			if (this.timeSlotNumbers) {
@@ -101,7 +72,6 @@ export default {
 					const numbersKey = `numbers${index + 1}`;
 					// 获取对应的预约人数，默认为 0
 					const reservationNumber = this.timeSlotNumbers[numbersKey] || 0;
-					console.log('预约人数：', reservationNumber);
 					return {
 						...slot, // 保留原有时段对象的所有属性
 						reservationNumber // 添加 reservationNumber 字段
@@ -113,28 +83,6 @@ export default {
 		}
 	},
 	methods: {
-		parseDateText(dateText) {
-			if (!dateText) {
-				return null;
-			}
-			const match = String(dateText).match(/^(\d{4})年(\d{2})月(\d{2})日$/);
-			if (!match) {
-				return null;
-			}
-			const [, year, month, day] = match;
-			return new Date(Number(year), Number(month) - 1, Number(day));
-		},
-		isDateInPickerRange(dateText) {
-			const selectedDate = this.parseDateText(dateText);
-			if (!selectedDate) {
-				return true;
-			}
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-			const endDate = new Date(today);
-			endDate.setDate(today.getDate() + 4);
-			return selectedDate >= today && selectedDate <= endDate;
-		},
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
 		},
@@ -181,12 +129,6 @@ export default {
 					}
 				});
 			}
-		},
-		handleCalendarClose() {
-			this.isShowCal = false;
-		},
-		handleSelectCal(res) {
-			this.selectedCal = res;
 		},
 		submit() {
 			if (this.memberList.length === 0) {
@@ -277,27 +219,8 @@ export default {
 	background-color: #f8f9ff;
 }
 
-.time-slot-title,
-.member-title,
-.name-title,
-.age-title,
-.phone-title,
 .explain-service-title {
 	margin: 40rpx 0 20rpx 0;
-	font-size: 38rpx;
-}
-.member-title {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-
-	.tips {
-		color: #999;
-		font-size: 30rpx;
-	}
-}
-.date-picker-title {
-	margin-bottom: 20rpx;
 	font-size: 38rpx;
 }
 .tip-title-1,
@@ -305,31 +228,6 @@ export default {
 	margin: 20rpx 0 40rpx 0;
 	color: #999;
 	font-size: 24rpx;
-}
-.morning-title {
-	color: #2a2a2a;
-	font-size: 38rpx;
-}
-
-.divider {
-	height: 1px;
-	margin: 30rpx 0;
-	background-color: #eaeaea;
-}
-
-.date-picker-wrap {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-	gap: 20rpx;
-}
-
-.calendar-trigger {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 }
 
 .add-member-btns {
@@ -449,28 +347,6 @@ export default {
 
 .submit-btn {
 	margin-top: 40rpx;
-}
-
-::v-deep .shake {
-	animation: shake 0.5s;
-}
-
-@keyframes shake {
-	0% {
-		transform: translateX(0rpx);
-	}
-	25% {
-		transform: translateX(-10rpx);
-	}
-	50% {
-		transform: translateX(10rpx);
-	}
-	75% {
-		transform: translateX(-10rpx);
-	}
-	100% {
-		transform: translateX(0rpx);
-	}
 }
 
 ::v-deep .van-radio {

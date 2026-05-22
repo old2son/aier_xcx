@@ -80,8 +80,10 @@ export default {
 			return this.combinedTimeSlotList.map((slot) => {
 				let disabled = false;
 
+				// todo: 人数限制有bug
 				// 人数限制
-				if (slot.numbers >= 40) {
+				if (slot?.reservationNumber >= 40) {
+					console.log('人数限制');
 					disabled = true;
 				}
 

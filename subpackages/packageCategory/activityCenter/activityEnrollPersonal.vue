@@ -5,40 +5,19 @@
 			<text class="txt-2-1">进行中</text>
 			<text class="txt-2-2">{{ requestResult.endTime }} 结束</text>
 		</view>
-		<view class="date-picker-title">日期选择</view>
-
-		<view class="date-picker-wrap">
-			<DatePicker
-				:isActivity="true"
-				:disabled-weekdays="[1]"
-				:selected-cal="selectedCal"
-				:needTimeSlotRequest="needTimeSlotRequest"
-				@date-selected="handleDateSelected"
-				@time-slot-numbers="updateTimeSlotNumbers"
-			/>
-			<view class="calendar-trigger" @click="isShowCal = true">
-				<van-icon name="calendar-o" :color="calendarIconColor" />
-				<van-icon name="arrow-down" :color="calendarIconColor" />
-			</view>
-		</view>
-		<CalendarPick
-			:show-popup="isShowCal"
-			:what-a-day="date"
-			@closePopup="handleCalendarClose"
-			@selectCal="handleSelectCal"
-		/>
-
-		<view class="divider" />
-		<view class="time-slot-title">时段选择</view>
-		<view class="morning-title">上午时段</view>
-
-		<TimeSlotPicker
-			:weight="true"
+		<ReservationDateTimePanel
+			theme="activity"
+			:is-activity="true"
+			:selected-cal="selectedCal"
+			:need-time-slot-request="needTimeSlotRequest"
+			:date="date"
 			:timeSlotList="combinedTimeSlotList"
-			:selectedTimeSlotIndex="selectedTimeSlotIndex"
-			:needTimeSlotRequest="needTimeSlotRequest"
-			:select-day="date"
-			@timeSlotSelected="handleTimeSlotSelected"
+			:selected-time-slot-index="selectedTimeSlotIndex"
+			:weight="true"
+			@date-selected="handleDateSelected"
+			@time-slot-numbers="updateTimeSlotNumbers"
+			@time-slot-selected="handleTimeSlotSelected"
+			@select-cal="selectedCal = $event"
 		/>
 
 		<ReservationMemberPanel :member-list="memberList" :child-age-max="17" @change="memberList = $event" />
@@ -59,14 +38,10 @@
 
 <script>
 import { mapState } from 'vuex';
-import ReservationMemberPanel from '@/components/ReservationMemberPanel/ReservationMemberPanel.vue';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
 import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api/index';
 
 export default {
-	components: {
-		ReservationMemberPanel
-	},
 	data() {
 		return {
 			title: '',
@@ -95,7 +70,6 @@ export default {
 			],
 			channel: '人人通',
 
-			isShowCal: false,
 			memberList: [],
 
 			selectedCal: null
@@ -103,9 +77,6 @@ export default {
 	},
 	computed: {
 		...mapState('moduleActivity', ['selectedActivity']),
-		calendarIconColor() {
-			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
-		},
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			if (this.timeSlotNumbers) {
@@ -125,28 +96,6 @@ export default {
 		}
 	},
 	methods: {
-		parseDateText(dateText) {
-			if (!dateText) {
-				return null;
-			}
-			const match = String(dateText).match(/^(\d{4})年(\d{2})月(\d{2})日$/);
-			if (!match) {
-				return null;
-			}
-			const [, year, month, day] = match;
-			return new Date(Number(year), Number(month) - 1, Number(day));
-		},
-		isDateInPickerRange(dateText) {
-			const selectedDate = this.parseDateText(dateText);
-			if (!selectedDate) {
-				return true;
-			}
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-			const endDate = new Date(today);
-			endDate.setDate(today.getDate() + 4);
-			return selectedDate >= today && selectedDate <= endDate;
-		},
 		async getDetailData() {
 			this.requestResult = this.selectedActivity;
 		},
@@ -198,12 +147,6 @@ export default {
 		},
 		handleDropdownChangeC(value) {
 			this.channel = this.partnerOptionC[value.detail].text;
-		},
-		handleCalendarClose() {
-			this.isShowCal = false;
-		},
-		handleSelectCal(res) {
-			this.selectedCal = res;
 		},
 		submit() {
 			if (this.memberList.length === 0) {
@@ -310,192 +253,18 @@ export default {
 			display: inline-block;
 		}
 	}
-	.date-picker-title {
-		color: #2a2a2a;
-		font-size: 32rpx;
-		font-weight: 550;
-		margin: 56rpx auto 6rpx auto;
-	}
 	.divider {
 		height: 1px;
 		background-color: #eaeaea;
 		margin: 30rpx 0;
 	}
-	.morning-title {
-		color: #2a2a2a;
-		font-weight: 550;
-		font-size: 32rpx;
-	}
 }
 
-.time-slot-title,
-.member-title,
-.name-title,
-.age-title,
-.phone-title,
 .partner-title {
 	font-weight: 550;
 	font-size: 32rpx;
 	margin: 40rpx 0 20rpx 0;
 }
-.date-picker-title {
-	font-size: 32rpx;
-	margin-bottom: 20rpx;
-}
-
-.morning-title {
-	font-size: 32rpx;
-	color: #2a2a2a;
-}
-
-.divider {
-	height: 1px;
-	background-color: #eaeaea;
-	margin: 30rpx 0;
-}
-
-.date-picker-wrap {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-	gap: 20rpx;
-}
-
-.calendar-trigger {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
-
-.add-member-btns {
-	display: flex;
-	justify-content: space-between;
-	gap: 20px;
-	margin-top: 30rpx;
-
-	van-button {
-		flex: 1;
-	}
-}
-
-.member-title {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-
-	.tips {
-		color: #999;
-		font-size: 30rpx;
-	}
-}
-
-.add-detail-wrap {
-	padding: 30rpx;
-
-	.add-title {
-		font-size: 38rpx;
-	}
-
-	.time-slot-title,
-	.member-title,
-	.name-title,
-	.age-title,
-	.phone-title,
-	.partner-title,
-	.idtype-title,
-	.id-title,
-	.explain-service-title {
-		margin: 50rpx 0 20rpx 0;
-		font-size: 32rpx;
-	}
-
-	::v-deep .custom-field {
-		padding: 8rpx 24rpx;
-		border: 2rpx solid #dcdfe6;
-		border-radius: 16rpx;
-		background: #ebf1ff;
-	}
-
-	::v-deep .custom-input {
-		color: #333;
-		font-size: 28rpx;
-	}
-
-	::v-deep .act-btns {
-		display: flex;
-		justify-content: space-between;
-		gap: 0 20rpx;
-		padding: 50rpx 0 20rpx;
-
-		van-button {
-			flex: 1;
-			width: 100%;
-		}
-	}
-}
-
-.member-list {
-	display: flex;
-	flex-direction: column;
-	gap: 12rpx;
-
-	.member-detail {
-		display: flex;
-		align-items: center;
-		padding: 0 20rpx;
-		overflow: hidden;
-		border-bottom: 1px solid #eaeaea;
-		// border-radius: 24rpx;
-		// box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
-		// background: #fff;
-	}
-
-	.delete-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 48rpx;
-		height: 48rpx;
-		border-radius: 50%;
-		background-color: red;
-	}
-
-	.member-info {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		flex: 1;
-		padding: 24rpx 30rpx;
-	}
-
-	.member-top {
-		display: flex;
-		align-items: center;
-		gap: 0 20rpx;
-	}
-
-	.member-name {
-		color: #333;
-		font-size: 32rpx;
-		font-weight: 600;
-	}
-
-	.member-phone {
-		color: #666;
-		font-size: 28rpx;
-		margin-top: 12rpx;
-	}
-
-	.member-bottom {
-		margin-top: 16rpx;
-		word-break: break-all;
-		color: #999;
-		font-size: 26rpx;
-	}
-}
-
 .submit-btn {
 	margin-top: 40rpx;
 }
