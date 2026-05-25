@@ -89,28 +89,28 @@
 						:error-message="phoneNumberError"
 						@input="phoneNumber = $event.detail"
 					/>
-
-					<view class="idtype-title">证件类型</view>
-					<van-radio-group :value="idTypeRadio" @change="handleIdRadioChange">
-						<van-radio name="1">身份证</van-radio>
-						<van-radio name="2">护照</van-radio>
-						<van-radio name="3">港澳居民往来通行证</van-radio>
-						<van-radio name="4">台湾居民往来内地通行证</van-radio>
-						<van-radio name="5">军官证</van-radio>
-					</van-radio-group>
-
-					<view class="id-title">证件号码</view>
-					<van-field
-						custom-class="custom-field"
-						input-class="custom-input"
-						:value="idCard"
-						:type="certificateFieldType"
-						maxlength="18"
-						:placeholder="certificatePlaceholder"
-						:error-message="idCardError"
-						@input="idCard = $event.detail"
-					/>
 				</view>
+
+				<view class="idtype-title">证件类型</view>
+				<van-radio-group :value="idTypeRadio" @change="handleIdRadioChange">
+					<van-radio name="1">身份证</van-radio>
+					<van-radio name="2">护照</van-radio>
+					<van-radio name="3">港澳居民往来通行证</van-radio>
+					<van-radio name="4">台湾居民往来内地通行证</van-radio>
+					<van-radio name="5">军官证</van-radio>
+				</van-radio-group>
+
+				<view class="id-title">证件号码</view>
+				<van-field
+					custom-class="custom-field"
+					input-class="custom-input"
+					:value="idCard"
+					:type="certificateFieldType"
+					maxlength="18"
+					:placeholder="certificatePlaceholder"
+					:error-message="idCardError"
+					@input="idCard = $event.detail"
+				/>
 
 				<view class="act-btns">
 					<van-button block round size="normal" color="#32579c" plain @click="closeAddMemberPopup">
@@ -261,15 +261,15 @@ export default {
 		validateCertificate(type, value) {
 			switch (type) {
 				case 'idcard':
-					return /^[1-9]\d{16}[\dXx]$/.test(value);
+					return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(value);
 				case 'passport':
-					return /^[a-zA-Z0-9]{5,17}$/.test(value);
+					return /^(?![0-9]+$)(?![A-Za-z]+$)[0-9A-Za-z]{1,16}$/.test(value);
 				case 'hkmo':
-					return /^[A-Z]\d{6,10}$/.test(value);
+					return /^H[0-9]{8}$/.test(value);
 				case 'taiwan':
-					return /^\d{8}$|^[A-Z][0-9]{9}$/.test(value);
+					return /^[0-9]{8,10}$/.test(value);
 				case 'military':
-					return /^[\u4e00-\u9fa5A-Za-z0-9]+$/.test(value);
+					return /^军\d+$/.test(value);
 				default:
 					return false;
 			}
@@ -337,23 +337,11 @@ export default {
 				return;
 			}
 
-			if (this.memberType === 0) {
-				this.emitMemberList([
-					...this.memberList,
-					{
-						userName: this.reservationName,
-						age: ageNumber
-					}
-				]);
-				this.closeAddMemberPopup();
-				return;
-			}
-
-			if (!this.phoneNumber) {
+			if (!this.phoneNumber && this.memberType !== 0) {
 				this.phoneNumberError = '手机号不能为空';
 				return;
 			}
-			if (!phoneRegex.test(this.phoneNumber)) {
+			if (!phoneRegex.test(this.phoneNumber) && this.memberType !== 0) {
 				this.phoneNumberError = '手机号格式错误';
 				return;
 			}
@@ -374,7 +362,7 @@ export default {
 				{
 					userName: this.reservationName,
 					age: ageNumber,
-					userPhone: this.phoneNumber,
+					userPhone: this.memberType !== 0 ? '' : this.phoneNumber,
 					idNumber: this.idCard,
 					documentType: certificateLabel
 				}
