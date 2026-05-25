@@ -14,7 +14,7 @@
 				<!-- 单选题 -->
 				<!-- :value="answers[item.value]" -->
 				<van-radio-group
-					v-if="isSingleChoice(item)"
+					v-if="isSingleChoice(item) || index === 3"
 					:value="answers[index]"
 					@change="(e) => onSingleChoiceChange(index, e.detail)"
 				>
@@ -187,15 +187,6 @@ export default {
 		isLastTextQuestion(item) {
 			return item.text.includes('[填空题]');
 		},
-		// onSingleChoiceChange(itemValue, val) {
-		//   console.log('单选题::当前选中的', itemValue,val)
-		//   this.answers[itemValue] = val
-		//   console.log("存储每题的答案", this.answers)
-		//   const hasOther = this.queueList.find(i => i.value === itemValue)?.list.find(opt => opt.topicName.includes('其他'))
-		//   if (hasOther) {
-		//     this.selectedOther[itemValue] = (val === hasOther.topicName)
-		//   }
-		// },
 		// 选中单选题
 		onSingleChoiceChange(index, val) {
 			console.log('单选题::当前选中的', index, val);
@@ -238,7 +229,7 @@ export default {
 				const item = this.queueList[i];
 				const answer = this.answers[i];
 
-				if (this.isSingleChoice(item) && !answer) {
+				if ((this.isSingleChoice(item) || i === 3) && !answer) {
 					this.$toast({
 						duration: 3000,
 						message: `请您完成第${i + 1}道的意见反馈`
@@ -283,72 +274,12 @@ export default {
 				return;
 			}
 
-			// 拼接需要带“其他内容”的三道题（第三题 identity、第九题 knowledge、第十题 optimize）
-			let identity = '';
-			let knowledge = [];
-			let optimize = [];
-
-			// 遍历
-			this.queueList.forEach((item, idx) => {
-				const answer = this.answers[idx];
-				const otherText = item.list[item.list.length - 1].topicName; // 最后一项是“其他”
-
-				if (idx === 2) {
-					// 第三题 identity
-					if (answer === otherText) {
-						identity = otherText + this.otherInputs[item.value];
-					} else {
-						identity = answer;
-					}
-				}
-
-				if (idx === 8) {
-					// 第九题 knowledge（多选）
-					if (Array.isArray(answer)) {
-						answer.forEach((opt) => {
-							if (opt === otherText) {
-								const content = otherText + this.otherInputs[item.value];
-								knowledge.push(content);
-							} else {
-								knowledge.push(opt);
-							}
-						});
-					}
-				}
-
-				if (idx === 9) {
-					// 第十题 optimize（多选）
-					if (Array.isArray(answer)) {
-						answer.forEach((opt) => {
-							if (opt === otherText) {
-								const content = otherText + this.otherInputs[item.value];
-								optimize.push(content);
-							} else {
-								optimize.push(opt);
-							}
-						});
-					}
-				}
-			});
-
-			console.log('identity:', identity);
-			console.log('knowledge:', knowledge);
-			console.log('optimize:', optimize);
-
 			//最终组装提交参数
 			const params = {
-				userSex: this.answers[0], // 第1道 性别
-				userAge: this.answers[1], // 第2道 年龄
-				identity: identity, // ✅ 用拼接后的 identity
-				userSource: this.answers[3], // 第4道 途径来源
-				resSatisfied: this.answers[4], // 第5道 线上预约满意度
-				facSatisfied: this.answers[5], // 第6道 场馆设施满意度
-				activitySatisfied: this.answers[6], // 第7道 活动满意度
-				courseSatisfied: this.answers[7], // 第8道 课程内容满意度
-				knowledge: knowledge, // ✅ 用拼接后的 knowledge
-				optimize: optimize, // ✅ 用拼接后的 optimize
-				recommend: this.answers[10], // 第11道 是否愿意推荐
-				overSatisfied: this.answers[11], // 第12道 总体满意度
+				res_satisfied: this.answers[0], // 线上预约满意度
+				fac_satisfied: this.answers[1], // 场馆设施满意度
+				activity_satisfied: this.answers[2], // 科普活动满意度
+				useruser_recommendSource: this.answers[3], // 是否推荐
 				other: this.lastTextAnswer // 最后一道 填空
 			};
 
@@ -388,22 +319,6 @@ export default {
 					});
 				});
 		}
-		// userSex: "性别",
-		// userAge: "年龄",
-		// identity: "身份来源",
-
-		// userSource: "途径来源",
-		// resSatisfied: "线上预约满意度",
-		// facSatisfied: "场馆设施满意度",
-		// activitySatisfied: "活动满意度",
-		// courseSatisfied: "课程内容满意度",
-
-		// knowledge: [ '眼科知识' ],              // 多选题
-		// optimize: [ '增加的体验形式' ],         // 多选题
-		// recommend: "是否愿意推荐",
-
-		// overSatisfied: "总体满意度",
-		// other: '请留下您宝贵的意见的内容'
 	}
 };
 </script>
