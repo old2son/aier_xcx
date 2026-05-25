@@ -30,7 +30,7 @@ export default {
 	props: {
 		timeSlotList: {
 			type: Array,
-			require: true
+			required: true
 		},
 		timeSlotNumbers: {
 			type: Object,
@@ -38,19 +38,19 @@ export default {
 		},
 		selectedTimeSlotIndex: {
 			type: Number,
-			require: true
+			required: true
 		},
 		needTimeSlotRequest: {
 			type: Boolean,
-			require: true
+			required: true
 		},
 		weight: {
 			type: Boolean,
-			require: false
+			required: false
 		},
 		selectDay: {
 			type: String,
-			require: true
+			required: true
 		}
 	},
 	data() {

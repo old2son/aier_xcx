@@ -18,8 +18,10 @@
 		</view>
 
 		<CalendarPick
+			v-if="Array.isArray(activeList)"
 			:show-popup="isShowCal"
 			:what-a-day="date"
+			:active-list="activeList"
 			@closePopup="handleCalendarClose"
 			@selectCal="handleSelectCal"
 		/>
@@ -41,7 +43,9 @@
 	</view>
 </template>
 
+
 <script>
+import { mapState, mapActions } from 'vuex';
 export default {
 	name: 'ReservationDateTimePanel',
 	props: {
@@ -104,15 +108,26 @@ export default {
 	},
 	data() {
 		return {
-			isShowCal: false
+			isShowCal: false,
+			activeList: null
 		};
 	},
 	computed: {
+		...mapState('moduleActivity', ['futureList']),
 		calendarIconColor() {
 			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
 		}
 	},
 	methods: {
+		...mapActions('moduleActivity', ['fetchActivities']),
+		async getActivityData() {
+			try {
+				await this.fetchActivities();
+				this.activeList = this.futureList;
+			} catch (e) {
+				console.error('接口获取失败', e);
+			}
+		},
 		parseDateText(dateText) {
 			if (!dateText) {
 				return null;
@@ -152,6 +167,9 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.$emit('time-slot-selected', slot, index);
 		}
+	},
+	mounted() {
+		this.getActivityData();
 	}
 };
 </script>

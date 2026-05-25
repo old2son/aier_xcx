@@ -27,11 +27,11 @@ export default {
 		},
 		needTimeSlotRequest: {
 			type: Boolean,
-			require: true
+			required: true
 		},
 		isActivity: {
 			type: Boolean,
-			require: false
+			required: false
 		},
 		selectedCal: {
 			type: Object,
@@ -42,7 +42,7 @@ export default {
 				year: Number,
 				index: Number
 			},
-			require: false
+			required: false
 		}
 	},
 	data() {

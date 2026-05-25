@@ -28,10 +28,16 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import dayjs from 'dayjs';
+
+let activeListCache = [];
 
 export default {
 	name: 'CalendarPick',
+	options: {
+		styleIsolation: 'shared'
+	},
 	props: {
 		showPopup: {
 			type: Boolean,
@@ -39,7 +45,11 @@ export default {
 		},
 		whatADay: {
 			type: String,
-			require: false
+			required: false
+		},
+		activeList: {
+			type: Array,
+			required: true
 		}
 	},
 	data() {
@@ -49,6 +59,9 @@ export default {
 			defaultDate: null
 		};
 	},
+	computed: {
+		...mapState('moduleActivity', ['futureList'])
+	},
 	watch: {
 		whatADay(newval) {
 			const timestamp = dayjs(newval.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).valueOf();
@@ -57,36 +70,31 @@ export default {
 				const calendar = this.selectComponent('#calendar');
 				calendar.reset();
 			});
+		},
+		activeList: {
+			immediate: true,
+			handler(val) {
+				activeListCache = Array.isArray(val) ? val : [];
+			}
 		}
 	},
 	methods: {
 		onSelectDate(event) {
 			const current = dayjs(event.detail);
-		
+
 			const date = current.format('MM-DD');
-		
+
 			const year = current.year();
-		
-			const weekMap = [
-				'周日',
-				'周一',
-				'周二',
-				'周三',
-				'周四',
-				'周五',
-				'周六'
-			];
-		
+
+			const weekMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
 			const week = weekMap[current.day()];
-		
+
 			const disabled = current.day() === 1;
-		
+
 			// 距离今天第几天
-			const index = current.diff(
-				dayjs().startOf('day'),
-				'day'
-			);
-		
+			const index = current.diff(dayjs().startOf('day'), 'day');
+
 			const result = {
 				date,
 				disabled,
@@ -94,7 +102,7 @@ export default {
 				year,
 				index
 			};
-			
+
 			this.$emit('selectCal', result);
 		},
 		closePopup() {
@@ -110,9 +118,38 @@ export default {
 		formatter(day) {
 			const date = day.date;
 
+			// 周一闭馆
 			if (date.getDay() === 1) {
 				day.type = 'disabled';
 				day.bottomInfo = '闭馆';
+
+				return day;
+			}
+
+			// 当前日期
+			const current = dayjs(date);
+
+			// 是否有活动
+			const hasActivity = activeListCache.some((item) => {
+				if (!item.startDate || !item.endDate) {
+					return false;
+				}
+
+				const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+				const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+				return (
+					current.isSame(start, 'day') ||
+					current.isSame(end, 'day') ||
+					(current.isAfter(start) && current.isBefore(end))
+				);
+			});
+
+			if (hasActivity) {
+				day.className = 'activity-day';
+				day.bottomInfo = '活动';
+					day.color = '#32579c';
 			}
 
 			return day;
@@ -144,4 +181,13 @@ export default {
 	gap: 20rpx;
 	padding: 20rpx 30rpx;
 }
+
+// ::v-deep .van-calendar__day {
+// 	color: #fff;
+// 	background-color: #32579c !important;
+// }
+
+// .van-calendar__bottom-info {
+// 	color: #32579c;
+// }
 </style>
