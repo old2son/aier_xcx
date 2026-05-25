@@ -261,11 +261,13 @@ export default {
 		validateCertificate(type, value) {
 			switch (type) {
 				case 'idcard':
-					return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(value);
+					return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
+						value
+					);
 				case 'passport':
 					return /^(?![0-9]+$)(?![A-Za-z]+$)[0-9A-Za-z]{1,16}$/.test(value);
 				case 'hkmo':
-					return /^H[0-9]{8}$/.test(value);
+					return /^[HM]\d{8}$/.test(value);
 				case 'taiwan':
 					return /^[0-9]{8,10}$/.test(value);
 				case 'military':
@@ -478,7 +480,6 @@ export default {
 		justify-content: center;
 		flex: 1;
 		padding: 24rpx 30rpx;
-		background: #f8f9fc;
 	}
 
 	.member-top {
