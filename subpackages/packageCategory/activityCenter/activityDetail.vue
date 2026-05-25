@@ -46,11 +46,11 @@
 				<view class="sign-title">报名类型</view>
 				<view class="sign-desc">为方便您顺利报名，活动设置两类报名通道：</view>
 				<view class="sign-row">
-					<text class="sign-label">个人预约：</text>
+					<text class="sign-label" style="color: #ff9400">个人预约：</text>
 					<text>社会群众个人报名</text>
 				</view>
 				<view class="sign-row">
-					<text class="sign-label">团队预约：</text>
+					<text class="sign-label" style="color: #4794ff">团队预约：</text>
 					<text>学校/企事业单位/社区/旅行社等团体</text>
 				</view>
 				<view class="sign-act">
@@ -268,21 +268,22 @@ export default {
 	}
 
 	.sign-title {
+		margin-bottom: 36rpx;
+		text-align: center;
+		color: #32579c;
 		font-size: 36rpx;
 		font-weight: 600;
-		text-align: center;
-		margin-bottom: 36rpx;
 	}
 
 	.sign-desc,
 	.sign-row {
-		font-size: 28rpx;
 		line-height: 1.8;
+		font-size: 28rpx;
 	}
 
 	.sign-desc {
-		color: #7c7e80;
 		margin-bottom: 20rpx;
+		color: #7c7e80;
 	}
 
 	.sign-label {
@@ -311,14 +312,14 @@ export default {
 	}
 
 	.btn-person {
-		background-color: #32579c;
 		color: #fff;
+		background-color: #ff9400;
 	}
 
 	.btn-team {
-		background-color: #eef4ff;
-		border: 1px solid #32579c;
-		color: #32579c;
+		color: #fff;
+		border: 1px solid #4794ff;
+		background-color: #4794ff;
 	}
 }
 </style>

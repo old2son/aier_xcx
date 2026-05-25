@@ -4,7 +4,7 @@
 
 		<view class="details-main" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
 			<view class="details-content" :class="cardClass">
-				<view class="details-tl">活动预约成功</view>
+				<view class="details-tl">{{ reservationType.replace(/（个人）|（团队）/g, '') }}成功</view>
 
 				<view class="qrcode-box">
 					<view class="qrcode" :style="{ width: image ? 'auto' : '300rpx' }">
@@ -130,10 +130,10 @@ export default {
 
 			if (type.includes('活动')) {
 				return {
-					start: '#fceabf',
+					start: '#fed3d4',
 					end: '#ffffff',
-					title: '#ff9400',
-					content: '#ff9400'
+					title: '#ff5959',
+					content: '#ff5959'
 				};
 			}
 
@@ -147,10 +147,10 @@ export default {
 			}
 
 			return {
-				start: '#fed3d4',
+				start: '#fceabf',
 				end: '#ffffff',
-				title: '#ff5959',
-				content: '#ff5959'
+				title: '#ff9400',
+				content: '#ff9400'
 			};
 		},
 		drawRoundRect(ctx, x, y, width, height, radius) {
@@ -490,19 +490,19 @@ export default {
 }
 
 .personal-card {
-	background: linear-gradient(to bottom, #fed3d4 0%, #ffffff 60%);
+	background: linear-gradient(to bottom, #fceabf 0%, #ffffff 35%);
 
 	.details-tl {
-		color: #ff5959;
+		color: #ff9400;
 	}
 
 	.row-cont {
-		color: #ff5959;
+		color: #ff9400;
 	}
 
 	.save-btn {
 		color: #fff;
-		background-color: #ff5959;
+		background-color: #ff9400;
 	}
 }
 
@@ -524,19 +524,19 @@ export default {
 }
 
 .activity-card {
-	background: linear-gradient(to bottom, #fceabf 0%, #ffffff 35%);
+	background: linear-gradient(to bottom, #fed3d4 0%, #ffffff 60%);
 
 	.details-tl {
-		color: #ff9400;
+		color: #ff5959;
 	}
 
 	.row-cont {
-		color: #ff9400;
+		color: #ff5959;
 	}
 
 	.save-btn {
 		color: #fff;
-		background-color: #ff9400;
+		background-color: #ff5959;
 	}
 }
 

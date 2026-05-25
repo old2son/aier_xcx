@@ -13,6 +13,9 @@
 					<view class="team-appt" @click="toSubpackagePage('/subpackages/packageAppointment/teamAppointment')">
 						<image :src="teamImage" mode="widthFix"></image>
 					</view>
+					<view class="act-appt" @click="toSubpackagePage('/subpackages/packageCategory/activityCenter/index')">
+						<image :src="actImage" mode="widthFix"></image>
+					</view>
 				</view>
 				<view class="appintment-guide">
 					<text>
@@ -34,7 +37,8 @@ export default {
 			appointmentData: appointmentData[0].appointmentLogo,
 			appintCardBack: appointmentData[0].appintCardBack,
 			perImage: appointmentData[0].perImage,
-			teamImage: appointmentData[0].teamImage
+			teamImage: appointmentData[0].teamImage,
+			actImage: appointmentData[0].actImage
 		};
 	},
 	onLoad() {
@@ -85,18 +89,19 @@ export default {
 				position: absolute;
 				top: 0;
 				width: 100%;
-				height: 65%;
+				height: 75%;
 			}
 			.appintment-entrance-wrap {
 				position: absolute;
 				width: 100%;
-				height: 65%;
+				height: 75%;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
 				.per-appt,
-				.team-appt {
+				.team-appt,
+				.act-appt {
 					width: 80%;
 					text-align: center;
 					image {
@@ -110,13 +115,16 @@ export default {
 				.team-appt {
 					margin-top: 2vh;
 				}
+				.act-appt {
+					margin-top: 2vh;
+				}
 			}
 		}
 	}
 
 	.appintment-guide {
 		position: absolute;
-		bottom: 20%;
+		bottom: 15%;
 		left: 50%;
 		transform: translateX(-50%);
 		background-color: #0766ff;
