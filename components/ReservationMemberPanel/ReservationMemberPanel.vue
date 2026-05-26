@@ -364,7 +364,7 @@ export default {
 				{
 					userName: this.reservationName,
 					age: ageNumber,
-					userPhone: this.memberType !== 0 ? '' : this.phoneNumber,
+					userPhone: this.memberType === 0 ? '' : this.phoneNumber,
 					idNumber: this.idCard,
 					documentType: certificateLabel
 				}
