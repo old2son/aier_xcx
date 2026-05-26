@@ -220,11 +220,9 @@ export default {
 				.then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
 						const allList = res.data || [];
-						console.log('allList', allList);
-
-						// this.unusedList = allList.filter((item) => item.status === 0); // 0 待使用
-						// this.usedList = allList.filter((item) => item.status === 2); // 2 已使用（目前没有，但是后期预留）
-						// this.expiredList = allList.filter((item) => item.status === 1); // 1 主动取消/过期
+						this.unusedList = allList.filter((item) => item.status === 0); // 0 待使用
+						this.usedList = allList.filter((item) => item.status === 2); // 2 已使用（目前没有，但是后期预留）
+						this.expiredList = allList.filter((item) => item.status === 1); // 1 主动取消/过期
 					}
 				})
 				.finally(() => {
