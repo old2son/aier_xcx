@@ -276,10 +276,10 @@ export default {
 
 			//最终组装提交参数
 			const params = {
-				res_satisfied: this.answers[0], // 线上预约满意度
-				fac_satisfied: this.answers[1], // 场馆设施满意度
-				activity_satisfied: this.answers[2], // 科普活动满意度
-				useruser_recommendSource: this.answers[3], // 是否推荐
+				resSatisfied: this.answers[0], // 线上预约满意度
+				facSatisfied: this.answers[1], // 场馆设施满意度
+				activitySatisfied: this.answers[2], // 科普活动满意度
+				recommend: this.answers[3], // 是否推荐
 				other: this.lastTextAnswer // 最后一道 填空
 			};
 
