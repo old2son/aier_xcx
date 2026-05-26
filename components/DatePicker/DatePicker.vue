@@ -33,7 +33,7 @@
 						护眼科普、公益体验名额有限，先到先得，快来活动中心锁定名额~
 					</view>
 					<van-button round block color="#32579c" type="primary" @click="goActivity"> 立即报名 </van-button>
-					<view class="activity-popup-close" @click="showActivityPopup = false"> 已知悉，不需要 </view>
+					<view class="activity-popup-close" @click="readedActTips"> 已知悉，不需要 </view>
 				</view>
 			</view>
 		</van-popup>
@@ -168,7 +168,6 @@ export default {
 			this.isActivityDay = this.isInActivityRange(currentDate);
 			if (this.isActivityDay && !this.hasShownActivityPopup) {
 				this.showActivityPopup = true;
-				this.hasShownActivityPopup = true;
 			}
 		},
 		getDefaultReservationTimeSlotNumbers() {
@@ -182,11 +181,6 @@ export default {
 				// 如果没有可用的日期，处理这种情况
 				console.log('没有可用的日期！'); // 你可以选择触发一个事件或者显示提示消息给用户
 			}
-		},
-		goActivity() {
-			uni.navigateTo({
-				url: '/subpackages/packageCategory/activityCenter/index'
-			});
 		},
 		isInActivityRange(date) {
 			return this.activeList.some((item) => {
@@ -202,6 +196,15 @@ export default {
 					date.isSame(start, 'day') || date.isSame(end, 'day') || (date.isAfter(start) && date.isBefore(end))
 				);
 			});
+		},
+		goActivity() {
+			uni.navigateTo({
+				url: '/subpackages/packageCategory/activityCenter/index'
+			});
+		},
+		readedActTips() {
+			this.showActivityPopup = false;
+			this.hasShownActivityPopup = true;
 		}
 	},
 	mounted() {
@@ -293,7 +296,7 @@ export default {
 }
 
 .activity-popup-title {
-	padding: 40rpx 40rpx;
+	padding: 40rpx;
 	color: #fff;
 	font-size: 36rpx;
 	font-weight: 600;
@@ -301,7 +304,7 @@ export default {
 }
 
 .activity-popup-content {
-	padding: 40rpx;
+	padding: 10rpx 40rpx 10rpx;
 }
 
 .activity-popup-subtitle {
@@ -320,8 +323,8 @@ export default {
 }
 
 .activity-popup-close {
-	margin-top: 32rpx;
-	font-size: 28rpx;
+	padding: 32rpx 0;
 	color: #999;
+	font-size: 28rpx;
 }
 </style>

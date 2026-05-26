@@ -53,11 +53,6 @@ export default {
 			required: true
 		}
 	},
-	data() {
-		return {
-			hasInit: false
-		};
-	},
 	computed: {
 		// 原始合并人数
 		combinedTimeSlotList() {
@@ -106,22 +101,13 @@ export default {
 		}
 	},
 	watch: {
-		// 初始化
-		timeSlotList: {
+		processedTimeSlotList: {
 			immediate: true,
 			handler(newVal) {
-				if (this.hasInit) return;
-
 				if (newVal && newVal.length > 0) {
-					this.renderSlotTimeList();
-					this.hasInit = true;
-				}
-			}
-		},
-		selectDay: {
-			handler(newVal) {
-				if (newVal && newVal.length > 0) {
-					this.renderSlotTimeList();
+					this.$nextTick(() => {
+						this.renderSlotTimeList(newVal);
+					});
 				}
 			}
 		}
@@ -133,20 +119,13 @@ export default {
 				this.$emit('timeSlotSelected', name, index);
 			}
 		},
-		renderSlotTimeList() {
+		renderSlotTimeList(slotList = this.processedTimeSlotList) {
 			// 自动顺延到下一个未禁用的时段
-			const availableIndex = this.processedTimeSlotList.findIndex((slot) => !slot.disabled);
+			const availableIndex = slotList.findIndex((slot) => !slot.disabled);
 			if (availableIndex !== -1) {
-				this.selectTimeSlot(this.processedTimeSlotList[availableIndex].name, availableIndex);
+				this.selectTimeSlot(slotList[availableIndex].name, availableIndex);
 			}
 		}
-	},
-	mounted() {
-		this.$nextTick(() => {
-			if (this.processedTimeSlotList.length > 0) {
-				this.renderSlotTimeList();
-			}
-		});
 	}
 };
 </script>
