@@ -30,11 +30,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ !item.members.length ? item.name : getMember(item).userName }}</text>
+											<text>{{ !item.members?.length ? item.name : getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ !item.members.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ !item.members?.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -78,11 +78,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ !item.members.length ? item.name : getMember(item).userName }}</text>
+											<text>{{ !item.members?.length ? item.name : getMember(item).userName }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ !item.members.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ !item.members?.length ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -194,7 +194,6 @@ export default {
 		};
 	},
 	mounted() {
-		console.log('tabList：', tabList);
 		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
 		this.getReservationRecord();
 	},
@@ -221,9 +220,11 @@ export default {
 				.then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
 						const allList = res.data || [];
-						this.unusedList = allList.filter((item) => item.status === 0); // 0 待使用
-						this.usedList = allList.filter((item) => item.status === 2); // 2 已使用（目前没有，但是后期预留）
-						this.expiredList = allList.filter((item) => item.status === 1); // 1 主动取消/过期
+						console.log('allList', allList);
+
+						// this.unusedList = allList.filter((item) => item.status === 0); // 0 待使用
+						// this.usedList = allList.filter((item) => item.status === 2); // 2 已使用（目前没有，但是后期预留）
+						// this.expiredList = allList.filter((item) => item.status === 1); // 1 主动取消/过期
 					}
 				})
 				.finally(() => {
@@ -237,7 +238,6 @@ export default {
 			});
 		},
 		toCredentials(item) {
-			console.log('item', item);
 			this.$store.commit('moduleAppointment/setSelectedAppointment', item);
 			uni.navigateTo({ url: '/subpackages/packageMine/appointment/credentials' });
 		},
