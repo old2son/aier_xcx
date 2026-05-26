@@ -149,16 +149,8 @@ export default {
 			this.channel = this.partnerOptionC[value.detail].text;
 		},
 		submit() {
-			if (this.memberList.length === 0) {
-				this.$toast({
-					duration: 3000,
-					message: '至少需要添加一位成年人'
-				});
-				return;
-			}
-
-			const hasAdultMember = this.memberList.some((item) => !!item.idNumber);
-			if (!hasAdultMember) {
+			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
+			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
 					message: '至少需要添加一位成年人'
