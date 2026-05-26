@@ -110,13 +110,13 @@ export default {
 					}
 				}
 				.per-appt {
-					margin-top: 5vh;
+					margin-top: 6vh;
 				}
 				.team-appt {
-					margin-top: 2vh;
+					margin-top: 0.5vh;
 				}
 				.act-appt {
-					margin-top: 2vh;
+					margin-top: 0.5vh;
 				}
 			}
 		}
