@@ -122,7 +122,7 @@ export default {
 			title: '',
 			requestResult: {},
 
-			showReservationPopup: true,
+			showReservationPopup: false,
 			date: null,
 			week: null,
 			timeSlotList: [],

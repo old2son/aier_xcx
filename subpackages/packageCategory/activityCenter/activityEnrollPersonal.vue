@@ -31,7 +31,8 @@
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
 
-		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
+		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
+
 		<van-dialog id="van-dialog" />
 	</view>
 </template>

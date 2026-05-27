@@ -96,7 +96,7 @@
 			<button class="custom-button" @click="submit()">确认提交</button>
 		</view>
 
-		<ReservationPopup :show="showReservationPopup" @close="handlePopupClose" />
+		<ReservationPopup :type="1" :show="showReservationPopup" @close="handlePopupClose" />
 
 		<van-dialog id="van-dialog" />
 	</view>
