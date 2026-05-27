@@ -137,7 +137,12 @@ export default {
 	beforeCreate() {
 		uni.hideTabBar();
 	},
-	onLoad() {
+	onLoad(data) {
+		// todo: 二维码扫描获取来源
+		if (data?.source) {
+			console.log('二维码扫描获取来源', data.source);
+		}
+
 		this.requestHomeData();
 	},
 	onPageScroll(e) {
