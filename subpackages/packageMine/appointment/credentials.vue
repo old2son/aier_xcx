@@ -34,7 +34,7 @@
 				<view class="row">
 					<text class="row-title">预约人：</text>
 					<text class="row-cont">{{
-						!selectedReservation.members.length
+						!selectedReservation.members || !selectedReservation.members.length
 							? selectedReservation.name
 							: getMember(selectedReservation).userName
 					}}</text>

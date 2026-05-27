@@ -24,7 +24,7 @@
 
 			<view class="submit-btn-wrap">
 				<van-button v-show="isActivityDay" round size="large" type="primary" @click="goActivity">
-					前往活动中心
+					前往报名
 				</van-button>
 
 				<van-button v-show="!isActivityDay" round size="large" type="primary" @click="closePopup">
