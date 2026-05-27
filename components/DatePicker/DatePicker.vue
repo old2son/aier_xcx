@@ -270,6 +270,18 @@ export default {
 		font-weight: bold;
 	}
 
+	.day-item.activity-day::before {
+		position: absolute;
+		left: 50%;
+		bottom: 10rpx;
+		content: '';
+		width: 32rpx;
+		height: 6rpx;
+		border-radius: 999rpx;
+		transform: translateX(-50%);
+		background-color: #ff4d4f;
+	}
+
 	.day-item:last-child {
 		margin: 0;
 	}

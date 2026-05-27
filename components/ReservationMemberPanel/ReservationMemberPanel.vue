@@ -363,7 +363,7 @@ export default {
 				...this.memberList,
 				{
 					userName: this.reservationName,
-					age: ageNumber,
+					userAge: ageNumber,
 					userPhone: this.memberType === 0 ? '' : this.phoneNumber,
 					idNumber: this.idCard,
 					documentType: certificateLabel

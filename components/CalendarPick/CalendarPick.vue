@@ -225,6 +225,18 @@ export default {
 	position: relative;
 }
 
+::v-deep .activity-day::before {
+	position: absolute;
+	left: 50%;
+	bottom: 20rpx;
+	content: '';
+	width: 24rpx;
+	height: 4rpx;
+	border-radius: 999rpx;
+	transform: translateX(-50%);
+	background-color: #ff4d4f;
+}
+
 ::v-deep .activity-day::after {
 	position: absolute;
 	top: 20rpx;
