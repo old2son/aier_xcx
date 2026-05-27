@@ -159,7 +159,7 @@ export default {
 		},
 		adultAgeMax: {
 			type: Number,
-			default: 150
+			default: 120
 		}
 	},
 	data() {
