@@ -16,7 +16,7 @@
 				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
 			</view>
 
-			<van-button size="small" round type="primary" color="#32579c" @click="isShowFilePopup = true">
+			<van-button size="small" round type="primary" @click="isShowFilePopup = true">
 				下载
 			</van-button>
 		</view>
@@ -498,8 +498,8 @@ export default {
 	padding: 0 28rpx;
 	border-radius: 100rpx !important;
 	color: #fff !important;
-	border-color: #6586bf !important;
-	background: #6586bf !important;
+	border-color: #4794ff !important;
+	background: #4794ff !important;
 }
 
 .file-popup {

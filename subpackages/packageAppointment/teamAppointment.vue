@@ -421,12 +421,6 @@ export default {
 	}
 }
 
-.divider {
-	width: 94%;
-	margin: 40rpx auto;
-	border: 1rpx solid #cfcfcf;
-}
-
 .download-card {
 	display: flex;
 	align-items: center;
@@ -454,8 +448,8 @@ export default {
 	padding: 0 28rpx;
 	border-radius: 100rpx !important;
 	color: #fff !important;
-	border-color: #6586bf !important;
-	background: #6586bf !important;
+	border-color: #4794ff !important;
+	background: #4794ff !important;
 }
 
 .file-popup {

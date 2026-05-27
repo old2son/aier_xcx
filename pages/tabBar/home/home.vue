@@ -413,21 +413,22 @@ export default {
 		box-sizing: border-box;
 		.title {
 			display: -webkit-box;
+			line-height: 1.2;
 			overflow: hidden;
 			-webkit-box-orient: vertical;
+			line-clamp: 3;
 			-webkit-line-clamp: 3;
 			text-overflow: ellipsis;
 			color: #333;
 			font-size: 32rpx;
-			line-height: 1.2;
 		}
 		.time {
-			font-size: 24rpx;
-			color: #7c7e80;
+			margin-top: 40rpx;
 			padding-bottom: 48rpx;
 			border-bottom: 0.5px solid #cccccc;
 			box-sizing: border-box;
-			margin-top: 40rpx;
+			color: #7c7e80;
+			font-size: 24rpx;
 		}
 	}
 	.base-updates-item:last-child .time {

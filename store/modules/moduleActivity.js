@@ -57,7 +57,6 @@ export default {
 		},
 		SET_FUTURE_LIST(state, context) {
 			state.futureList = context;
-			console.log('futureList', state.futureList);
 		},
 		setSelectedActivity(state, context) {
 			state.selectedActivity = context;
