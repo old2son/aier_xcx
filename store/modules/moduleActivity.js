@@ -28,6 +28,7 @@ export default {
 		starting: [], // 活动进行中
 		future: [], // 活动即将开始
 		error: false,
+		hasShownActivityPopup: false, // 是否已经显示过活动弹窗
 		selectedActivity: {}, // 选中的活动
 		futureList: [] // 未来一个月内的活动日期
 	},
@@ -43,6 +44,9 @@ export default {
 		},
 		futureList(state) {
 			return state.futureList;
+		},
+		hasShownActivityPopup(state) {
+			return state.hasShownActivityPopup;
 		}
 	},
 	mutations: {
@@ -60,6 +64,9 @@ export default {
 		},
 		setSelectedActivity(state, context) {
 			state.selectedActivity = context;
+		},
+		setHasShownActivityPopup(state, context) {
+			state.hasShownActivityPopup = context;
 		}
 	},
 	actions: {

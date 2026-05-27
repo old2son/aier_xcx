@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
 import dayjs from 'dayjs';
 import { getReservationTimeSlotNumbers, getActivityReservationTimeSlotNumbers } from '@/api';
 export default {
@@ -79,9 +80,11 @@ export default {
 			days: [],
 			midnightTimer: null, // 用于每天自动更新的计时器
 			selectedDayIndex: 0, // 选中的日期
-			showActivityPopup: false,
-			hasShownActivityPopup: false
+			showActivityPopup: false
 		};
+	},
+	computed: {
+		...mapState('moduleActivity', ['hasShownActivityPopup'])
 	},
 	watch: {
 		selectedCal(newVal) {
@@ -91,6 +94,7 @@ export default {
 		}
 	},
 	methods: {
+		...mapMutations('moduleActivity', ['setHasShownActivityPopup']),
 		// 生成当天和接下来的六天的日期信息
 		generateWeekDays() {
 			const today = dayjs().startOf('day'); // 获取当前日期（精确到当天0点）
@@ -167,6 +171,14 @@ export default {
 
 			this.isActivityDay = this.isInActivityRange(currentDate);
 			if (this.isActivityDay && !this.hasShownActivityPopup) {
+				const pages = getCurrentPages();
+				const currentPage = pages[pages.length - 1];
+
+				if (currentPage.route.includes('activityCenter')) {
+					this.showActivityPopup = false;
+					return;
+				}
+
 				this.showActivityPopup = true;
 			}
 		},
@@ -204,7 +216,7 @@ export default {
 		},
 		readedActTips() {
 			this.showActivityPopup = false;
-			this.hasShownActivityPopup = true;
+			this.setHasShownActivityPopup(true);
 		}
 	},
 	mounted() {

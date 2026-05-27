@@ -20,15 +20,15 @@
 		</view>
 
 		<view class="calendar-footer">
+			<view class="submit-tips" v-show="isActivityDay">当日有活动，报名参加请前往【活动中心】</view>
+
 			<view class="submit-btn-wrap">
-				<van-button
-					v-show="isActivityDay"
-					round
-					size="large"
-					type="primary"
-					@click="goActivity"
-				>
+				<van-button v-show="isActivityDay" round size="large" type="primary" @click="goActivity">
 					前往活动中心
+				</van-button>
+
+				<van-button v-show="!isActivityDay" round size="large" type="primary" @click="closePopup">
+					确认
 				</van-button>
 			</view>
 			<view class="cancel-btn-wrap">
@@ -152,11 +152,20 @@ export default {
 
 			const current = dayjs(date);
 
-			const hasActivity = isInActivityRange(current);
+			// 只允许未来30天
+			const today = dayjs().startOf('day');
+
+			const maxDay = today.add(30, 'day');
+
+			const isWithin30Days =
+				current.isSame(today, 'day') ||
+				(current.isAfter(today) && current.isBefore(maxDay)) ||
+				current.isSame(maxDay, 'day');
+
+			const hasActivity = isWithin30Days && isInActivityRange(current);
 
 			if (hasActivity) {
 				day.className = 'activity-day';
-				// day.bottomInfo = '活动';
 			}
 
 			return day;
@@ -210,6 +219,13 @@ export default {
 		color: #fff;
 		background-color: #32579c;
 	}
+}
+
+.submit-tips {
+	text-align: center;
+	color: #ff4d4f;
+	font-weight: 600;
+	font-size: 32rpx;
 }
 
 .cancel-btn-wrap {
