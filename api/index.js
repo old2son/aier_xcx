@@ -1,5 +1,6 @@
 import request from './request';
-const baseUrl = 'https://api.grandeffect.cn'; /* 基础地址 */
+// const baseUrl = 'https://api.grandeffect.cn'; /* 基础地址 */
+const baseUrl = 'https://api.aierkepu.com'; /* 基础地址 */
 
 /* ———— 首页页面接口 ———— */
 // 顶部 banner 轮播图

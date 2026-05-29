@@ -201,7 +201,8 @@ export default {
 
 			try {
 				const res = await uni.uploadFile({
-					url: 'https://applet.ecloudeffect.com/api/user/scienceMuseumUserUploadAvatar',
+					// url: 'https://applet.ecloudeffect.com/api/user/scienceMuseumUserUploadAvatar',
+					url: 'https://api.aierkepu.com/api/user/scienceMuseumUserUploadAvatar',
 					header: {
 						token
 					},
