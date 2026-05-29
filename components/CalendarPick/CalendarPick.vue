@@ -20,8 +20,20 @@
 		</view>
 
 		<view class="calendar-footer">
-			<!-- <van-button round size="large" color="#32579c" type="primary" @click="confirmDate">前往报名</van-button> -->
-			<van-button round size="large" color="#32579c" plain @click="closePopup">返回</van-button>
+			<view class="submit-btn-wrap">
+				<van-button
+					v-show="isActivityDay"
+					round
+					size="large"
+					type="primary"
+					@click="goActivity"
+				>
+					前往报名
+				</van-button>
+			</view>
+			<view class="cancel-btn-wrap">
+				<van-button round size="large" plain @click="closePopup">返回</van-button>
+			</view>
 			<!-- <van-button round size="large" color="#32579c" plain @click="resetDate">重置</van-button> -->
 		</view>
 	</van-popup>
@@ -32,6 +44,19 @@ import { mapState } from 'vuex';
 import dayjs from 'dayjs';
 
 let activeListCache = [];
+const isInActivityRange = (date) => {
+	return activeListCache.some((item) => {
+		if (!item.startDate || !item.endDate) {
+			return false;
+		}
+
+		const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+		const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+		return date.isSame(start, 'day') || date.isSame(end, 'day') || (date.isAfter(start) && date.isBefore(end));
+	});
+};
 
 export default {
 	name: 'CalendarPick',
@@ -56,7 +81,8 @@ export default {
 		return {
 			minDate: '',
 			maxDate: '',
-			defaultDate: null
+			defaultDate: null,
+			isActivityDay: false
 		};
 	},
 	computed: {
@@ -81,6 +107,8 @@ export default {
 	methods: {
 		onSelectDate(event) {
 			const current = dayjs(event.detail);
+
+			this.isActivityDay = isInActivityRange(current);
 
 			const date = current.format('MM-DD');
 
@@ -126,33 +154,21 @@ export default {
 				return day;
 			}
 
-			// 当前日期
 			const current = dayjs(date);
 
-			// 是否有活动
-			const hasActivity = activeListCache.some((item) => {
-				if (!item.startDate || !item.endDate) {
-					return false;
-				}
-
-				const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
-
-				const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
-
-				return (
-					current.isSame(start, 'day') ||
-					current.isSame(end, 'day') ||
-					(current.isAfter(start) && current.isBefore(end))
-				);
-			});
+			const hasActivity = isInActivityRange(current);
 
 			if (hasActivity) {
 				day.className = 'activity-day';
-				day.bottomInfo = '活动';
-					day.color = '#32579c';
+				// day.bottomInfo = '活动';
 			}
 
 			return day;
+		},
+		goActivity() {
+			uni.navigateTo({
+				url: '/subpackages/packageCategory/activityCenter/index'
+			});
 		}
 	},
 	mounted() {
@@ -182,12 +198,45 @@ export default {
 	padding: 20rpx 30rpx;
 }
 
-// ::v-deep .van-calendar__day {
-// 	color: #fff;
-// 	background-color: #32579c !important;
-// }
+.submit-btn-wrap,
+.cancel-btn-wrap {
+	height: 100rpx;
+	text-align: center;
 
-// .van-calendar__bottom-info {
-// 	color: #32579c;
-// }
+	::v-deep .van-button {
+		width: 70%;
+	}
+}
+
+.submit-btn-wrap {
+	::v-deep .van-button {
+		border-color: #32579c;
+		color: #fff;
+		background-color: #32579c;
+	}
+}
+
+.cancel-btn-wrap {
+	::v-deep .van-button {
+		width: 70%;
+		color: #80aae6;
+		border-color: #c5deff;
+		background-color: #dcebff;
+	}
+}
+
+::v-deep .activity-day {
+	position: relative;
+}
+
+::v-deep .activity-day::after {
+	position: absolute;
+	top: 20rpx;
+	right: 15rpx;
+	content: '*';
+	line-height: 1;
+	color: #ff4d4f;
+	font-size: 30rpx;
+	font-weight: bold;
+}
 </style>
