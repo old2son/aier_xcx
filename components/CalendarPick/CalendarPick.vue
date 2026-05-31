@@ -28,7 +28,7 @@
 					type="primary"
 					@click="goActivity"
 				>
-					前往报名
+					前往活动中心
 				</van-button>
 			</view>
 			<view class="cancel-btn-wrap">
@@ -40,7 +40,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import dayjs from 'dayjs';
 
 let activeListCache = [];
@@ -84,9 +83,6 @@ export default {
 			defaultDate: null,
 			isActivityDay: false
 		};
-	},
-	computed: {
-		...mapState('moduleActivity', ['futureList'])
 	},
 	watch: {
 		whatADay(newval) {

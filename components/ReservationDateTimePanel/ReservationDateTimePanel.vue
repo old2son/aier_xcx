@@ -4,10 +4,12 @@
 
 		<view class="date-wrap">
 			<DatePicker
+				v-if="Array.isArray(activeList)"
 				:isActivity="isActivity"
 				:disabled-weekdays="disabledWeekdays"
 				:selected-cal="selectedCal"
 				:needTimeSlotRequest="needTimeSlotRequest"
+				:active-list="activeList"
 				@date-selected="handleDateSelected"
 				@time-slot-numbers="handleTimeSlotNumbers"
 			/>
@@ -42,7 +44,6 @@
 		/>
 	</view>
 </template>
-
 
 <script>
 import { mapState, mapActions } from 'vuex';

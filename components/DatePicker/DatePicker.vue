@@ -4,7 +4,11 @@
 			<view
 				v-for="(day, index) in days"
 				:key="index"
-				:class="{ disabled: day.disabled, 'date-selected': selectedDayIndex === index }"
+				:class="{
+					disabled: day.disabled,
+					'date-selected': selectedDayIndex === index,
+					'activity-day': day.hasActivity && !day.disabled
+				}"
 				class="day-item"
 				@tap="selectDay(day, index)"
 			>
@@ -12,6 +16,27 @@
 				<text>{{ day.date }}</text>
 			</view>
 		</view>
+
+		<van-popup
+			:show="showActivityPopup"
+			round
+			position="center"
+			custom-style="width: 620rpx; border-radius: 24rpx;"
+			@close="showActivityPopup = false"
+		>
+			<view class="activity-popup">
+				<view class="activity-popup-title"> 温馨提示·今日活动 </view>
+
+				<view class="activity-popup-content">
+					<view class="activity-popup-subtitle"> 专属活动火热报名中！ </view>
+					<view class="activity-popup-desc">
+						护眼科普、公益体验名额有限，先到先得，快来活动中心锁定名额~
+					</view>
+					<van-button round block color="#32579c" type="primary" @click="goActivity"> 立即报名 </van-button>
+					<view class="activity-popup-close" @click="showActivityPopup = false"> 已知悉，不需要 </view>
+				</view>
+			</view>
+		</van-popup>
 	</view>
 </template>
 
@@ -43,22 +68,20 @@ export default {
 				index: Number
 			},
 			required: false
+		},
+		activeList: {
+			type: Array,
+			required: true
 		}
 	},
 	data() {
 		return {
 			days: [],
 			midnightTimer: null, // 用于每天自动更新的计时器
-			selectedDayIndex: 0 // 选中的日期
+			selectedDayIndex: 0, // 选中的日期
+			showActivityPopup: false,
+			hasShownActivityPopup: false
 		};
-	},
-	mounted() {
-		this.generateWeekDays();
-		this.setMidnightUpdate();
-		this.getDefaultReservationTimeSlotNumbers();
-	},
-	beforeDestroy() {
-		this.clearMidnightTimer(); // 在组件销毁时清理定时器
 	},
 	watch: {
 		selectedCal(newVal) {
@@ -73,16 +96,20 @@ export default {
 			const today = dayjs().startOf('day'); // 获取当前日期（精确到当天0点）
 			const daysArray = [];
 			const currentYear = today.year(); // 获取当前年份
+
 			// 动态生成 5 天的日期信息
 			for (let i = 0; i < 5; i++) {
 				const currentDay = today.add(i, 'day'); // 从当天开始依次生成
 				const dayOfWeek = currentDay.day(); // 获取星期几
 				const dateString = currentDay.format('MM-DD'); // 格式化日期为 MM-DD
+				const hasActivity = this.isInActivityRange(currentDay);
+
 				daysArray.push({
 					year: currentYear,
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
-					disabled: this.disabledWeekdays.includes(dayOfWeek) // 如果是周一，则禁用
+					disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
+					hasActivity
 				});
 			}
 			this.days = daysArray; // 更新日期数组
@@ -118,6 +145,7 @@ export default {
 			if (day.disabled) return;
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
+			const currentDate = dayjs(fullDate, 'YYYY-MM-DD');
 			const formattedDate = dayjs(fullDate, 'YYYY-MM-DD').format('YYYY年MM月DD日');
 			// console.log('formattedDate', formattedDate);
 			// 给父组件传递数据（子组件触发父组件方法）
@@ -136,6 +164,12 @@ export default {
 					}
 				});
 			}
+
+			this.isActivityDay = this.isInActivityRange(currentDate);
+			if (this.isActivityDay && !this.hasShownActivityPopup) {
+				this.showActivityPopup = true;
+				this.hasShownActivityPopup = true;
+			}
 		},
 		getDefaultReservationTimeSlotNumbers() {
 			// 找到第一个没有禁用的日期
@@ -148,7 +182,35 @@ export default {
 				// 如果没有可用的日期，处理这种情况
 				console.log('没有可用的日期！'); // 你可以选择触发一个事件或者显示提示消息给用户
 			}
+		},
+		goActivity() {
+			uni.navigateTo({
+				url: '/subpackages/packageCategory/activityCenter/index'
+			});
+		},
+		isInActivityRange(date) {
+			return this.activeList.some((item) => {
+				if (!item.startDate || !item.endDate) {
+					return false;
+				}
+
+				const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+				const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+
+				return (
+					date.isSame(start, 'day') || date.isSame(end, 'day') || (date.isAfter(start) && date.isBefore(end))
+				);
+			});
 		}
+	},
+	mounted() {
+		this.generateWeekDays();
+		this.setMidnightUpdate();
+		this.getDefaultReservationTimeSlotNumbers();
+	},
+	beforeDestroy() {
+		this.clearMidnightTimer(); // 在组件销毁时清理定时器
 	}
 };
 </script>
@@ -174,6 +236,7 @@ export default {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		position: relative;
 		margin-right: 20rpx;
 		background-color: #ebf1ff;
 		text-align: center;
@@ -193,6 +256,17 @@ export default {
 		}
 	}
 
+	.day-item.activity-day::after {
+		position: absolute;
+		top: 10rpx;
+		right: 12rpx;
+		content: '*';
+		line-height: 1;
+		color: #ff4d4f;
+		font-size: 30rpx;
+		font-weight: bold;
+	}
+
 	.day-item:last-child {
 		margin: 0;
 	}
@@ -210,5 +284,44 @@ export default {
 			color: #7f7f7f;
 		}
 	}
+}
+
+.activity-popup {
+	overflow: hidden;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.activity-popup-title {
+	padding: 40rpx 40rpx;
+	color: #fff;
+	font-size: 36rpx;
+	font-weight: 600;
+	background-color: #32579c;
+}
+
+.activity-popup-content {
+	padding: 40rpx;
+}
+
+.activity-popup-subtitle {
+	margin: 24rpx;
+	color: #222;
+	font-size: 30rpx;
+	font-weight: 600;
+}
+
+.activity-popup-desc {
+	padding: 0 40rpx;
+	margin: 24rpx 0 40rpx;
+	line-height: 1.7;
+	color: #666;
+	font-size: 28rpx;
+}
+
+.activity-popup-close {
+	margin-top: 32rpx;
+	font-size: 28rpx;
+	color: #999;
 }
 </style>
