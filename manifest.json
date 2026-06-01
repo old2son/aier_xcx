@@ -50,6 +50,12 @@
     "quickapp" : {},
     /* 快应用特有相关 */
     "mp-weixin" : {
+        /* "plugins" : {
+            "t-video" : {
+                "version" : "1.0.10",
+                "provider" : "wx5474241b2a65b906"
+            }
+        }, */
         /* 小程序特有相关 */
         "appid" : "wx01e3c2e198f9600a",
         "setting" : {

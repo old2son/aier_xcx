@@ -65,6 +65,7 @@
 							class="recommendation-item"
 							v-for="(item, index) in recommendationList"
 							:key="item.columnId"
+							@click="toRec(item.columnId)"
 						>
 							<view class="img-box">
 								<image :src="item.h5FileUrl" mode="aspectFill"></image>
@@ -235,6 +236,20 @@ export default {
 			uni.navigateTo({
 				url: '/subpackages/' + url
 			});
+		},
+
+		toRec(cId) {
+			if (cId === 477) {
+				uni.navigateTo({
+					url: '/pages/tabBar/science/science'
+				});
+			}
+
+			if (cId === 478) {
+			}
+
+			if (cId === 479) {
+			}
 		}
 	}
 };

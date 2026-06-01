@@ -58,6 +58,10 @@ const router = createRouter({
 			name: '基地原创视频'
 		},
 		{
+			path: '/subpackage/packageVideo/detail',
+			name: '视频详情'
+		},
+		{
 			path: '/subpackages/packageCategory/hotScience/recommendation',
 			name: '热门推荐'
 		},

@@ -313,7 +313,10 @@
 			"van-search": "/wxcomponents/vant/search/index",
 			"van-icon": "/wxcomponents/vant/icon/index",
 			"van-calendar": "/wxcomponents/vant/calendar/index"
+			// "t-video": "plugin://t-video/t-video"
 		}
+
+
 	},
 	"tabBar": {
 		"color": "#a8a8a8", // 默认文字颜色
