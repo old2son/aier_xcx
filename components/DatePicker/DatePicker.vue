@@ -150,6 +150,9 @@ export default {
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
 			const currentDate = dayjs(fullDate, 'YYYY-MM-DD');
+			const isInCurrentFiveDays = currentDate.isSame(dayjs(), 'day') || currentDate.isAfter(dayjs(), 'day')
+				? currentDate.diff(dayjs().startOf('day'), 'day') <= 4
+				: false;
 			const formattedDate = dayjs(fullDate, 'YYYY-MM-DD').format('YYYY年MM月DD日');
 			// console.log('formattedDate', formattedDate);
 			// 给父组件传递数据（子组件触发父组件方法）
@@ -170,7 +173,7 @@ export default {
 			}
 
 			this.isActivityDay = this.isInActivityRange(currentDate);
-			if (this.isActivityDay && !this.hasShownActivityPopup) {
+			if (this.isActivityDay && isInCurrentFiveDays && !this.hasShownActivityPopup) {
 				const pages = getCurrentPages();
 				const currentPage = pages[pages.length - 1];
 
