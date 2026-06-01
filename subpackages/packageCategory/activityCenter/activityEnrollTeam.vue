@@ -11,28 +11,7 @@
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
 		</view>
 
-		<view class="download-card">
-			<view class="download-left">
-				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
-			</view>
-
-			<van-button size="small" round type="primary" @click="isShowFilePopup = true">
-				下载
-			</van-button>
-		</view>
-		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
-			<view class="file-popup">
-				<view class="popup-title"> 文件下载 </view>
-
-				<view class="popup-tip"> 预览文件，发送到微信文件传输助手 </view>
-
-				<van-button block round type="primary" color="#32579c" @click="previewFile"> 预览文件 </van-button>
-
-				<!-- <van-button block round plain color="#32579c" @click="downloadFile"> 下载文件 </van-button> -->
-
-				<van-button block round @click="isShowFilePopup = false"> 返回 </van-button>
-			</view>
-		</van-popup>
+		<ExcelSave />
 
 		<view class="divider" />
 		<ReservationDateTimePanel
@@ -48,55 +27,14 @@
 			@select-cal="selectedCal = $event"
 		/>
 
-		<view class="team-submits-info-box">
-			<van-field
-				label="领队姓名"
-				type="text"
-				maxlength="8"
-				placeholder="请输入领队者姓名"
-				:value="leaderName"
-				:error-message="leaderNameError"
-				@input="validateInput('leaderName', $event)"
-			/>
-			<van-field
-				label="手机号码"
-				type="tel"
-				maxlength="11"
-				placeholder="请输入联系手机号码"
-				:value="phoneNumber"
-				:error-message="phoneNumberError"
-				@input="phoneNumber = $event.detail"
-			/>
-			<van-field
-				label="单位名称"
-				type="text"
-				maxlength="20"
-				placeholder="请输入单位名称"
-				:value="unitName"
-				:error-message="unitNameError"
-				@input="validateInput('unitName', $event)"
-			/>
-			<van-field
-				label="参观人数"
-				type="digit"
-				maxlength="5"
-				placeholder="参观人数宜在15-50之间"
-				:value="visitorsNumber"
-				:error-message="visitorsNumberError"
-				@input="visitorsNumber = $event.detail"
-			/>
-		</view>
+		<ReservationTeamPanel
+			theme="activity"
+			:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
+			:errors="{ leaderNameError, phoneNumberError, unitNameError, visitorsNumberError }"
+			@change="handleTeamFormChange"
+		/>
 
-		<view class="upload-card">
-			<view class="upload-title"> 预约上传文件 </view>
-			<view class="upload-desc"> 仅支持 Excel 文件（xls、xlsx） </view>
-			<view class="upload-desc"> 文件大小不超过 20MB </view>
-			<view v-if="!uploadedFileName" class="upload-btn" @click="chooseExcelFile"> 点击上传文件 </view>
-			<view v-if="uploadedFileName" class="file-row">
-				<view class="delete-btn" @click="removeExcelFile">删除</view>
-				<view class="uploaded-file">已上传：{{ uploadedFileName }}</view>
-			</view>
-		</view>
+		<ExcelUpload @getFile="handleExcelFile" />
 
 		<OnlineAsk :askInfo="askInfo" />
 
@@ -112,11 +50,15 @@
 
 <script>
 import { mapState } from 'vuex';
+import ReservationTeamPanel from '@/components/ReservationTeamPanel/ReservationTeamPanel.vue';
 import myData from '@/data/appointment.json';
 import Dialog from '@/wxcomponents/vant/dialog/dialog';
 import { getReservationTimeSlot, personalActivityTeamReservation } from '@/api/index';
 
 export default {
+	components: {
+		ReservationTeamPanel
+	},
 	data() {
 		return {
 			title: '',
@@ -144,12 +86,7 @@ export default {
 			visitorsNumberError: '',
 
 			selectedCal: null,
-
-			uploadedFile: null,
-			uploadedFileName: '',
 			base64File: '',
-			// templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
-			templateUrl: 'https://cseye-kpg.oss-cn-wuhan-lr.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
 	computed: {
@@ -171,138 +108,17 @@ export default {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
 		},
-		previewFile() {
-			uni.showLoading({
-				title: '加载中'
-			});
-
-			const fileName = '爱尔眼健康科普教育基地团队预约填写模板.xlsx';
-
-			uni.downloadFile({
-				url: this.templateUrl,
-
-				success: (res) => {
-					if (res.statusCode === 200) {
-						const fs = uni.getFileSystemManager();
-
-						// 小程序本地路径
-						const newPath = `${wx.env.USER_DATA_PATH}/${fileName}`;
-
-						// 复制并重命名
-						fs.copyFile({
-							srcPath: res.tempFilePath,
-							destPath: newPath,
-
-							success: () => {
-								uni.openDocument({
-									filePath: newPath,
-									showMenu: true
-								});
-							}
-						});
-					}
-				},
-
-				complete: () => {
-					uni.hideLoading();
-				}
-			});
+		handleExcelFile( file ) {
+			this.base64File = file;
 		},
-		chooseExcelFile() {
-			wx.chooseMessageFile({
-				count: 1,
-				type: 'file',
-				extension: ['xls', 'xlsx'],
-
-				success: (res) => {
-					const file = res.tempFiles[0];
-
-					const maxSize = 20 * 1024 * 1024;
-
-					if (file.size > maxSize) {
-						this.$toast({
-							message: '文件不能超过20MB'
-						});
-
-						return;
-					}
-
-					const fileName = file.name.toLowerCase();
-
-					const isExcel = fileName.endsWith('.xls') || fileName.endsWith('.xlsx');
-
-					if (!isExcel) {
-						this.$toast({
-							message: '仅支持Excel文件'
-						});
-
-						return;
-					}
-					uni.showLoading({
-						title: '处理中...',
-						mask: true
-					});
-					const fs = wx.getFileSystemManager();
-					fs.readFile({
-						filePath: file.path,
-						encoding: 'base64',
-						success: (readRes) => {
-							this.uploadedFile = file;
-							this.uploadedFileName = file.name;
-							const ext = file.name.split('.').pop().toLowerCase();
-
-							// 非标准 MIME
-							this.base64File = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.${ext};base64,${readRes.data}`;
-
-							this.$toast({
-								message: '上传成功'
-							});
-						},
-						fail: () => {
-							this.uploadedFile = null;
-							this.uploadedFileName = '';
-							this.base64File = '';
-							this.$toast({
-								message: '文件处理失败，请重试'
-							});
-						},
-						complete: () => {
-							uni.hideLoading();
-						}
-					});
-				},
-				fail: (err) => {
-					console.log(err);
-				}
-			});
-		},
-		removeExcelFile() {
-			this.uploadedFile = null;
-			this.uploadedFileName = '';
-			this.base64File = '';
-			this.$toast({
-				message: '已删除上传文件'
-			});
+		handleTeamFormChange({ field, value }) {
+			this[field] = value;
 		},
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
 				this.timeSlotList = res.data;
 				console.log('四个时间段的时间数据', this.timeSlotList);
 			});
-		},
-		validateInput(fieldName, event) {
-			const value = event.detail;
-			const allowedRegex = /^[a-zA-Z\u4e00-\u9fa5\s]*$/;
-			if (!allowedRegex.test(value)) {
-				this[fieldName] = value.replace(/[^a-zA-Z\u4e00-\u9fa5\s]/g, '');
-				uni.showToast({
-					title: '只能输入英文或中文，不允许特殊符号或数字',
-					icon: 'none',
-					duration: 3000
-				});
-			} else {
-				this[fieldName] = value;
-			}
 		},
 		submit() {
 			this.leaderNameError = '';
@@ -587,30 +403,6 @@ export default {
 	font-size: 24rpx;
 	color: #32579c;
 	word-break: break-all;
-}
-
-.team-submits-info-box {
-	width: 100%;
-	padding: 30rpx;
-	margin: 40rpx 0;
-	overflow: hidden;
-	border-radius: 24rpx;
-	box-sizing: border-box;
-	background-color: #fff;
-
-	.uni-forms-item {
-		margin-bottom: 30rpx;
-
-		&:last-child {
-			margin-bottom: 0;
-		}
-
-		.uni-forms-item__label {
-			color: #2a2a2a;
-			font-size: 28rpx;
-			width: 160rpx !important;
-		}
-	}
 }
 
 .submit-btn {
