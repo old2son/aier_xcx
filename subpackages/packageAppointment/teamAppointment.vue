@@ -4,27 +4,8 @@
 			<view>预约说明：</view>
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
 		</view>
-
-		<view class="download-card">
-			<view class="download-left">
-				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
-			</view>
-
-			<van-button size="small" round type="primary" @click="isShowFilePopup = true"> 下载 </van-button>
-		</view>
-		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
-			<view class="file-popup">
-				<view class="popup-title"> 文件下载 </view>
-
-				<view class="popup-tip"> 预览文件，发送到微信文件传输助手 </view>
-
-				<van-button block round type="primary" color="#32579c" @click="previewFile"> 预览文件 </van-button>
-
-				<!-- <van-button block round plain color="#32579c" @click="downloadFile"> 下载文件 </van-button> -->
-
-				<van-button block round @click="isShowFilePopup = false"> 返回 </van-button>
-			</view>
-		</van-popup>
+		
+		<ExcelSave />
 
 		<ReservationDateTimePanel
 			:selected-cal="selectedCal"
@@ -136,7 +117,6 @@ export default {
 			uploadedFile: null,
 			uploadedFileName: '',
 			base64File: '',
-			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 		};
 	},
 	computed: {
