@@ -33,6 +33,7 @@
 				color="#32579c"
 				type="primary"
 				@click="showAddMemberPopup(0)"
+				:plain="memberList.length > 0 ? true : false"
 			>
 				添加儿童
 			</van-button>
@@ -44,6 +45,7 @@
 				color="#32579c"
 				type="primary"
 				@click="showAddMemberPopup(1)"
+				:plain="memberList.length > 0 ? true : false"
 			>
 				添加成人
 			</van-button>

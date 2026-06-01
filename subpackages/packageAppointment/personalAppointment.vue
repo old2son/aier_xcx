@@ -117,8 +117,6 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			console.log('this.datethis.datethis.datethis.date', this.date);
-			console.log('this.selectedTimeSlotthis.selectedTimeSlotthis.selectedTimeSlot', this.selectedTimeSlot);
 			if (this.date && this.selectedTimeSlot) {
 				getReservationWeekNumbers({
 					dateTime: this.date,
