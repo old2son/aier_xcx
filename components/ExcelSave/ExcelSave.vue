@@ -5,7 +5,7 @@
 				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
 			</view>
 
-			<van-button size="small" round type="primary" @click="isShowFilePopup = true"> 下载 </van-button>
+			<van-button size="small" round type="primary" color="#4794ff" @click="isShowFilePopup = true"> 下载 </van-button>
 		</view>
 		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
 			<view class="file-popup">
@@ -25,7 +25,7 @@
 
 <script>
 export default {
-	name: 'excelSave',
+	name: 'ExcelSave',
 	data() {
 		return {
 			isShowFilePopup: false,
@@ -99,13 +99,6 @@ export default {
 	font-weight: 400;
 }
 
-::v-deep .download-card .van-button {
-	padding: 0 28rpx;
-	border-radius: 100rpx !important;
-	color: #fff !important;
-	border-color: #4794ff !important;
-	background: #4794ff !important;
-}
 
 .file-popup {
 	display: flex;
