@@ -399,7 +399,13 @@ export default {
 		}
 	},
 	mounted() {
-		this.qrcodeData = JSON.stringify(this.selectedReservation.members || this.selectedReservation);
+		let text = '';
+		if (this.selectedReservation.members?.length > 0) {
+			text = JSON.stringify(this.selectedReservation.members);
+		} else {
+			text = JSON.stringify(this.selectedReservation);
+		}
+		this.qrcodeData = text;
 	},
 	beforeDestroy() {
 		this.clearSavePressTimer();

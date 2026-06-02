@@ -374,14 +374,14 @@ export default {
 }
 
 .recommendation-box {
-	width: 90%;
-	margin: 0 auto;
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
+	width: 90%;
+	padding-bottom: 24rpx;
+	margin: 0 auto  80rpx;
 	overflow-x: auto; // 横向滚动
 	scroll-behavior: smooth;
-	padding-bottom: 24rpx;
-	margin-bottom: 80rpx;
+
 	.recommendation-item {
 		width: 40.2%;
 		margin-right: 4%;

@@ -208,7 +208,6 @@ export default {
 			if (!Array.isArray(item.members) || item.members.length === 0) {
 				return null;
 			}
-			console.log(item.members.find((member) => !!member.userPhone) || null);
 			return item.members.find((member) => !!member.userPhone) || null;
 		},
 		getDisplayName(item) {
@@ -278,7 +277,6 @@ export default {
 				reId: this.reId
 			})
 				.then((res) => {
-					console.log(res);
 					uni.showToast({
 						title: res.message,
 						duration: 3000,
