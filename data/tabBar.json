@@ -1,67 +1,67 @@
 {
-  "searchIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/home/%E6%90%9C%E7%B4%A2.png",
-  "searchPageIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/search-page-icon.png",
-  "loginPanelIcon": [
-    {
-      "id": 0,
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-phone-icon.svg"
-    },
-    {
-      "id": 1,
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-verification%20-code-icon.svg"
-    }
-  ],
-  "defaultAvatar": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E7%88%B1%E5%B0%94%E7%A7%91%E6%99%AEdefault-avatar.png",
-  "rightArrowIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/right-%E7%AE%AD%E5%A4%B4.png",
-  "signInBtn": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%8E%BB%E7%AD%BE%E5%88%B0.png",
-  "categoryList": [
-    {
-      "id": 0,
-      "title": "常用观众",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%B8%B8%E7%94%A8%E8%A7%82%E4%BC%97.png",
-      "tourl": "/subpackages/packageMine/audience/audienceManage"
-    },
-    {
-      "id": 1,
-      "title": "我的收藏",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%88%91%E7%9A%84%E6%94%B6%E8%97%8F.png",
-      "tourl": "/subpackages/packageMine/collect"
-    },
-    {
-      "id": 2,
-      "title": "浏览记录",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%B5%8F%E8%A7%88%E8%AE%B0%E5%BD%95.png",
-      "tourl": "/subpackages/packageMine/browsingHistory"
-    },
-    {
-      "id": 3,
-      "title": "消息中心",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%B6%88%E6%81%AF%E4%B8%AD%E5%BF%83.png",
-      "tourl": "/subpackages/packageMine/messageCenter/index"
-    }
-  ],
-  "mineAppointmentImage": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%88%91%E7%9A%84%E9%A2%84%E7%BA%A6.png",
-  "mineIntegralImage": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/EYE%E7%A7%AF%E5%88%86.png",
-  "bottomCategoryList": [
-    {
-      "id": 0,
-      "title": "在线咨询(非诊疗)",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/riFill-customer-service-2-fill%20Copy%402x.png",
-      "tourl": "/subpackages/packageMine/onlineConsultation"
-    },
-    {
-      "id": 1,
-      "title": "意见反馈",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/far%20fa-envelope%20Copy%402x.png",
-      "tourl": "/subpackages/packageMine/feedback"
-    },
-    {
-      "id": 2,
-      "title": "关于我们",
-      "imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/riLine-settings-3-line%20Copy%402x.png",
-      "tourl": "/subpackages/packageLogin/appletPrivacyPolicy"
-    }
-  ],
-  "robotPic": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/robot-pic.png",
-  "robotIntroduction": "您好！欢迎咨询眼健康科普问题（非医疗诊断）。请告诉我们您想了解的眼健康相关知识或疑问，我们将尽力为您提供解答。"
+	"searchIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/home/%E6%90%9C%E7%B4%A2.png",
+	"searchPageIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/search-page-icon.png",
+	"loginPanelIcon": [
+		{
+			"id": 0,
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-phone-icon.svg"
+		},
+		{
+			"id": 1,
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/login/login-verification%20-code-icon.svg"
+		}
+	],
+	"defaultAvatar": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E7%88%B1%E5%B0%94%E7%A7%91%E6%99%AEdefault-avatar.png",
+	"rightArrowIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/right-%E7%AE%AD%E5%A4%B4.png",
+	"signInBtn": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%8E%BB%E7%AD%BE%E5%88%B0.png",
+	"categoryList": [
+		{
+			"id": 0,
+			"title": "常用观众",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%B8%B8%E7%94%A8%E8%A7%82%E4%BC%97.png",
+			"tourl": "/subpackages/packageMine/audience/audienceManage"
+		},
+		{
+			"id": 1,
+			"title": "我的收藏",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%88%91%E7%9A%84%E6%94%B6%E8%97%8F.png",
+			"tourl": "/subpackages/packageMine/collect"
+		},
+		{
+			"id": 2,
+			"title": "浏览记录",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%B5%8F%E8%A7%88%E8%AE%B0%E5%BD%95.png",
+			"tourl": "/subpackages/packageMine/browsingHistory"
+		},
+		{
+			"id": 3,
+			"title": "消息中心",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%B6%88%E6%81%AF%E4%B8%AD%E5%BF%83.png",
+			"tourl": "/subpackages/packageMine/messageCenter/index"
+		}
+	],
+	"mineAppointmentImage": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%88%91%E7%9A%84%E9%A2%84%E7%BA%A6.png",
+	"mineIntegralImage": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/EYE%E7%A7%AF%E5%88%86.png",
+	"bottomCategoryList": [
+		{
+			"id": 0,
+			"title": "在线咨询(非诊疗)",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/riFill-customer-service-2-fill%20Copy%402x.png",
+			"tourl": "/subpackages/packageMine/onlineConsultation"
+		},
+		{
+			"id": 1,
+			"title": "意见反馈",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/far%20fa-envelope%20Copy%402x.png",
+			"tourl": "/subpackages/packageMine/feedback"
+		},
+		{
+			"id": 2,
+			"title": "关于我们",
+			"imgUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/riLine-settings-3-line%20Copy%402x.png",
+			"tourl": "/subpackages/packageLogin/appletPrivacyPolicy"
+		}
+	],
+	"robotPic": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/robot-pic.png",
+	"robotIntroduction": "您好！欢迎咨询眼健康科普问题（非医疗诊断）。请告诉我们您想了解的眼健康相关知识或疑问，我们将尽力为您提供解答。"
 }

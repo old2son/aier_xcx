@@ -1,57 +1,57 @@
 {
-  "editGenderIcon": [
-    {
-      "boyIcon": [
-        {
-          "url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/boy_grey.png"
-        },
-        {
-          "url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/boy_dark.png"
-        }
-      ]
-    },
-    {
-      "girlIcon": [
-        {
-          "url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/girl_grey.png"
-        },
-        {
-          "url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/girl_dark.png"
-        }
-      ]
-    }
-  ],
-  "goPoints": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/go-points.png",
-  "taskCenterList": [
-    {
-      "id": 0,
-      "iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E9%98%85%E8%AF%BB%E6%96%87%E7%AB%A0.png",
-      "toUrl": "/subpackages/packageCategory/hotScience/recommendation",
-      "title": "阅读文章",
-      "txt": "关注官方公众号",
-      "pointsTips": "+5积分",
-      "operateTxt": "去阅读"
-    },
-    {
-      "id": 1,
-      "iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%94%B6%E8%97%8F%E6%96%87%E7%AB%A0.png",
-      "toUrl": "/subpackages/packageCategory/hotScience/recommendation",
-      "title": "收藏文章",
-      "txt": "每天最多收藏5篇文章",
-      "pointsTips": "+5积分",
-      "operateTxt": "去收藏"
-    },
-    {
-      "id": 2,
-      "iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%8F%82%E4%B8%8E%E6%B4%BB%E5%8A%A8.png",
-      "toUrl": "/subpackages/packageCategory/activityCenter/index",
-      "title": "参与活动",
-      "txt": "报名参加线下官方活动",
-      "pointsTips": "+10积分",
-      "operateTxt": "去报名"
-    }
-  ],
-  "pointsIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E9%87%91%E5%B8%81.png",
-  "exchangeSuccess": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%85%91%E6%8D%A2success.png",
-  "exchangeFailed": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%85%91%E6%8D%A2error.png"
+	"editGenderIcon": [
+		{
+			"boyIcon": [
+				{
+					"url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/boy_grey.png"
+				},
+				{
+					"url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/boy_dark.png"
+				}
+			]
+		},
+		{
+			"girlIcon": [
+				{
+					"url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/girl_grey.png"
+				},
+				{
+					"url": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/userAvatar/girl_dark.png"
+				}
+			]
+		}
+	],
+	"goPoints": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/go-points.png",
+	"taskCenterList": [
+		{
+			"id": 0,
+			"iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E9%98%85%E8%AF%BB%E6%96%87%E7%AB%A0.png",
+			"toUrl": "/subpackages/packageCategory/hotScience/recommendation",
+			"title": "阅读文章",
+			"txt": "关注官方公众号",
+			"pointsTips": "+5积分",
+			"operateTxt": "去阅读"
+		},
+		{
+			"id": 1,
+			"iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E6%94%B6%E8%97%8F%E6%96%87%E7%AB%A0.png",
+			"toUrl": "/subpackages/packageCategory/hotScience/recommendation",
+			"title": "收藏文章",
+			"txt": "每天最多收藏5篇文章",
+			"pointsTips": "+5积分",
+			"operateTxt": "去收藏"
+		},
+		{
+			"id": 2,
+			"iconUrl": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%8F%82%E4%B8%8E%E6%B4%BB%E5%8A%A8.png",
+			"toUrl": "/subpackages/packageCategory/activityCenter/index",
+			"title": "参与活动",
+			"txt": "报名参加线下官方活动",
+			"pointsTips": "+10积分",
+			"operateTxt": "去报名"
+		}
+	],
+	"pointsIcon": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E9%87%91%E5%B8%81.png",
+	"exchangeSuccess": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%85%91%E6%8D%A2success.png",
+	"exchangeFailed": "https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/%E5%85%91%E6%8D%A2error.png"
 }
