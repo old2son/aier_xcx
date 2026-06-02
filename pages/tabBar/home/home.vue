@@ -240,9 +240,8 @@ export default {
 
 		toRec(cId) {
 			if (cId === 477) {
-				uni.navigateTo({
-					url: '/pages/tabBar/science/science'
-				});
+				uni.switchTab({ url: '/pages/tabBar/science/science' });
+				return;
 			}
 
 			if (cId === 478) {
