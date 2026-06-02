@@ -362,12 +362,12 @@
 				"selectedIconPath": "static/tab-icons/home-active.png",
 				"text": "首页"
 			},
-			{
-				"pagePath": "pages/tabBar/science/science",
-				"iconPath": "static/tab-icons/science.png",
-				"selectedIconPath": "static/tab-icons/science-active.png",
-				"text": "科普"
-			},
+			// {
+			// 	"pagePath": "pages/tabBar/science/science",
+			// 	"iconPath": "static/tab-icons/science.png",
+			// 	"selectedIconPath": "static/tab-icons/science-active.png",
+			// 	"text": "科普"
+			// },
 			// {
 			// 	"pagePath": "pages/tabBar/guide/guide",
 			// 	"iconPath": "static/tab-icons/guide.png",

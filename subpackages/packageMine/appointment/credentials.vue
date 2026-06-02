@@ -399,7 +399,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.qrcodeData = JSON.stringify(this.selectedReservation.members || []);
+		this.qrcodeData = JSON.stringify(this.selectedReservation.members || this.selectedReservation);
 	},
 	beforeDestroy() {
 		this.clearSavePressTimer();

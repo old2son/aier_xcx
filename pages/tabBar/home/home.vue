@@ -46,7 +46,12 @@
 						</view>
 					</view>
 					<view class="category-list">
-						<view class="category-item" v-for="(item, index) in homeData.categoryList" :key="item.id">
+						<view
+							class="category-item"
+							v-if="index !== 0"
+							v-for="(item, index) in homeData.categoryList"
+							:key="item.id"
+						>
 							<view class="image-wrapper">
 								<image
 									:src="item.imgUrl"
@@ -62,6 +67,7 @@
 					</view>
 					<view class="recommendation-box" v-if="recommendationList.length">
 						<view
+							v-if="index !== 0"
 							class="recommendation-item"
 							v-for="(item, index) in recommendationList"
 							:key="item.columnId"
@@ -328,10 +334,11 @@ export default {
 }
 
 .category-list {
+	display: flex;
+	justify-content: space-around;
 	width: 90%;
 	margin: 60rpx auto 80rpx auto;
-	display: flex;
-	justify-content: space-between;
+
 	.category-item {
 		width: 18.5%;
 		.image-wrapper {

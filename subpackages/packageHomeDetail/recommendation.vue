@@ -4,7 +4,7 @@
 			<image :src="banner" mode="widthFix"></image>
 		</view>
 		<view class="recommendation-list">
-			<view class="recommendation-item" v-for="(item, index) in recommendationList" :key="item.columnId" @click="toRec(item.columnId)">
+			<view class="recommendation-item" v-if="index !== 0" v-for="(item, index) in recommendationList" :key="item.columnId" @click="toRec(item.columnId)">
 				<image :src="item.h5FileUrl" mode="widthFix"></image>
 				<view class="txt">{{ item.fileName }}</view>
 			</view>
@@ -48,15 +48,11 @@ export default {
 
 <style lang="scss" scoped>
 .recommendation-container {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
 	width: 100%;
 	height: 100vh;
 	background-color: #fff;
 	.banner {
 		width: 100%;
-		height: 403px;
 		image {
 			width: 100%;
 			height: 100%;
@@ -64,16 +60,17 @@ export default {
 	}
 
 	.recommendation-list {
-		position: relative;
-		top: -142px;
-		width: 100%;
-		padding: 52rpx 4% 0 4%;
-		box-sizing: border-box;
-		background-color: #fff;
-		border-radius: 40rpx 40rpx 0 0;
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-between;
+		position: relative;
+		top: -302rpx;
+		width: 100%;
+		padding: 52rpx 4% 0 4%;
+		box-sizing: border-box;
+		border-radius: 40rpx 40rpx 0 0;
+		background-color: #fff;
+		
 		.recommendation-item {
 			background-color: #fff;
 			border-radius: 20rpx;
