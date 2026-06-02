@@ -1,6 +1,6 @@
 import request from './request';
 // const baseUrl = 'https://api.grandeffect.cn'; /* 格度 */
-const baseUrl = 'https://api.aierkepu.com'; /* 爱尔 */ 
+const baseUrl = 'https://api.aierkepu.com'; /* 爱尔 */
 
 /* ———— 首页页面接口 ———— */
 // 顶部 banner 轮播图
@@ -126,7 +126,7 @@ export const getScienceActivityEvents = () =>
 	request({
 		url: baseUrl + '/api/user/getScienceActivityEvents'
 	});
-	
+
 // 活动中心查询时间段预约人数
 export const getActivityReservationTimeSlotNumbers = (params) =>
 	request({
@@ -244,6 +244,16 @@ export const getHotRecommendInpage = (params) =>
 	request({
 		url: baseUrl + '/api/user/getHotRecommendInpage',
 		data: params
+	});
+// 查内页
+export const scienceArticleInformation = (params) =>
+	request({
+		url: baseUrl + '/api/user/scienceArticleInformation',
+		method: 'POST',
+		data: params,
+		auth: {
+			needLogin: true
+		}
 	});
 // 热门推荐
 export const getSciencePopularRecommendations = () =>

@@ -237,17 +237,16 @@ export default {
 				url: '/subpackages/' + url
 			});
 		},
-
 		toRec(cId) {
 			if (cId === 477) {
 				uni.switchTab({ url: '/pages/tabBar/science/science' });
 				return;
 			}
 
-			if (cId === 478) {
-			}
-
-			if (cId === 479) {
+			if (cId === 478 || cId === 479) {
+				uni.navigateTo({
+					url: '/subpackages/packageHomeDetail/noImgList?cId=' + cId
+				});
 			}
 		}
 	}

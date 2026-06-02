@@ -46,6 +46,17 @@ const router = createRouter({
 			name: '搜索'
 		},
 		{
+			path: '/subpackages/packageHomeDetail/noImgList',
+			name: '列表'
+		},
+		{
+			path: '/subpackages/packageHomeDetail/imgDetail',
+			name: '详情',
+			meta: {
+				needLogin: true
+			}
+		},
+		{
 			path: '/subpackages/packageCategory/hotScience/categoryIconInner',
 			name: 'categoryInit'
 		},
