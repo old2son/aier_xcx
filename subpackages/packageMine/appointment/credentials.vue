@@ -56,7 +56,7 @@
 			ref="qrcodeRef"
 			useCanvasToTempFilePath
 			@success="success"
-			:value="`https://www.example.com?data=${qrcodeData}`"
+			:value="qrcodeData"
 		/>
 		<canvas
 			canvas-id="credentialCanvas"

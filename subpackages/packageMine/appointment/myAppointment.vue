@@ -30,11 +30,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ !item.members || item.members.length === 0 ? item.name : getMember(item).userName }}</text>
+											<text>{{ getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ !item.members || item.members.length === 0 ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -78,11 +78,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ !item.members || item.members.length === 0 ? item.name : getMember(item).userName }}</text>
+											<text>{{ getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ !item.members || item.members.length === 0 ? formatPhone(item.phone) : formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -121,11 +121,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getMember(item).userName }}</text>
+											<text>{{ getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ formatPhone(getMember(item).userPhone) }}</text>
+											<text>{{ getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -205,12 +205,32 @@ export default {
 	},
 	methods: {
 		getMember(item) {
-			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
+			if (!Array.isArray(item.members) || item.members.length === 0) {
+				return null;
+			}
+			console.log(item.members.find((member) => !!member.userPhone) || null);
+			return item.members.find((member) => !!member.userPhone) || null;
+		},
+		getDisplayName(item) {
+			const member = this.getMember(item);
+			if (!Array.isArray(item.members) || item.members.length === 0) {
+				return item.name || '';
+			}
+			return member && member.userPhone ? member.userName || '' : '';
+		},
+		getDisplayPhone(item) {
+			const member = this.getMember(item);
+			if (!Array.isArray(item.members) || item.members.length === 0) {
+				return this.formatPhone(item.phone);
+			}
+			return member && member.userPhone ? this.formatPhone(member.userPhone) : '';
 		},
 		formatPhone(phone) {
-			if (!phone || phone.length < 7) return phone;
+			if (!phone) return '';
+			const phoneText = String(phone);
+			if (phoneText.length < 7) return phoneText;
 			// 只保留前三位和后四位，中间用 **** 替代
-			return phone.slice(0, 3) + '****' + phone.slice(-4);
+			return phoneText.slice(0, 3) + '****' + phoneText.slice(-4);
 		},
 		getReservationRecord() {
 			uni.showLoading({

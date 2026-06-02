@@ -5,7 +5,7 @@
 				<view class="download-title"> 《爱尔眼健康科普教育基地团队预约填写模板》 </view>
 			</view>
 
-			<van-button size="small" round type="primary" color="#4794ff" @click="isShowFilePopup = true"> 下载 </van-button>
+			<van-button size="small" round type="primary" color="#4794ff" @click="openDownload"> 下载 </van-button>
 		</view>
 		<van-popup :show="isShowFilePopup" round position="bottom" @close="isShowFilePopup = false">
 			<view class="file-popup">
@@ -30,7 +30,8 @@ export default {
 		return {
 			isShowFilePopup: false,
 			// templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
-			templateUrl: 'https://cseye-kpg.oss-cn-wuhan-lr.aliyuncs.com/aier-applet/template_regist_team.xlsx'
+			// templateUrl: 'https://cseye-kpg.oss-cn-wuhan-lr.aliyuncs.com/aier-applet/template_regist_team.xlsx'
+			templateUrl: ''
 		};
 	},
 	methods: {
@@ -70,6 +71,14 @@ export default {
 					uni.hideLoading();
 				}
 			});
+		},
+		openDownload() {
+			if (this.templateUrl === '') {
+				this.$toast('模板文件不存在');
+				return;
+			}
+			
+			this.isShowFilePopup = true;
 		}
 	}
 };
