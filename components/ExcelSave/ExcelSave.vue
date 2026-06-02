@@ -29,9 +29,8 @@ export default {
 	data() {
 		return {
 			isShowFilePopup: false,
-			// templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
+			templateUrl: 'https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/template_regist_team.xlsx'
 			// templateUrl: 'https://cseye-kpg.oss-cn-wuhan-lr.aliyuncs.com/aier-applet/template_regist_team.xlsx'
-			templateUrl: ''
 		};
 	},
 	methods: {
