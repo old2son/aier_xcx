@@ -3,7 +3,7 @@
 		<view class="online-ask-wrap layout-center-92">
 			<view class="introduce-1" :style="{ color: askInfo.spanColor }">{{ askInfo.introduce1 }}</view>
 			<view class="introduce-2" :style="{ color: askInfo.spanColor }">{{ askInfo.introduce2 }}</view>
-			<view class="qr-code-image">
+			<view class="qr-code-image" @click="previewQrCode">
 				<image :src="askInfo.qrCode" mode="widthFix" />
 			</view>
 		</view>
@@ -22,6 +22,13 @@ export default {
 				introduce2: '',
 				qrCode: '',
 				spanColor: '#000' // 添加默认颜色
+			})
+		}
+	},
+	methods: {
+		previewQrCode() {
+			wx.previewImage({
+				urls: [this.askInfo.qrCode]
 			})
 		}
 	}
