@@ -175,7 +175,7 @@ export default {
 								new Promise((resolve) => {
 									if (action === 'confirm') {
 										uni.reLaunch({
-											url: '/subpackages/packageMine/messageCenter/index'
+											url: '/subpackages/packageMine/appointment/myAppointment'
 										});
 									}
 									resolve(true); // 无论是否跳转都允许关闭
