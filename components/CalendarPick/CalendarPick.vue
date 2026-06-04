@@ -103,8 +103,14 @@ export default {
 	methods: {
 		onSelectDate(event) {
 			const current = dayjs(event.detail);
+			const pages = getCurrentPages();
+			const currentPage = pages[pages.length - 1];
 
-			this.isActivityDay = isInActivityRange(current);
+			if (currentPage.route.includes('activityCenter')) {
+				this.isActivityDay = false;
+			} else {
+				this.isActivityDay = isInActivityRange(current);
+			}
 
 			const date = current.format('MM-DD');
 
