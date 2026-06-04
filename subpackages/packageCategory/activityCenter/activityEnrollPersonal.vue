@@ -190,7 +190,7 @@ export default {
 								new Promise((resolve) => {
 									if (action === 'confirm') {
 										uni.reLaunch({
-											url: `/subpackages/packageMine/points/index?remind=true`
+											url: '/subpackages/packageMine/messageCenter/index'
 										});
 									}
 									resolve(true); // 无论是否跳转都允许关闭

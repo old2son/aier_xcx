@@ -4,7 +4,7 @@
 			<view>预约说明：</view>
 			<view>研学合作仅供学校、团队组织等填写，以便在线提前申请参观时间。</view>
 		</view>
-		
+
 		<ExcelSave />
 
 		<ReservationDateTimePanel
@@ -76,8 +76,7 @@ export default {
 			base64File: ''
 		};
 	},
-	computed: {
-	},
+	computed: {},
 	methods: {
 		handlePopupClose() {
 			this.showReservationPopup = false;
@@ -90,7 +89,7 @@ export default {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
 		},
-		handleExcelFile( file ) {
+		handleExcelFile(file) {
 			this.base64File = file;
 		},
 		handleTeamFormChange({ field, value }) {
@@ -179,18 +178,16 @@ export default {
 						Dialog.alert({
 							message: '您已成功预约',
 							theme: 'round-button',
-							confirmButtonText: '我知道了'
-						}).then(() => {
-							const pages = getCurrentPages();
-							if (pages.length > 1) {
-								uni.navigateBack({
-									delta: 1
-								});
-							} else {
-								uni.reLaunch({
-									url: '/pages/tabBar/home/home'
-								});
-							}
+							confirmButtonText: '我知道了',
+							beforeClose: (action) =>
+								new Promise((resolve) => {
+									if (action === 'confirm') {
+										uni.reLaunch({
+											url: '/subpackages/packageMine/messageCenter/index'
+										});
+									}
+									resolve(true); // 无论是否跳转都允许关闭
+								})
 						});
 					} else {
 						uni.hideLoading();
