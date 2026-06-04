@@ -10,7 +10,9 @@
 				@tap="selectTimeSlot(item.name, index)"
 			>
 				<view class="time-slot-part">{{ item.name }}</view>
-				<view class="reservation-num" v-if="needTimeSlotRequest">已报名：{{ item.reservationNumber }}人</view>
+				<view class="reservation-num" v-if="needTimeSlotRequest && typeof item.reservationNumber === 'number'"
+					>已报名：{{ item.reservationNumber }}人</view
+				>
 			</view>
 			<view
 				:style="weight ? 'font-weight: bold; font-size: 32rpx;' : ''"
