@@ -151,6 +151,22 @@ export default {
 		updateVerCode(event) {
 			this.verificationCodeLoginParams.code = event.detail;
 		},
+		getWxCode() {
+			return new Promise((resolve, reject) => {
+				wx.login({
+					success(res) {
+						if (res.code) {
+							resolve(res.code);
+						} else {
+							reject(new Error('获取登录凭证失败'));
+						}
+					},
+					fail(err) {
+						reject(err);
+					}
+				});
+			});
+		},
 		// 发送手机验证码
 		async getVerificationCode() {
 			await this.checkPrivacy(); // 获取验证码查询是否同意《小程序用户隐私保护指引》
@@ -254,7 +270,8 @@ export default {
 			if (this.stopRun) return;
 
 			const detail = event.detail || {};
-			if (detail.errMsg !== 'getPhoneNumber:ok' || !detail.code) {
+
+			if (!detail.code) {
 				this.$toast({
 					message: '未授权手机号，无法快捷登录'
 				});
@@ -262,77 +279,61 @@ export default {
 			}
 
 			uni.showLoading();
-			wx.login({
-				success: async (loginRes) => {
-					if (!loginRes.code) {
-						uni.hideLoading();
-						this.$toast({
-							message: '获取登录凭证失败'
-						});
-						return;
-					}
 
-					try {
-						const resp = await this.$store.dispatch('moduleUser/phoneQuickLogin', {
-							wxCode: loginRes.code,
-							phone: event.detail.code
-						});
-						if (resp.code === 200) {
-							uni.switchTab({
-								url: '/pages/tabBar/mine/mine'
-							});
-						} else {
-							this.$toast({
-								message: resp.message || '快捷登录失败'
-							});
-						}
-					} finally {
-						uni.hideLoading();
-					}
-				},
-				fail: () => {
-					uni.hideLoading();
+			try {
+				const wxCode = await this.getWxCode();
+
+				const resp = await this.$store.dispatch('moduleUser/phoneQuickLogin', {
+					wxCode,
+					phone: detail.code
+				});
+
+				if (resp.code === 200 && resp.data) {
+					uni.switchTab({
+						url: '/pages/tabBar/mine/mine'
+					});
+				} else {
 					this.$toast({
-						message: '获取登录凭证失败'
+						message: resp.message || '快捷登录失败'
 					});
 				}
-			});
+			} catch (e) {
+				this.$toast({
+					message: '获取登录凭证失败'
+				});
+			} finally {
+				uni.hideLoading();
+			}
 		},
-		verificationCodeLogin() {
+		async verificationCodeLogin() {
 			if (!this.validatePhoneForm()) return;
+
 			uni.showLoading();
 
-			wx.login({
-				success: (loginRes) => {
-					if (!loginRes.code) {
-						uni.hideLoading();
-						this.$toast({
-							message: '获取登录凭证失败'
-						});
-						return;
-					}
-					
-					this.verificationCodeLoginParams.wxCode = loginRes.code;
-					this.$store
-						.dispatch('moduleUser/verificationCodeLogin', this.verificationCodeLoginParams)
-						.then((resp) => {
-							if (resp.code === 200) {
-								uni.switchTab({
-									url: '/pages/tabBar/mine/mine'
-								});
-							}
-						})
-						.finally(() => {
-							uni.hideLoading();
-						});
-				},
-				fail: () => {
-					uni.hideLoading();
+			try {
+				const wxCode = await this.getWxCode();
+
+				const resp = await this.$store.dispatch('moduleUser/verificationCodeLogin', {
+					...this.verificationCodeLoginParams,
+					wxCode
+				});
+
+				if (resp.code === 200 && resp.data) {
+					uni.switchTab({
+						url: '/pages/tabBar/mine/mine'
+					});
+				} else {
 					this.$toast({
-						message: '获取登录凭证失败'
+						message: resp.message || '登录失败'
 					});
 				}
-			});
+			} catch (e) {
+				this.$toast({
+					message: '获取登录凭证失败'
+				});
+			} finally {
+				uni.hideLoading();
+			}
 		},
 		toAppletPrivacyPolicy() {
 			uni.navigateTo({
