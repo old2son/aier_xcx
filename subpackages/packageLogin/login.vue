@@ -293,14 +293,20 @@ export default {
 						url: '/pages/tabBar/mine/mine'
 					});
 				} else {
-					this.$toast({
-						message: resp.message || '快捷登录失败'
-					});
+					uni.hideLoading();
+					setTimeout(() => {
+						this.$toast({
+							message: resp.message || '登录失败'
+						});
+					}, 50);
 				}
 			} catch (e) {
-				this.$toast({
-					message: '获取登录凭证失败'
-				});
+				uni.hideLoading();
+				setTimeout(() => {
+					this.$toast({
+						message: '获取登录凭证失败'
+					});
+				}, 50);
 			} finally {
 				uni.hideLoading();
 			}
@@ -323,14 +329,20 @@ export default {
 						url: '/pages/tabBar/mine/mine'
 					});
 				} else {
-					this.$toast({
-						message: resp.message || '登录失败'
-					});
+					uni.hideLoading();
+					setTimeout(() => {
+						this.$toast({
+							message: resp.message || '登录失败'
+						});
+					}, 50);
 				}
 			} catch (e) {
-				this.$toast({
-					message: '获取登录凭证失败'
-				});
+				uni.hideLoading();
+				setTimeout(() => {
+					this.$toast({
+						message: '获取登录凭证失败'
+					});
+				}, 50);
 			} finally {
 				uni.hideLoading();
 			}
