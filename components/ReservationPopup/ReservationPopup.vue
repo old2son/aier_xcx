@@ -14,8 +14,14 @@
 					>预约须知中的开放时间修改为上午 08:30-12:00 下午 14:30-17:00（17:00后停止入馆）</text
 				>
 				<view class="h2-tl">（二）个人预约规则</view>
+				<view class="tips-img">
+					<image
+						mode="widthFix"
+						src="https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/personal_tips.png"
+					></image>
+				</view>
 
-				<view class="h3-tl">1.预约对象</view>
+				<!-- <view class="h3-tl">1.预约对象</view>
 				<view class="ul">
 					<view class="li">·所有社会公众个人及家庭（14岁以下未成年人需由成人陪同）</view>
 					<view class="li">·个人预约每单最多可预约5人（含预约者本人）</view>
@@ -47,7 +53,7 @@
 				<view class="ul">
 					<view class="li">·如需修改或取消，请于参观前24小时在平台操作</view>
 					<view class="li">·每人每月限取消3次，超过将影响后续预约</view>
-				</view>
+				</view> -->
 
 				<van-checkbox :value="checked" shape="square" @change="toggleCheckbox"
 					>我已阅读并同意温馨提示内容</van-checkbox
@@ -71,8 +77,14 @@
 					>预约须知中的开放时间修改为上午 08:30-12:00 下午14:30-17:00（17:00后停止入馆）</text
 				>
 				<view class="h2-tl">（二）团队预约规则</view>
+				<view class="tips-img">
+					<image
+						mode="widthFix"
+						src="https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/aier-applet/team_tips.png"
+					></image>
+				</view>
 
-				<view class="h3-tl">1.预约对象与人数要求</view>
+				<!-- <view class="h3-tl">1.预约对象与人数要求</view>
 				<view class="ul">
 					<view class="li">·学校、企事业单位、社区组织、旅行社等团体组织</view>
 					<view class="li"
@@ -125,7 +137,7 @@
 					<view class="li">·团队需提前10分钟到达，进行签到准备和注意事项讲解</view>
 					<view class="li">·团队参观期间请保持秩序，服从场馆工作人员引导</view>
 					<view class="li">·活动预约与参观预约共享名额，请勿在统一时段重复预约</view>
-				</view>
+				</view> -->
 
 				<van-checkbox :value="checked" shape="square" @change="toggleCheckbox"
 					>我已阅读并同意温馨提示内容</van-checkbox
@@ -212,14 +224,24 @@ export default {
 }
 
 .tips-content {
-	width: 100%;
-	height: 90%;
 	display: flex;
 	flex-direction: column;
-	color: #333;
-	padding: 0 48rpx 5% 48rpx;
-	box-sizing: border-box;
+	width: 100%;
+	height: 90%;
+	padding: 0 48rpx 5%;
 	overflow-y: auto;
+	box-sizing: border-box;
+	color: #333;
+
+	.tips-img {
+		margin: 0 -24rpx;
+
+		image {
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+		}
+	}
 }
 
 .personal {
@@ -290,8 +312,8 @@ export default {
 
 .overview {
 	display: block;
-	margin-top: 16rpx;
 	line-height: 1.6;
+	margin-top: 16rpx;
 	font-size: 28rpx;
 }
 
