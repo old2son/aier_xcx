@@ -106,7 +106,6 @@
 <script>
 import loginData from '@/data/login.json';
 import { mapState } from 'vuex';
-
 import { sendCode } from '@/api/index.js';
 
 export default {
@@ -275,8 +274,8 @@ export default {
 
 					try {
 						const resp = await this.$store.dispatch('moduleUser/phoneQuickLogin', {
-							wxCode:  loginRes.code,
-							phone: event.detail.code,
+							wxCode: loginRes.code,
+							phone: event.detail.code
 						});
 						if (resp.code === 200) {
 							uni.switchTab({
@@ -302,18 +301,38 @@ export default {
 		verificationCodeLogin() {
 			if (!this.validatePhoneForm()) return;
 			uni.showLoading();
-			this.$store
-				.dispatch('moduleUser/verificationCodeLogin', this.verificationCodeLoginParams)
-				.then((resp) => {
-					if (resp.code === 200) {
-						uni.switchTab({
-							url: '/pages/tabBar/mine/mine'
+
+			wx.login({
+				success: (loginRes) => {
+					if (!loginRes.code) {
+						uni.hideLoading();
+						this.$toast({
+							message: '获取登录凭证失败'
 						});
+						return;
 					}
-				})
-				.finally(() => {
+					
+					this.verificationCodeLoginParams.wxCode = loginRes.code;
+					this.$store
+						.dispatch('moduleUser/verificationCodeLogin', this.verificationCodeLoginParams)
+						.then((resp) => {
+							if (resp.code === 200) {
+								uni.switchTab({
+									url: '/pages/tabBar/mine/mine'
+								});
+							}
+						})
+						.finally(() => {
+							uni.hideLoading();
+						});
+				},
+				fail: () => {
 					uni.hideLoading();
-				});
+					this.$toast({
+						message: '获取登录凭证失败'
+					});
+				}
+			});
 		},
 		toAppletPrivacyPolicy() {
 			uni.navigateTo({
