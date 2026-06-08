@@ -20,6 +20,13 @@ export const getScienceHomeBaseDynamics = () =>
 	});
 
 /* ———— 登录页面接口 ———— */
+// 小程序登录
+export const miniProgramLogin = (params) =>
+	request({
+		url: baseUrl + '/api/user/miniProgramLogin',
+		data: params,
+		method: 'POST'
+	});
 // 发送（登录/注册）手机验证码
 export const sendCode = (params) =>
 	request({
@@ -32,7 +39,7 @@ export const scienceMuseumUserLogin = (params) =>
 	request({
 		url: baseUrl + '/api/user/scienceMuseumUserLogin',
 		data: params,
-		method: 'POST'
+		method: 'POST',
 	});
 // 帐号登出
 export const scienceMuseumUserLogOut = () =>

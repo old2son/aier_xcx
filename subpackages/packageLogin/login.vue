@@ -1,76 +1,105 @@
 <template>
 	<view class="login-container">
-		<view class="login-logo">
-			<image :src="loginLogo" mode="heightFix" />
-		</view>
+		<view>
+			<view class="login-logo">
+				<image :src="loginLogo" mode="heightFix" />
+			</view>
 
-		<view class="login-panel">
-			<view class="title-text">欢迎登录</view>
-			<van-cell-group>
-				<van-field
-					clearable
-					type="tel"
-					maxlength="11"
-					:adjust-position="false"
-					placeholder="请输入手机号"
-					:left-icon="loginPanelIcon[0].imgUrl"
-					:value="verificationCodeLoginParams.phone"
-					@input="updatePhone"
-				/>
-				<van-field
-					clearable
-					type="number"
-					maxlength="6"
-					:adjust-position="false"
-					placeholder="验证码"
-					custom-class="second-field"
-					:left-icon="loginPanelIcon[1].imgUrl"
-					:value="verificationCodeLoginParams.code"
-					@input="updateVerCode"
-				>
-					<van-button
-						slot="button"
-						size="small"
-						type="primary"
-						color="transparent"
-						custom-class="send-btn"
-						:disabled="!isPhoneValid || countDown !== 0"
-						@click="getVerificationCode"
+			<view class="login-panel">
+				<view class="login-mode-tabs">
+					<view
+						class="mode-item"
+						:class="{ 'mode-active': loginMode === 'quick' }"
+						@click="switchLoginMode('quick')"
 					>
-						<text class="prepare-sending" v-if="countDown === 0">获取验证码</text>
-						<text class="is-sending" v-else>已发送({{ countDown }}s)</text>
-					</van-button>
-				</van-field>
-			</van-cell-group>
-
-			<view class="tip-text">首次登录将自动注册</view>
-			<van-button
-				round
-				color="#32579c"
-				size="large"
-				class="login-btn"
-				custom-style="height: 88rpx"
-				@click="verificationCodeLogin"
-			>
-				立即登录
-			</van-button>
-
-			<view class="privacy-policy-wrap">
-				<view class="policy-point-block">
-					<van-checkbox
-						:value="checked"
-						checked-color="#32579c"
-						icon-size="28rpx"
-						@change="toggleCheckbox()"
+						手机号快捷登录
+					</view>
+					<view
+						class="mode-item"
+						:class="{ 'mode-active': loginMode === 'code' }"
+						@click="switchLoginMode('code')"
+					>
+						手机验证码登录
+					</view>
+				</view>
+				<view class="title-text">欢迎登录</view>
+				<van-cell-group v-if="loginMode === 'code'">
+					<van-field
+						clearable
+						type="tel"
+						maxlength="11"
+						:adjust-position="false"
+						placeholder="请输入手机号"
+						:left-icon="loginPanelIcon[0].imgUrl"
+						:value="verificationCodeLoginParams.phone || ''"
+						@input="updatePhone"
 					/>
-					<text>已阅读并同意</text>
-					<text class="link-text" @click="toAppletPrivacyPolicy">《爱尔眼健康科普教育基地隐私政策》</text>
+					<van-field
+						clearable
+						type="number"
+						maxlength="6"
+						:adjust-position="false"
+						placeholder="验证码"
+						custom-class="second-field"
+						:left-icon="loginPanelIcon[1].imgUrl"
+						:value="verificationCodeLoginParams.code || ''"
+						@input="updateVerCode"
+					>
+						<van-button
+							slot="button"
+							size="small"
+							type="primary"
+							color="transparent"
+							custom-class="send-btn"
+							:disabled="!isPhoneValid || countDown !== 0"
+							@click="getVerificationCode"
+						>
+							<text class="prepare-sending" v-if="countDown === 0">获取验证码</text>
+							<text class="is-sending" v-else>已发送({{ countDown }}s)</text>
+						</van-button>
+					</van-field>
+				</van-cell-group>
+				<view v-else class="quick-login-wrap">
+					<button
+						v-if="checked"
+						class="quick-login-btn"
+						open-type="getPhoneNumber"
+						@getphonenumber="handleQuickPhoneLogin"
+					>
+						手机号快捷登录
+					</button>
+					<button v-else class="quick-login-btn" @click="handleQuickPhoneLogin">手机号快捷登录</button>
+				</view>
+
+				<van-button
+					v-if="loginMode === 'code'"
+					round
+					color="#32579c"
+					size="large"
+					class="login-btn"
+					custom-style="height: 88rpx"
+					@click="verificationCodeLogin"
+				>
+					立即登录
+				</van-button>
+
+				<view class="privacy-policy-wrap">
+					<view class="policy-point-block">
+						<van-checkbox
+							:value="checked"
+							checked-color="#32579c"
+							icon-size="28rpx"
+							@change="toggleCheckbox()"
+						/>
+						<text>已阅读并同意</text>
+						<text class="link-text" @click="toAppletPrivacyPolicy">《爱尔眼健康科普教育基地隐私政策》</text>
+					</view>
 				</view>
 			</view>
+			<Popup ref="privacyPopup" :type="'center'" :maskClick="false">
+				<PrivacyPopup @closePopup="closePopup"></PrivacyPopup>
+			</Popup>
 		</view>
-		<Popup ref="privacyPopup" :type="'center'" :maskClick="false">
-			<PrivacyPopup @closePopup="closePopup"></PrivacyPopup>
-		</Popup>
 	</view>
 </template>
 
@@ -78,7 +107,7 @@
 import loginData from '@/data/login.json';
 import { mapState } from 'vuex';
 
-import { sendCode } from '@/api';
+import { sendCode } from '@/api/index.js';
 
 export default {
 	data() {
@@ -94,13 +123,13 @@ export default {
 			countDown: 0,
 
 			checkClause: false, // 是否勾选隐私条款
-			stopRun: false // 是否阻止继续进行
+			stopRun: false, // 是否阻止继续进行
+			loginMode: 'quick'
 		};
 	},
 	computed: {
 		...mapState('moduleUser', ['showPrivacyPopup']),
 		isPhoneValid() {
-			console.log('？？？？？', /^[1][2-9][0-9]{9}$/.test(this.verificationCodeLoginParams.phone));
 			return /^[1][2-9][0-9]{9}$/.test(this.verificationCodeLoginParams.phone);
 		}
 	},
@@ -114,6 +143,9 @@ export default {
 		}
 	},
 	methods: {
+		switchLoginMode(mode) {
+			this.loginMode = mode;
+		},
 		updatePhone(event) {
 			this.verificationCodeLoginParams.phone = event.detail;
 		},
@@ -147,7 +179,6 @@ export default {
 		},
 		validatePhoneForm() {
 			const t = this.verificationCodeLoginParams;
-			console.log('t', t);
 			if (!t.phone) {
 				this.$toast({
 					message: '请输入您的手机号码'
@@ -211,6 +242,62 @@ export default {
 					this.countDown = 0; // 保证不会跌破 0
 				}
 			}, 1000);
+		},
+		async handleQuickPhoneLogin(event) {
+			if (!this.checked) {
+				this.$toast({
+					message: '请同意协议和隐私政策'
+				});
+				return;
+			}
+
+			await this.checkPrivacy();
+			if (this.stopRun) return;
+
+			const detail = event.detail || {};
+			if (detail.errMsg !== 'getPhoneNumber:ok' || !detail.code) {
+				this.$toast({
+					message: '未授权手机号，无法快捷登录'
+				});
+				return;
+			}
+
+			uni.showLoading();
+			wx.login({
+				success: async (loginRes) => {
+					if (!loginRes.code) {
+						uni.hideLoading();
+						this.$toast({
+							message: '获取登录凭证失败'
+						});
+						return;
+					}
+
+					try {
+						const resp = await this.$store.dispatch('moduleUser/phoneQuickLogin', {
+							wxCode:  loginRes.code,
+							phone: event.detail.code,
+						});
+						if (resp.code === 200) {
+							uni.switchTab({
+								url: '/pages/tabBar/mine/mine'
+							});
+						} else {
+							this.$toast({
+								message: resp.message || '快捷登录失败'
+							});
+						}
+					} finally {
+						uni.hideLoading();
+					}
+				},
+				fail: () => {
+					uni.hideLoading();
+					this.$toast({
+						message: '获取登录凭证失败'
+					});
+				}
+			});
 		},
 		verificationCodeLogin() {
 			if (!this.validatePhoneForm()) return;
@@ -276,6 +363,32 @@ export default {
 			margin-bottom: 8%;
 		}
 
+		.login-mode-tabs {
+			display: flex;
+			align-items: center;
+			margin-bottom: 56rpx;
+			padding: 8rpx;
+			border-radius: 999rpx;
+			background: #eef3fb;
+		}
+
+		.mode-item {
+			flex: 1;
+			height: 72rpx;
+			line-height: 72rpx;
+			border-radius: 999rpx;
+			text-align: center;
+			color: #7c7e80;
+			font-size: 28rpx;
+		}
+
+		.mode-active {
+			color: #32579c;
+			font-weight: 600;
+			background: #fff;
+			box-shadow: 0 4rpx 16rpx rgba(50, 87, 156, 0.12);
+		}
+
 		.tip-text {
 			margin: 3% auto 20% auto;
 			font-size: 24rpx;
@@ -289,9 +402,30 @@ export default {
 			font-size: 36rpx;
 		}
 
+		.quick-login-wrap {
+			padding: 20rpx 0;
+		}
+
+		.quick-login-btn {
+			height: 88rpx;
+			line-height: 88rpx;
+			border-radius: 999rpx;
+			color: #fff;
+			font-size: 36rpx;
+			background-color: #32579c;
+		}
+
+		.quick-login-btn::after {
+			display: none;
+		}
+
 		::v-deep .van-cell {
 			display: flex;
 			align-items: center;
+		}
+
+		::v-deep .second-field {
+			margin-bottom: 50rpx;
 		}
 
 		::v-deep .second-field .van-field__body {
