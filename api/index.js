@@ -39,7 +39,7 @@ export const scienceMuseumUserLogin = (params) =>
 	request({
 		url: baseUrl + '/api/user/scienceMuseumUserLogin',
 		data: params,
-		method: 'POST',
+		method: 'POST'
 	});
 // 帐号登出
 export const scienceMuseumUserLogOut = () =>
@@ -117,6 +117,19 @@ export const personalReservation = (params) =>
 export const teamReservation = (params) =>
 	request({
 		url: baseUrl + '/api/user/teamReservation',
+		data: params,
+		method: 'POST',
+		auth: {
+			needLogin: true
+		}
+	});
+/** 
+ * 推送预约通知
+ * 参数：reId，预约ID 
+ * */
+export const sendAppointmentSuccess = (params) =>
+	request({
+		url: baseUrl + '/api/user/sendAppointmentSuccess',
 		data: params,
 		method: 'POST',
 		auth: {
