@@ -67,6 +67,7 @@
 </template>
 
 <script>
+// todo: 优化使用reId获取入场凭证内容，以配合通知查看使用
 import { mapState } from 'vuex';
 
 export default {

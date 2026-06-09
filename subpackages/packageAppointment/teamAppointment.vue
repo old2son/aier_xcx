@@ -40,15 +40,11 @@
 </template>
 
 <script>
-import ReservationTeamPanel from '@/components/ReservationTeamPanel/ReservationTeamPanel.vue';
 import myData from '@/data/appointment.json';
-import Dialog from '@/wxcomponents/vant/dialog/dialog';
-import { getReservationTimeSlot, teamReservation } from '@/api';
+import { handleReservationResult } from '@/utils/reservation.js';
+import { getReservationTimeSlot, teamReservation } from '@/api/index.js';
 
 export default {
-	components: {
-		ReservationTeamPanel
-	},
 	data() {
 		return {
 			showReservationPopup: true,
@@ -174,30 +170,7 @@ export default {
 				delayPromise
 			])
 				.then(([res]) => {
-					if (res.code === 200 && res.message === '您已成功预约') {
-						Dialog.alert({
-							message: '您已成功预约',
-							theme: 'round-button',
-							confirmButtonText: '我知道了',
-							beforeClose: (action) =>
-								new Promise((resolve) => {
-									if (action === 'confirm') {
-										uni.reLaunch({
-											url: '/subpackages/packageMine/appointment/myAppointment'
-										});
-									}
-									resolve(true); // 无论是否跳转都允许关闭
-								})
-						});
-					} else {
-						uni.hideLoading();
-						setTimeout(() => {
-							this.$toast({
-								duration: 3000,
-								message: res.message
-							});
-						}, 50);
-					}
+					handleReservationResult(this, res, false);
 				})
 				.finally(() => {
 					uni.hideLoading();
