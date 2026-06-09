@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { handleReservationResult } from '@/utils/reservation.js';
+import { requestSubscribe, handleReservationResult } from '@/utils/reservation.js';
 import { getReservationTimeSlot, getReservationWeekNumbers, personalReservation } from '@/api/index.js';
 
 export default {
@@ -129,7 +129,7 @@ export default {
 				});
 			}
 		},
-		submit() {
+		async submit() {
 			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
@@ -146,6 +146,8 @@ export default {
 				});
 				return;
 			}
+
+			await requestSubscribe();
 
 			uni.showLoading({
 				title: '提交中...',
@@ -166,7 +168,7 @@ export default {
 				delayPromise
 			])
 				.then(([res]) => {
-					handleReservationResult(this, res, true);
+					handleReservationResult(this, res);
 				})
 				.finally(() => {
 					uni.hideLoading();

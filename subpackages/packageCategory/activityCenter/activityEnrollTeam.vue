@@ -192,7 +192,7 @@ export default {
 				delayPromise
 			])
 				.then(([res]) => {
-					handleReservationResult(this, res, false);
+					handleReservationResult(this, res);
 				})
 				.finally(() => {
 					uni.hideLoading();

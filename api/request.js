@@ -17,7 +17,6 @@ const request = ({
 			if (config.auth.needLogin) {
 				// 判断接口请求的请求头是否需要携带token
 				const token = uni.getStorageSync('token');
-				// const token = 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxNTgxMTg2NzA5MiIsInN1YiI6IjE1ODExODY3MDkyIiwiaWF0IjoxNzU2MjYxNjYwLCJjb21wYW55UGhvbmUiOiIxNTgxMTg2NzA5MiIsImV4cCI6MTc2MTQ0NTY2MH0.RvtosRflkdHgOm10VXn2F7DsNl_3H9oaFMuDIJfQcKl'
 
 				if (token) {
 					config.header.token = token;

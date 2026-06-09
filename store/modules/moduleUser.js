@@ -12,7 +12,8 @@ export default {
 		isLogin: false,
 		userInfo: {},
 
-		showPrivacyPopup: false
+		showPrivacyPopup: false,
+		subscribeGuideDismissed: false
 	},
 	getters: {},
 	mutations: {
@@ -31,6 +32,10 @@ export default {
 		// 是否开启个人信息保护指引
 		openPrivacyPopup(state, context) {
 			state.showPrivacyPopup = context;
+		},
+		// 是否暂时关闭订阅引导
+		setSubscribeGuideDismissed(state, context) {
+			state.subscribeGuideDismissed = context;
 		}
 	},
 
