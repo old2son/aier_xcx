@@ -6,7 +6,6 @@
 				class="message-item"
 				v-for="(item, index) in messageList"
 				:key="item.messageId"
-				@click="toDetail(item.messageId)"
 			>
 				<view class="title">
 					<text>{{ getTitle(item.messageType) }}</text>
@@ -30,10 +29,10 @@
 					</template>
 				</view>
 
-				<view class="go-detail">
+				<!-- <view class="go-detail">
 					<text>查看详情</text>
 					<image class="edit-icon" :src="tabBarData.rightArrowIcon" mode="heightFix"></image>
-				</view>
+				</view> -->
 			</view>
 		</view>
 	</view>
@@ -141,12 +140,16 @@ export default {
 			.content-box {
 				padding: 16rpx 0;
 				box-sizing: border-box;
-				border-bottom: 0.5px solid #f0f0f0;
+				// border-bottom: 0.5px solid #f0f0f0;
 				font-size: 28rpx;
 				.content-init {
 					display: flex;
 					align-items: center;
-					margin: 10rpx 0 20rpx 0;
+					margin: 10rpx 0 20rpx;
+
+					&:last-child {
+						margin-bottom: 0;
+					}
 				}
 			}
 			.go-detail {

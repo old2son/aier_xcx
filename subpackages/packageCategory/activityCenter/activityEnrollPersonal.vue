@@ -22,10 +22,10 @@
 
 		<ReservationMemberPanel :member-list="memberList" :child-age-max="17" @change="memberList = $event" />
 
-		<view class="partner-title">您了解本次活动的渠道</view>
+		<!-- <view class="partner-title">您了解本次活动的渠道</view>
 		<van-dropdown-menu>
 			<van-dropdown-item :value="channelValue" :options="partnerOptionC" @change="handleDropdownChangeC" />
-		</van-dropdown-menu>
+		</van-dropdown-menu> -->
 
 		<view class="submit-btn">
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
@@ -61,15 +61,15 @@ export default {
 			radio: '0',
 			needExplainServiceNum: 50, // 需要讲解服务的人数，后台获取
 			channelValue: 1,
-			partnerOptionC: [
-				{ text: '公众号/抖音推送', value: 0 },
-				{ text: '人人通', value: 1 },
-				{ text: '科普馆社群', value: 2 },
-				{ text: '患者社群', value: 3 },
-				{ text: '朋友/家人推荐', value: 4 },
-				{ text: '其他', value: 5 }
-			],
-			channel: '人人通',
+			// partnerOptionC: [
+			// 	{ text: '公众号/抖音推送', value: 0 },
+			// 	{ text: '人人通', value: 1 },
+			// 	{ text: '科普馆社群', value: 2 },
+			// 	{ text: '患者社群', value: 3 },
+			// 	{ text: '朋友/家人推荐', value: 4 },
+			// 	{ text: '其他', value: 5 }
+			// ],
+			// channel: '人人通',
 
 			memberList: [],
 
@@ -146,9 +146,9 @@ export default {
 				});
 			}
 		},
-		handleDropdownChangeC(value) {
-			this.channel = this.partnerOptionC[value.detail].text;
-		},
+		// handleDropdownChangeC(value) {
+		// 	this.channel = this.partnerOptionC[value.detail].text;
+		// },
 		async submit() {
 			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
 			if (this.memberList.length === 0 || !hasAdultMember) {
@@ -174,7 +174,7 @@ export default {
 				personalActivityReservation({
 					activityId: this.requestResult.activityId,
 					activityName: this.requestResult.activityName,
-					channel: this.channel,
+					// channel: this.channel,
 					dateTime: this.date,
 					timeSlot: this.selectedTimeSlot,
 					week: this.week,
@@ -238,7 +238,7 @@ export default {
 	margin: 40rpx 0 20rpx 0;
 }
 .submit-btn {
-	margin-top: 40rpx;
+	margin-top: 80rpx;
 }
 
 ::v-deep .van-radio {
