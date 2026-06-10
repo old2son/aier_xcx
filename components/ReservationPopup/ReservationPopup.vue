@@ -314,7 +314,12 @@ export default {
 	display: block;
 	line-height: 1.6;
 	margin-top: 16rpx;
-	font-size: 28rpx;
+	color: #555;
+	font-weight: 400;
+	font-size: 26rpx;
+	font-family:
+		-apple-system, 'PingFang SC', 'Heiti SC', 'Microsoft YaHei', '微软雅黑', 'Noto Sans CJK SC',
+		'Source Han Sans CN', sans-serif;
 }
 
 .txt {
