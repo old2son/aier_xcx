@@ -312,6 +312,18 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "subpackages/webview",
+			"pages": [
+				{
+					"path": "webview",
+					"style": {
+						"navigationBarTitleText": "您正在进入爱尔眼健康科普教育基地",
+						"enablePullDownRefresh": false
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {

@@ -73,7 +73,7 @@ const router = createRouter({
 			name: '热门推荐'
 		},
 		// {
-		// 	path: '/subpackage/packageVideo/detail',
+		// 	path: '/subpackages/packageVideo/detail',
 		// 	name: '视频详情'
 		// },
 		{
@@ -231,6 +231,10 @@ const router = createRouter({
 			meta: {
 				needLogin: true
 			}
+		},
+		{
+			path: '/subpackages/webview/webview',
+			name: '爱尔眼健康科普基地'
 		},
 		...ROUTES
 	]
