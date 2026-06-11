@@ -2,7 +2,12 @@
 	<view class="base-updates-container">
 		<CustomNavInner title="基地动态" />
 		<view class="base-updates-list" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
-			<view class="base-updates-item" v-for="(item, index) in formattedList" :key="item.specialId">
+			<view
+				class="base-updates-item"
+				v-for="(item, index) in formattedList"
+				:key="item.specialId"
+				@click="toDetail(item.specialId)"
+			>
 				<view class="title">{{ item.specialName }}</view>
 				<view class="time">
 					{{ item.formattedTime }}
@@ -37,15 +42,20 @@ export default {
 			});
 		}
 	},
-	onLoad() {
-		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
-		this.requestData();
-	},
 	methods: {
 		async requestData() {
 			const { data: baseUpdatesList } = await getScienceHomeBaseDynamics();
 			this.baseUpdatesList = baseUpdatesList;
+		},
+		toDetail(id) {
+			uni.navigateTo({
+				url: '/subpackages/packageHomeDetail/imgDetail?articleId=' + id
+			});
 		}
+	},
+	onLoad() {
+		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
+		this.requestData();
 	}
 };
 </script>

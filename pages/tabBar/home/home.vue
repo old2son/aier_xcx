@@ -84,7 +84,12 @@
 						<text @click="toSubpackagePage('packageHomeDetail/baseUpdates')">查看更多 ></text>
 					</view>
 					<view class="base-updates-list">
-						<view class="base-updates-item" v-for="(item, index) in formattedList" :key="item.specialId">
+						<view
+							class="base-updates-item"
+							v-for="(item, index) in formattedList"
+							:key="item.specialId"
+							@click="toDetail(item.specialId)"
+						>
 							<view class="title">{{ item.specialName }}</view>
 							<view class="time">
 								{{ item.formattedTime }}
@@ -254,6 +259,11 @@ export default {
 					url: '/subpackages/packageHomeDetail/noImgList?cId=' + cId
 				});
 			}
+		},
+		toDetail(id) {
+			uni.navigateTo({
+				url: '/subpackages/packageHomeDetail/imgDetail?articleId=' + id
+			});
 		}
 	}
 };
@@ -378,7 +388,7 @@ export default {
 	justify-content: flex-start;
 	width: 90%;
 	padding-bottom: 24rpx;
-	margin: 0 auto  80rpx;
+	margin: 0 auto 80rpx;
 	overflow-x: auto; // 横向滚动
 	scroll-behavior: smooth;
 

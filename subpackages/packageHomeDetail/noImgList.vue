@@ -3,7 +3,7 @@
 		<CustomNavInner :title="pageTitle" />
 		<view class="list-wrap" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
 			<view v-if="list.length" class="list-box">
-				<view v-for="item in list" :key="item.specialId" class="list-item" @click="toDetail(item)">
+				<view v-for="item in list" :key="item.specialId" class="list-item" @click="toDetail(item.specialId)">
 					<text class="list-title">{{ item.specialName }}</text>
 				</view>
 			</view>
@@ -36,9 +36,9 @@ export default {
 				this.pageTitle = this.cId === '478' ? 'EYE百科' : this.cId === '479' ? 'EYE问答' : '列表';
 			}
 		},
-		toDetail(item) {
+		toDetail(id) {
 			uni.navigateTo({
-				url: '/subpackages/packageHomeDetail/imgDetail?articleId=' + item.specialId
+				url: '/subpackages/packageHomeDetail/imgDetail?articleId=' + id
 			});
 		}
 	},
