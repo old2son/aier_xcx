@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import { getScienceHomeBaseDynamics } from '@/api';
 import { mapState } from 'vuex';
+import { getScienceHomeBaseDynamics } from '@/api/index.js';
 export default {
 	data() {
 		return {

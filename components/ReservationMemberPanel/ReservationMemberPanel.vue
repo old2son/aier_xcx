@@ -50,6 +50,20 @@
 				添加成人
 			</van-button>
 		</view>
+		<view class="add-usual-btn">
+			<van-button
+				block
+				round
+				size="normal"
+				icon="plus"
+				color="#32579c"
+				type="primary"
+				@click="showAddMemberPopup(2)"
+				:plain="memberList.length > 0 ? true : false"
+			>
+				添加常用观众
+			</van-button>
+		</view>
 
 		<van-popup class="add-popup" round position="bottom" :show="isShowAdd" @close="closeAddMemberPopup">
 			<view class="add-detail-wrap">
@@ -406,6 +420,16 @@ export default {
 	justify-content: space-between;
 	gap: 20px;
 	margin-top: 30rpx;
+
+	van-button {
+		flex: 1;
+	}
+}
+
+.add-usual-btn {
+	display: flex;
+	justify-content: center;
+	margin-top: 40rpx;
 
 	van-button {
 		flex: 1;
