@@ -14,7 +14,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { scienceArticleInformation } from '@/api/index.js';
+import { scienceArticleInformation } from '@/api/index';
 
 export default {
 	data() {

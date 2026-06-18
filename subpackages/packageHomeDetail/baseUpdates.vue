@@ -19,7 +19,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { getScienceHomeBaseDynamics } from '@/api/index.js';
+import { getScienceHomeBaseDynamics } from '@/api/index';
 export default {
 	data() {
 		return {

@@ -3,7 +3,7 @@ import {
 	scienceMuseumUserLogOut,
 	getScienceMuseumUserInforMation,
 	miniProgramLogin
-} from '@/api/index.js';
+} from '@/api/index';
 
 export default {
 	namespaced: true,

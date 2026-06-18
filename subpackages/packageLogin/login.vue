@@ -106,7 +106,7 @@
 <script>
 import loginData from '@/data/login.json';
 import { mapState } from 'vuex';
-import { sendCode } from '@/api/index.js';
+import { sendCode } from '@/api/index';
 
 export default {
 	data() {

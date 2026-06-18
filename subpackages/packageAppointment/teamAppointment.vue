@@ -42,7 +42,7 @@
 <script>
 import myData from '@/data/appointment.json';
 import { handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, teamReservation } from '@/api/index.js';
+import { getReservationTimeSlot, teamReservation } from '@/api/index';
 
 export default {
 	data() {

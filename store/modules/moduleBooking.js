@@ -1,4 +1,4 @@
-import { getAllScienceReservation } from '@/api/index.js';
+import { getAllScienceReservation } from '@/api/index';
 import { formatReservationConfig } from '@/utils/formatReservationConfig';
 
 export default {
@@ -31,7 +31,6 @@ export default {
 						}
 					})
 					.catch((error) => {
-						console.log('获取预约配置列表出错', error);
 						commit('setReservationConfigList', []);
 						reject(error);
 					});

@@ -40,7 +40,7 @@
 <script>
 import { mapState } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api/index.js';
+import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api/index';
 
 export default {
 	data() {

@@ -52,7 +52,7 @@
 import { mapState } from 'vuex';
 import myData from '@/data/appointment.json';
 import { handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, personalActivityTeamReservation } from '@/api/index.js';
+import { getReservationTimeSlot, personalActivityTeamReservation } from '@/api/index';
 
 export default {
 	data() {
