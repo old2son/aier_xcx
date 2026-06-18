@@ -40,10 +40,9 @@
 </template>
 
 <script>
-import { formatReservationConfig } from '@/utils/formatReservationConfig';
+import { mapActions, mapState } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation';
 import {
-	getAllScienceReservation,
 	getReservationTimeSlot,
 	getReservationWeekNumbers,
 	personalReservation
@@ -67,12 +66,11 @@ export default {
 
 			memberList: [],
 
-			selectedCal: null,
-			
-			reservationConfigList: []
+			selectedCal: null
 		};
 	},
 	computed: {
+		...mapState('moduleBooking', ['reservationConfigList']),
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			const currentDateConfig = this.getCurrentDateConfig();
@@ -96,6 +94,7 @@ export default {
 		}
 	},
 	methods: {
+		...mapActions('moduleBooking', ['getReservationConfigList']),
 		formatSelectedDate(dateText) {
 			if (!dateText) {
 				return '';
@@ -246,19 +245,7 @@ export default {
 	},
 	mounted() {
 		this.getReservationTimeSlotData();
-
-		getAllScienceReservation().then((res) => {
-			if (res.code === 200) {
-				this.reservationConfigList = res.data || [];
-
-				console.log('this.reservationConfigList', this.reservationConfigList);
-
-				this.reservationConfigList = formatReservationConfig(this.reservationConfigList);
-
-				console.log('formatReservationConfigList', this.reservationConfigList);
-
-			}
-		});
+		this.getReservationConfigList();
 	}
 };
 </script>
