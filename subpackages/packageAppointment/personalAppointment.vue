@@ -161,24 +161,24 @@ export default {
 		},
 		// 接收子组件返回的预约人数数据
 		updateTimeSlotNumbers(numbers) {
-			console.log('预约人数', numbers);
-			this.timeSlotNumbers = numbers;
+			// console.log('预约人数', numbers);
+			// this.timeSlotNumbers = numbers;
 		},
 		// 选择四个时间段
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			if (this.date && this.selectedTimeSlot) {
-				getReservationWeekNumbers({
-					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot
-				}).then((res) => {
-					console.log('选择讲解服务的人数', res);
-					if (res.code === 200 && res.message == '查询成功') {
-						this.needExplainServiceNum = res.data.numbers;
-					}
-				});
-			}
+			// if (this.date && this.selectedTimeSlot) {
+			// 	getReservationWeekNumbers({
+			// 		dateTime: this.date,
+			// 		timeSlot: this.selectedTimeSlot
+			// 	}).then((res) => {
+			// 		console.log('选择讲解服务的人数', res);
+			// 		if (res.code === 200 && res.message == '查询成功') {
+			// 			this.needExplainServiceNum = res.data.numbers;
+			// 		}
+			// 	});
+			// }
 		},
 		async submit() {
 			if (!this.date) {
