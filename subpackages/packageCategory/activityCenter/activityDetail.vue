@@ -11,13 +11,8 @@
 		<view class="txt-3">
 			<view class="txt-3-1">活动背景：{{ requestResult.theBackground }}</view>
 			<view class="txt-3-2">活动地点：{{ requestResult.place }}</view>
-			<view class="txt-3-3">活动时间：{{ requestResult.beginFullDate }} - {{ requestResult.endDay }}</view>
-			<view class="txt-3-4">
-				{{ requestResult.beginDay }} - {{ requestResult.endDay }}&nbsp;&nbsp;&nbsp;{{
-					requestResult.beginShijian
-				}}
-				- {{ requestResult.endShijian }}
-			</view>
+			<view class="txt-3-3">活动日期：{{ requestResult.activityTime }} - {{ requestResult.endDate }}</view>
+			<view class="txt-3-4">活动时间：{{ requestResult.startTime }} - {{ requestResult.endTime }} </view>
 		</view>
 		<view class="bottom-box">
 			<van-button
