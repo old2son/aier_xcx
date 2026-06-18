@@ -73,6 +73,10 @@ export default {
 		activeList: {
 			type: Array,
 			required: true
+		},
+		reservationConfigList: {
+			type: Array,
+			required: false
 		}
 	},
 	data() {
@@ -150,9 +154,10 @@ export default {
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
 			const currentDate = dayjs(fullDate, 'YYYY-MM-DD');
-			const isInCurrentFiveDays = currentDate.isSame(dayjs(), 'day') || currentDate.isAfter(dayjs(), 'day')
-				? currentDate.diff(dayjs().startOf('day'), 'day') <= 4
-				: false;
+			const isInCurrentFiveDays =
+				currentDate.isSame(dayjs(), 'day') || currentDate.isAfter(dayjs(), 'day')
+					? currentDate.diff(dayjs().startOf('day'), 'day') <= 4
+					: false;
 			const formattedDate = dayjs(fullDate, 'YYYY-MM-DD').format('YYYY年MM月DD日');
 			// console.log('formattedDate', formattedDate);
 			// 给父组件传递数据（子组件触发父组件方法）
@@ -203,13 +208,23 @@ export default {
 					return false;
 				}
 
-				const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
-
-				const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+				const start = dayjs(item.startDate);
+				const end = dayjs(item.endDate);
 
 				return (
-					date.isSame(start, 'day') || date.isSame(end, 'day') || (date.isAfter(start) && date.isBefore(end))
+					date.isSame(start, 'day') ||
+					date.isSame(end, 'day') ||
+					(date.isAfter(start, 'day') && date.isBefore(end, 'day'))
 				);
+			});
+		},
+		isReservationConfigRange(date) {
+			return this.reservationConfigList.some((item) => {
+				if (!item.dateTime) {
+					return false;
+				}
+
+				return date.isSame(dayjs(item.dateTime), 'day');
 			});
 		},
 		goActivity() {

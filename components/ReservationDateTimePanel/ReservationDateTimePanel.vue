@@ -10,6 +10,7 @@
 				:selected-cal="selectedCal"
 				:needTimeSlotRequest="needTimeSlotRequest"
 				:active-list="activeList"
+				:reservation-config-list="reservationConfigList"
 				@date-selected="handleDateSelected"
 				@time-slot-numbers="handleTimeSlotNumbers"
 			/>
@@ -24,6 +25,7 @@
 			:show-popup="isShowCal"
 			:what-a-day="date"
 			:active-list="activeList"
+			:reservation-config-list="reservationConfigList"
 			@closePopup="handleCalendarClose"
 			@selectCal="handleSelectCal"
 		/>
@@ -115,6 +117,7 @@ export default {
 	},
 	computed: {
 		...mapState('moduleActivity', ['futureList']),
+		...mapState('moduleBooking', ['reservationConfigList']),
 		calendarIconColor() {
 			return this.isDateInPickerRange(this.date) ? '#32579c' : '#60a2fe';
 		}

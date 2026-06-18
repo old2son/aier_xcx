@@ -41,24 +41,10 @@
 
 <script>
 import dayjs from 'dayjs';
+import { isInActivityRange, isReservationConfigRange } from '@/utils/dataRange';
 
 let activeListCache = [];
-const isInActivityRange = (date) => {
-	return activeListCache.some((item) => {
-		if (!item.startDate || !item.endDate) {
-			return false;
-		}
-
-		const start = dayjs(item.startDate);
-		const end = dayjs(item.endDate);
-
-		return (
-			date.isSame(start, 'day') ||
-			date.isSame(end, 'day') ||
-			(date.isAfter(start, 'day') && date.isBefore(end, 'day'))
-		);
-	});
-};
+let reservationConfigCache = [];
 
 export default {
 	name: 'CalendarPick',
@@ -77,6 +63,10 @@ export default {
 		activeList: {
 			type: Array,
 			required: true
+		},
+		reservationConfigList: {
+			type: Array,
+			required: false
 		}
 	},
 	data() {
@@ -101,6 +91,13 @@ export default {
 			handler(val) {
 				activeListCache = Array.isArray(val) ? val : [];
 			}
+		},
+		reservationConfigList: {
+			immediate: true,
+			handler(val) {
+				console.log('reservationConfigList', val);
+				reservationConfigCache = Array.isArray(val) ? val : [];
+			}
 		}
 	},
 	methods: {
@@ -112,7 +109,7 @@ export default {
 			if (currentPage.route.includes('activityCenter')) {
 				this.isActivityDay = false;
 			} else {
-				this.isActivityDay = isInActivityRange(current);
+				this.isActivityDay = isInActivityRange(current, activeListCache);
 			}
 
 			const date = current.format('MM-DD');
@@ -171,10 +168,21 @@ export default {
 				(current.isAfter(today) && current.isBefore(maxDay)) ||
 				current.isSame(maxDay, 'day');
 
-			const hasActivity = isWithin30Days && isInActivityRange(current);
+			const hasActivity = isWithin30Days && isInActivityRange(current, activeListCache);
 
+			const isReservationConfig = isWithin30Days && isReservationConfigRange(current, reservationConfigCache);
+
+			const classNames = [];
 			if (hasActivity) {
-				day.className = 'activity-day';
+				classNames.push('activity-day');
+			}
+
+			if (isReservationConfig) {
+				classNames.push('reservation-day');
+			}
+
+			if (classNames.length) {
+				day.className = classNames.join(' ');
 			}
 
 			return day;
@@ -271,5 +279,12 @@ export default {
 	color: #ff4d4f;
 	font-size: 30rpx;
 	font-weight: bold;
+}
+
+::v-deep .reservation-day {
+	color: #fff;
+	background-image: radial-gradient(circle, #32579c 0 25rpx, transparent 28rpx);
+	background-position: center calc(100% + 1rpx);
+	background-repeat: no-repeat;
 }
 </style>
