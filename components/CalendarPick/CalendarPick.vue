@@ -49,11 +49,14 @@ const isInActivityRange = (date) => {
 			return false;
 		}
 
-		const start = dayjs(item.startDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
+		const start = dayjs(item.startDate);
+		const end = dayjs(item.endDate);
 
-		const end = dayjs(item.endDate.replace(/年/g, '/').replace(/月/g, '/').replace(/日/g, ''));
-
-		return date.isSame(start, 'day') || date.isSame(end, 'day') || (date.isAfter(start) && date.isBefore(end));
+		return (
+			date.isSame(start, 'day') ||
+			date.isSame(end, 'day') ||
+			(date.isAfter(start, 'day') && date.isBefore(end, 'day'))
+		);
 	});
 };
 
