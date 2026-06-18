@@ -32,15 +32,22 @@
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
 
-		<ReservationPopup :type="0" :show="showReservationPopup" @close="handlePopupClose" />
+		<!-- debug -->
+		<!-- <ReservationPopup :type="0" :show="showReservationPopup" @close="handlePopupClose" /> -->
 
 		<van-dialog id="van-dialog" />
 	</view>
 </template>
 
 <script>
-import { requestSubscribe, handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, getReservationWeekNumbers, personalReservation } from '@/api/index.js';
+import { formatReservationConfig } from '@/utils/formatReservationConfig';
+import { requestSubscribe, handleReservationResult } from '@/utils/reservation';
+import {
+	getAllScienceReservation,
+	getReservationTimeSlot,
+	getReservationWeekNumbers,
+	personalReservation
+} from '@/api/index';
 
 export default {
 	data() {
@@ -60,28 +67,72 @@ export default {
 
 			memberList: [],
 
-			selectedCal: null
+			selectedCal: null,
+			
+			reservationConfigList: []
 		};
 	},
 	computed: {
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
-			if (this.timeSlotNumbers) {
-				return this.timeSlotList.map((slot, index) => {
-					const numbersKey = `numbers${index + 1}`;
-					// 获取对应的预约人数，默认为 0
-					const reservationNumber = this.timeSlotNumbers[numbersKey] || 0;
-					return {
-						...slot, // 保留原有时段对象的所有属性
-						reservationNumber // 添加 reservationNumber 字段
-					};
-				});
-			}
-			// 如果没有 timeSlotNumbers 数据，直接返回 timeSlotList
-			return this.timeSlotList;
+			const currentDateConfig = this.getCurrentDateConfig();
+			const currentTimeSlotList = currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
+
+			return this.timeSlotList.map((slot, index) => {
+				const numbersKey = `numbers${index + 1}`;
+				const reservationNumber = this.timeSlotNumbers ? this.timeSlotNumbers[numbersKey] || 0 : 0;
+				const slotName = this.getTimeSlotName(slot);
+				const matchedSlot = currentTimeSlotList.find((item) => this.getTimeSlotName(item) === slotName);
+
+				return {
+					...slot,
+					name: slotName,
+					configId: matchedSlot ? matchedSlot.configId : '',
+					surplusNumber: matchedSlot ? matchedSlot.surplusNumber : 0,
+					reservationNumber,
+					disabled: !matchedSlot || Number(matchedSlot.surplusNumber) <= 0
+				};
+			});
 		}
 	},
 	methods: {
+		formatSelectedDate(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			return String(dateText)
+				.replace('年', '-')
+				.replace('月', '-')
+				.replace('日', '');
+		},
+		getTimeSlotName(slot) {
+			if (!slot) {
+				return '';
+			}
+
+			if (slot.name) {
+				return slot.name;
+			}
+
+			if (slot.label) {
+				return slot.label;
+			}
+
+			if (slot.startTime && slot.endTime) {
+				return `${slot.startTime}-${slot.endTime}`;
+			}
+
+			return '';
+		},
+		getCurrentDateConfig() {
+			const currentDate = this.formatSelectedDate(this.date);
+			if (!currentDate) {
+				return null;
+			}
+
+			return this.reservationConfigList.find((item) => item.dateTime === currentDate) || null;
+		},
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
 		},
@@ -96,6 +147,8 @@ export default {
 		handleDateSelected({ date, week }) {
 			this.date = date;
 			this.week = week;
+			this.selectedTimeSlot = null;
+			this.selectedTimeSlotIndex = -1;
 			// if (this.date && this.selectedTimeSlot) {
 			// 	getReservationWeekNumbers({
 			// 		dateTime: this.date,
@@ -130,6 +183,22 @@ export default {
 			}
 		},
 		async submit() {
+			if (!this.date) {
+				this.$toast({
+					duration: 3000,
+					message: '请选择预约日期'
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot) {
+				this.$toast({
+					duration: 3000,
+					message: '当前日期暂无可预约时段'
+				});
+				return;
+			}
+
 			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
@@ -177,6 +246,19 @@ export default {
 	},
 	mounted() {
 		this.getReservationTimeSlotData();
+
+		getAllScienceReservation().then((res) => {
+			if (res.code === 200) {
+				this.reservationConfigList = res.data || [];
+
+				console.log('this.reservationConfigList', this.reservationConfigList);
+
+				this.reservationConfigList = formatReservationConfig(this.reservationConfigList);
+
+				console.log('formatReservationConfigList', this.reservationConfigList);
+
+			}
+		});
 	}
 };
 </script>

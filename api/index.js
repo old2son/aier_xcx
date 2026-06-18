@@ -80,6 +80,12 @@ export const scienceMuseumUserUploadAvatar = (params) =>
 	});
 
 /* ———— 预约相关接口 ———— */
+// 查询可预约的场次
+export const getAllScienceReservation = () =>
+	request({
+		url: baseUrl + '/api/user/getAllScienceReservation'
+	});
+
 // 获取预约四个时间段时间数据
 export const getReservationTimeSlot = () =>
 	request({
@@ -123,9 +129,9 @@ export const teamReservation = (params) =>
 			needLogin: true
 		}
 	});
-/** 
+/**
  * 推送预约通知
- * 参数：reId，预约ID 
+ * 参数：reId，预约ID
  * */
 export const sendAppointmentSuccess = (params) =>
 	request({

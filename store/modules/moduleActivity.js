@@ -1,22 +1,13 @@
 import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api/index';
 
 function formatFutureList(startingList, futureList) {
-	// 合并活动列表
 	const allList = [...startingList, ...futureList];
 
-	// 提取日期
-	const formatList = allList.map((item) => {
-		const startMatch = item.activityTime?.match(/\d{4}年\d{1,2}月\d{1,2}日/);
+	const formatList = allList.map((item) => ({
+		startDate: item.activityTime || '',
+		endDate: item.endDate || ''
+	}));
 
-		const endMatch = item.endTime?.match(/\d{4}年\d{1,2}月\d{1,2}日/);
-
-		return {
-			startDate: startMatch ? startMatch[0] : '',
-			endDate: endMatch ? endMatch[0] : ''
-		};
-	});
-
-	// 去重
 	return formatList.filter((item, index, self) => {
 		return index === self.findIndex((v) => v.startDate === item.startDate && v.endDate === item.endDate);
 	});
@@ -81,6 +72,7 @@ export default {
 				commit('SET_FUTURE', futureList);
 
 				const futureListDate = formatFutureList(startingList, futureList);
+				console.log('未来一个月内的活动日期', futureListDate);
 				commit('SET_FUTURE_LIST', futureListDate);
 			} catch (e) {
 				console.error(e);

@@ -7,7 +7,7 @@
 					disabled: item.disabled,
 					'time-slot-selected': selectedTimeSlotIndex === index && !item.disabled
 				}"
-				@tap="selectTimeSlot(item.name, index)"
+				@tap="selectTimeSlot(item, index)"
 			>
 				<view class="time-slot-part">{{ item.name }}</view>
 				<view class="reservation-num" v-if="needTimeSlotRequest">已报名：{{ item.reservationNumber || 0 }}人</view>
@@ -73,7 +73,11 @@ export default {
 			);
 
 			return this.combinedTimeSlotList.map((slot) => {
-				let disabled = false;
+				let disabled = !!slot.disabled;
+
+				if (Number(slot.surplusNumber) <= 0) {
+					disabled = true;
+				}
 
 				// 人数限制
 				if (slot?.reservationNumber >= 40) {
@@ -111,17 +115,17 @@ export default {
 		}
 	},
 	methods: {
-		selectTimeSlot(name, index) {
-			if (!this.processedTimeSlotList[index].disabled) {
+		selectTimeSlot(item, index) {
+			if (item && !this.processedTimeSlotList[index].disabled) {
 				// 禁用状态不能选择
-				this.$emit('timeSlotSelected', name, index);
+				this.$emit('timeSlotSelected', item.name, index);
 			}
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {
 			// 自动顺延到下一个未禁用的时段
 			const availableIndex = slotList.findIndex((slot) => !slot.disabled);
 			if (availableIndex !== -1) {
-				this.selectTimeSlot(slotList[availableIndex].name, availableIndex);
+				this.selectTimeSlot(slotList[availableIndex], availableIndex);
 			}
 		}
 	}
