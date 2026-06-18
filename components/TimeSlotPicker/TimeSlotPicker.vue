@@ -10,7 +10,7 @@
 				@tap="selectTimeSlot(item, index)"
 			>
 				<view class="time-slot-part">{{ item.name }}</view>
-				<view class="reservation-num" v-if="needTimeSlotRequest">已报名：{{ item.reservationNumber || 0 }}人</view>
+				<view class="reservation-num" v-if="needTimeSlotRequest">剩余：{{ item.surplusNumber || 0 }}人</view>
 			</view>
 			<view
 				:style="weight ? 'font-weight: bold; font-size: 32rpx;' : ''"
@@ -76,11 +76,6 @@ export default {
 				let disabled = !!slot.disabled;
 
 				if (Number(slot.surplusNumber) <= 0) {
-					disabled = true;
-				}
-
-				// 人数限制
-				if (slot?.reservationNumber >= 40) {
 					disabled = true;
 				}
 
