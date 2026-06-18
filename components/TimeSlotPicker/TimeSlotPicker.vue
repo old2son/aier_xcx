@@ -50,7 +50,7 @@ export default {
 		},
 		selectDay: {
 			type: String,
-			required: true
+			default: ''
 		}
 	},
 	computed: {
@@ -66,22 +66,25 @@ export default {
 		// 处理禁用逻辑
 		processedTimeSlotList() {
 			const now = dayjs();
+			const currentSelectDay = this.selectDay
+				? this.selectDay.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')
+				: '';
 
-			const isToday = dayjs(this.selectDay.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).isSame(
-				dayjs(),
-				'day'
-			);
+			const isToday = currentSelectDay ? dayjs(currentSelectDay).isSame(dayjs(), 'day') : false;
 
 			return this.combinedTimeSlotList.map((slot) => {
 				let disabled = !!slot.disabled;
+				const slotName = slot.name || '';
+
+				console.log('slotslotslot', slot);
 
 				if (Number(slot.surplusNumber) <= 0) {
 					disabled = true;
 				}
 
 				// 当前时间超过该时段的结束时间
-				if (isToday) {
-					const [start, end] = slot.name.split('-');
+				if (isToday && slotName.includes('-')) {
+					const [start, end] = slotName.split('-');
 					const endTimeToday = dayjs()
 						.hour(Number(end.split(':')[0]))
 						.minute(Number(end.split(':')[1]));
@@ -101,7 +104,7 @@ export default {
 		processedTimeSlotList: {
 			immediate: true,
 			handler(newVal) {
-				if (newVal && newVal.length > 0) {
+				if (Array.isArray(newVal) && newVal.length > 0) {
 					this.$nextTick(() => {
 						this.renderSlotTimeList(newVal);
 					});

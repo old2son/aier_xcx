@@ -43,6 +43,7 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 import dayjs from 'dayjs';
+import { isInActivityRange, isReservationConfigRange } from '@/utils/dataRange';
 import { getReservationTimeSlotNumbers, getActivityReservationTimeSlotNumbers } from '@/api';
 export default {
 	name: 'DatePicker',
@@ -110,14 +111,16 @@ export default {
 				const currentDay = today.add(i, 'day'); // 从当天开始依次生成
 				const dayOfWeek = currentDay.day(); // 获取星期几
 				const dateString = currentDay.format('MM-DD'); // 格式化日期为 MM-DD
-				const hasActivity = this.isInActivityRange(currentDay);
+				const hasActivity = isInActivityRange(currentDay, this.activeList);
+				const hasReservation = isReservationConfigRange(currentDay, this.reservationConfigList);
 
 				daysArray.push({
 					year: currentYear,
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
 					disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
-					hasActivity
+					hasActivity,
+					hasReservation
 				});
 			}
 			this.days = daysArray; // 更新日期数组
@@ -177,7 +180,7 @@ export default {
 				});
 			}
 
-			this.isActivityDay = this.isInActivityRange(currentDate);
+			this.isActivityDay = isInActivityRange(currentDate, this.activeList);
 			if (this.isActivityDay && isInCurrentFiveDays && !this.hasShownActivityPopup) {
 				const pages = getCurrentPages();
 				const currentPage = pages[pages.length - 1];
@@ -201,31 +204,6 @@ export default {
 				// 如果没有可用的日期，处理这种情况
 				console.log('没有可用的日期！'); // 你可以选择触发一个事件或者显示提示消息给用户
 			}
-		},
-		isInActivityRange(date) {
-			return this.activeList.some((item) => {
-				if (!item.startDate || !item.endDate) {
-					return false;
-				}
-
-				const start = dayjs(item.startDate);
-				const end = dayjs(item.endDate);
-
-				return (
-					date.isSame(start, 'day') ||
-					date.isSame(end, 'day') ||
-					(date.isAfter(start, 'day') && date.isBefore(end, 'day'))
-				);
-			});
-		},
-		isReservationConfigRange(date) {
-			return this.reservationConfigList.some((item) => {
-				if (!item.dateTime) {
-					return false;
-				}
-
-				return date.isSame(dayjs(item.dateTime), 'day');
-			});
 		},
 		goActivity() {
 			uni.navigateTo({
