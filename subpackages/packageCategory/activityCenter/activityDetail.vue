@@ -6,7 +6,7 @@
 		<view class="txt-1">{{ requestResult.activityName }}</view>
 		<view class="txt-2">
 			<text class="txt-2-1">进行中</text>
-			<text class="txt-2-2">{{ requestResult.endTime }} 结束</text>
+			<text class="txt-2-2">{{ requestResult.endDate }} {{ requestResult.endTime }} 结束</text>
 		</view>
 		<view class="txt-3">
 			<view class="txt-3-1">活动背景：{{ requestResult.theBackground }}</view>
