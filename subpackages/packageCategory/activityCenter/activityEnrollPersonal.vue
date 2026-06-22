@@ -2,8 +2,8 @@
 	<view class="activity-enroll-container">
 		<view class="txt-1">{{ requestResult.activityName }}</view>
 		<view class="txt-2">
-			<text class="txt-2-1">进行中</text>
-			<text class="txt-2-2">{{ requestResult.endTime }} 结束</text>
+			<text class="txt-2-1" :class="activityStatusInfo.className">{{ activityStatusInfo.text }}</text>
+			<text class="txt-2-2">{{ requestResult.endDate }} {{ requestResult.endTime }} 结束</text>
 		</view>
 		<ReservationDateTimePanel
 			theme="activity"
@@ -13,6 +13,8 @@
 			:date="date"
 			:timeSlotList="combinedTimeSlotList"
 			:selected-time-slot-index="selectedTimeSlotIndex"
+			time-title="活动时段"
+			morning-title="固定时间"
 			:weight="true"
 			@date-selected="handleDateSelected"
 			@time-slot-numbers="updateTimeSlotNumbers"
@@ -38,9 +40,10 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
 import { mapState } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, getReservationWeekNumbers, personalActivityReservation } from '@/api/index';
+import { personalActivityReservation } from '@/api/index';
 
 export default {
 	data() {
@@ -53,13 +56,11 @@ export default {
 			date: null,
 			week: null,
 			selectedTimeSlot: null, // 当前选中的时段
-			selectedTimeSlotIndex: 0, // 当前选中的时段索引
-			timeSlotList: [], // 四个预约时间段
+			selectedTimeSlotIndex: -1, // 当前选中的时段索引
 			timeSlotNumbers: null, // 子组件返回的预约人数数据
 			needTimeSlotRequest: true, // 是否需要请求时间段信息
 
 			radio: '0',
-			needExplainServiceNum: 50, // 需要讲解服务的人数，后台获取
 			channelValue: 1,
 			// partnerOptionC: [
 			// 	{ text: '公众号/抖音推送', value: 0 },
@@ -78,78 +79,155 @@ export default {
 	},
 	computed: {
 		...mapState('moduleActivity', ['selectedActivity']),
+		activityStatusInfo() {
+			const startAt = this.buildActivityDateTime(this.requestResult.activityTime, this.requestResult.startTime);
+			const endAt = this.buildActivityDateTime(this.requestResult.endDate, this.requestResult.endTime);
+			const now = dayjs();
+
+			if (endAt && now.isAfter(endAt)) {
+				return {
+					text: '已结束',
+					className: 'status-end'
+				};
+			}
+
+			if (startAt && now.isBefore(startAt)) {
+				return {
+					text: '即将开始',
+					className: 'status-soon'
+				};
+			}
+
+			return {
+				text: '进行中',
+				className: 'status-ing'
+			};
+		},
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
-			if (this.timeSlotNumbers) {
-				return this.timeSlotList.map((slot, index) => {
-					const numbersKey = `numbers${index + 1}`;
-					// 获取对应的预约人数，默认为 0
-					const reservationNumber = this.timeSlotNumbers[numbersKey] || 0;
-					console.log('预约人数：：', reservationNumber);
-					return {
-						...slot, // 保留原有时段对象的所有属性
-						reservationNumber // 添加 reservationNumber 字段
-					};
-				});
+			const fixedTimeSlot = this.getFixedTimeSlotName();
+			const surplusNumber = this.getActivitySurplusNumber();
+
+			if (!fixedTimeSlot) {
+				return [];
 			}
-			// 如果没有 timeSlotNumbers 数据，直接返回 timeSlotList
-			return this.timeSlotList;
+
+			return [
+				{
+					name: fixedTimeSlot,
+					surplusNumber,
+					disabled: !this.date || surplusNumber <= 0
+				}
+			];
 		}
 	},
 	methods: {
+		padNumber(value) {
+			return String(value).padStart(2, '0');
+		},
+		normalizeDateText(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, year, month, day] = match;
+			return `${year}-${this.padNumber(month)}-${this.padNumber(day)}`;
+		},
+		normalizeTimeText(timeText) {
+			if (!timeText) {
+				return '';
+			}
+
+			const match = String(timeText).match(/(\d{1,2})[:：](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, hour, minute] = match;
+			return `${this.padNumber(hour)}:${this.padNumber(minute)}`;
+		},
+		buildActivityDateTime(dateText, timeText) {
+			const normalizedDate = this.normalizeDateText(dateText);
+			const normalizedTime = this.normalizeTimeText(timeText);
+
+			if (!normalizedDate || !normalizedTime) {
+				return null;
+			}
+
+			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
+			return dateTime.isValid() ? dateTime : null;
+		},
+		getFixedTimeSlotName() {
+			const startTime = this.normalizeTimeText(this.requestResult.startTime);
+			const endTime = this.normalizeTimeText(this.requestResult.endTime);
+
+			if (!startTime || !endTime) {
+				return '';
+			}
+
+			return `${startTime}-${endTime}`;
+		},
+		getActivitySurplusNumber() {
+			const requestResult = this.requestResult || {};
+			const candidateKeys = ['surplusNumber', 'numbers', 'remainNumber', 'remainingNumber', 'residueNumber'];
+
+			for (let i = 0; i < candidateKeys.length; i++) {
+				const value = requestResult[candidateKeys[i]];
+				if (value !== undefined && value !== null && value !== '') {
+					return Number(value) || 0;
+				}
+			}
+
+			return 0;
+		},
 		async getDetailData() {
 			this.requestResult = this.selectedActivity;
+			console.log('报名详情数据', this.selectedActivity);
 		},
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
-		},
-		// 获取初始的时段数据
-		getReservationTimeSlotData() {
-			getReservationTimeSlot().then((res) => {
-				this.timeSlotList = res.data;
-				console.log('四个时间段的时间数据', this.timeSlotList);
-			});
 		},
 		// 处理日期选择
 		handleDateSelected({ date, week }) {
 			this.date = date;
 			this.week = week;
-			// if (this.date && this.selectedTimeSlot) {
-			// 	getReservationWeekNumbers({
-			// 		dateTime: this.date,
-			// 		timeSlot: this.selectedTimeSlot
-			// 	}).then((res) => {
-			// 		if (res.code === 200 && res.message === '查询成功') {
-			// 			this.needExplainServiceNum = res.data.numbers;
-			// 		}
-			// 	});
-			// }
+			this.selectedTimeSlot = null;
+			this.selectedTimeSlotIndex = -1;
 		},
 		// 接收子组件返回的预约人数数据
 		updateTimeSlotNumbers(numbers) {
-			console.log('预约人数', numbers);
-			this.timeSlotNumbers = numbers;
+			// this.timeSlotNumbers = numbers;
 		},
 		// 选择四个时间段
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			if (this.date && this.selectedTimeSlot) {
-				getReservationWeekNumbers({
-					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot
-				}).then((res) => {
-					console.log('选择讲解服务的人数', res);
-					if (res.code === 200 && res.message == '查询成功') {
-						this.needExplainServiceNum = res.data.numbers;
-					}
-				});
-			}
 		},
 		// handleDropdownChangeC(value) {
 		// 	this.channel = this.partnerOptionC[value.detail].text;
 		// },
 		async submit() {
+			if (!this.date) {
+				this.$toast({
+					duration: 3000,
+					message: '请选择预约日期'
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot) {
+				this.$toast({
+					duration: 3000,
+					message: '当前日期暂无可预约活动时段'
+				});
+				return;
+			}
+
 			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
@@ -192,7 +270,6 @@ export default {
 	},
 	onLoad() {
 		this.getDetailData();
-		this.getReservationTimeSlotData();
 	}
 };
 </script>
@@ -218,6 +295,15 @@ export default {
 		margin-top: 8rpx;
 		.txt-2-1 {
 			color: #02c6a2;
+		}
+		.txt-2-1.status-ing {
+			color: #02c6a2;
+		}
+		.txt-2-1.status-soon {
+			color: #ff9400;
+		}
+		.txt-2-1.status-end {
+			color: #999;
 		}
 		.txt-2-2 {
 			color: #7c7e80;

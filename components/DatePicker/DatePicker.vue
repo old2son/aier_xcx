@@ -174,13 +174,15 @@ export default {
 						this.$emit('time-slot-numbers', res.data[0]);
 					}
 				});
-			} else if (this.needTimeSlotRequest && this.isActivity) {
-				getActivityReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
-					if (res.code === 200 && res.message === '查询成功') {
-						this.$emit('time-slot-numbers', res.data[0]);
-					}
-				});
 			}
+			// 活动改成自定义时间
+			// else if (this.needTimeSlotRequest && this.isActivity) {
+			// 	getActivityReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
+			// 		if (res.code === 200 && res.message === '查询成功') {
+			// 			this.$emit('time-slot-numbers', res.data[0]);
+			// 		}
+			// 	});
+			// }
 
 			this.isActivityDay = isInActivityRange(currentDate, this.activeList);
 			if (this.isActivityDay && isInCurrentFiveDays && !this.hasShownActivityPopup) {

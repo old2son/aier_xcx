@@ -112,12 +112,27 @@ export default {
 	},
 	methods: {
 		selectTimeSlot(item, index) {
+			if (!item || this.processedTimeSlotList[index].disabled) {
+				return;
+			}
+
+			if (this.selectedTimeSlotIndex === index) {
+				return;
+			}
+
 			if (item && !this.processedTimeSlotList[index].disabled) {
 				// 禁用状态不能选择
 				this.$emit('timeSlotSelected', item.name, index);
 			}
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {
+			const currentSelectedSlot =
+				this.selectedTimeSlotIndex > -1 ? slotList[this.selectedTimeSlotIndex] || null : null;
+
+			if (currentSelectedSlot && !currentSelectedSlot.disabled) {
+				return;
+			}
+
 			// 自动顺延到下一个未禁用的时段
 			const availableIndex = slotList.findIndex((slot) => !slot.disabled);
 			if (availableIndex !== -1) {

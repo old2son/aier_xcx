@@ -34,7 +34,7 @@
 
 		<view class="time-title">{{ timeTitle }}</view>
 		<view v-if="timeTip" class="time-tip">{{ timeTip }}</view>
-		<view class="morning-title">{{ morningTitle }}</view>
+		<view v-if="!isActivity" class="morning-title">{{ morningTitle }}</view>
 
 		<TimeSlotPicker
 			:weight="weight"

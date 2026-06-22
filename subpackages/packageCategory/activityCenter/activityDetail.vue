@@ -5,7 +5,7 @@
 		</view>
 		<view class="txt-1">{{ requestResult.activityName }}</view>
 		<view class="txt-2">
-			<text class="txt-2-1">进行中</text>
+			<text class="txt-2-1" :class="activityStatusInfo.className">{{ activityStatusInfo.text }}</text>
 			<text class="txt-2-2">{{ requestResult.endDate }} {{ requestResult.endTime }} 结束</text>
 		</view>
 		<view class="txt-3">
@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
 import { mapState, mapMutations } from 'vuex';
 import categoryData from '@/data/category.json';
 
@@ -73,10 +74,74 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['selectedActivity'])
+		...mapState('moduleActivity', ['selectedActivity']),
+		activityStatusInfo() {
+			const startAt = this.buildActivityDateTime(this.requestResult.activityTime, this.requestResult.startTime);
+			const endAt = this.buildActivityDateTime(this.requestResult.endDate, this.requestResult.endTime);
+			const now = dayjs();
+
+			if (endAt && now.isAfter(endAt)) {
+				return {
+					text: '已结束',
+					className: 'status-end'
+				};
+			}
+
+			if (startAt && now.isBefore(startAt)) {
+				return {
+					text: '即将开始',
+					className: 'status-soon'
+				};
+			}
+
+			return {
+				text: '进行中',
+				className: 'status-ing'
+			};
+		}
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setSelectedActivity']),
+		padNumber(value) {
+			return String(value).padStart(2, '0');
+		},
+		normalizeDateText(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, year, month, day] = match;
+			return `${year}-${this.padNumber(month)}-${this.padNumber(day)}`;
+		},
+		normalizeTimeText(timeText) {
+			if (!timeText) {
+				return '';
+			}
+
+			const match = String(timeText).match(/(\d{1,2})[:：](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, hour, minute] = match;
+			return `${this.padNumber(hour)}:${this.padNumber(minute)}`;
+		},
+		buildActivityDateTime(dateText, timeText) {
+			const normalizedDate = this.normalizeDateText(dateText);
+			const normalizedTime = this.normalizeTimeText(timeText);
+
+			if (!normalizedDate || !normalizedTime) {
+				return null;
+			}
+
+			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
+			return dateTime.isValid() ? dateTime : null;
+		},
 		// 抽离分享配置
 		getShareConfig() {
 			return {
@@ -191,6 +256,15 @@ export default {
 		margin-top: 8rpx;
 		.txt-2-1 {
 			color: #02c6a2;
+		}
+		.txt-2-1.status-ing {
+			color: #02c6a2;
+		}
+		.txt-2-1.status-soon {
+			color: #ff9400;
+		}
+		.txt-2-1.status-end {
+			color: #999;
 		}
 		.txt-2-2 {
 			color: #7c7e80;
