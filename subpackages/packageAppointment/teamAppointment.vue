@@ -19,6 +19,7 @@
 			@select-cal="selectedCal = $event"
 		/>
 
+		<!-- todo：优化表单错误提示；优化滚动封装 -->
 		<view class="team-box-anchor">
 			<ReservationTeamPanel
 				:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
@@ -199,7 +200,7 @@ export default {
 				});
 				return;
 			}
-			
+
 			this.leaderNameError = '';
 			this.phoneNumberError = '';
 			this.unitNameError = '';
