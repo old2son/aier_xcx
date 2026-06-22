@@ -72,7 +72,6 @@ export default {
 				commit('SET_FUTURE', futureList);
 
 				const futureListDate = formatFutureList(startingList, futureList);
-				console.log('未来一个月内的活动日期', futureListDate);
 				commit('SET_FUTURE_LIST', futureListDate);
 			} catch (e) {
 				console.error(e);

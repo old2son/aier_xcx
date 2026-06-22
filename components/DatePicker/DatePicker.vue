@@ -7,7 +7,8 @@
 				:class="{
 					disabled: day.disabled,
 					'date-selected': selectedDayIndex === index,
-					'activity-day': day.hasActivity && !day.disabled
+					'activity-day': day.hasActivity && !day.disabled,
+					'reservation-day': day.hasReservation && !day.disabled
 				}"
 				class="day-item"
 				@tap="selectDay(day, index)"
@@ -84,7 +85,7 @@ export default {
 		return {
 			days: [],
 			midnightTimer: null, // 用于每天自动更新的计时器
-			selectedDayIndex: 0, // 选中的日期
+			selectedDayIndex: -1, // 选中的日期
 			showActivityPopup: false
 		};
 	},
@@ -154,6 +155,7 @@ export default {
 		},
 		selectDay(day, index) {
 			if (day.disabled) return;
+			if (this.selectedDayIndex === index) return;
 			this.selectedDayIndex = index;
 			const fullDate = `${day.year}-${day.date}`;
 			const currentDate = dayjs(fullDate, 'YYYY-MM-DD');
@@ -251,7 +253,7 @@ export default {
 		margin-right: 20rpx;
 		background-color: #ebf1ff;
 		text-align: center;
-		border-radius: 16rpx;
+		border-radius: 12rpx;
 		padding: 20rpx;
 		box-sizing: border-box;
 		transition: background-color 0.3s ease;
@@ -285,9 +287,13 @@ export default {
 		content: '';
 		width: 32rpx;
 		height: 6rpx;
-		border-radius: 999rpx;
+		border-radius: 3rpx;
 		transform: translateX(-50%);
 		background-color: #ff4d4f;
+	}
+
+	.day-item.reservation-day {
+		box-shadow: inset 0 0 0 2rpx #8fb8ff;
 	}
 
 	.day-item:last-child {
@@ -296,6 +302,11 @@ export default {
 
 	.date-selected {
 		background-color: #32579c;
+
+		&.reservation-day {
+			box-shadow: inset 0 0 0 2rpx #32579c;
+		}
+
 		text {
 			color: #fff;
 		}

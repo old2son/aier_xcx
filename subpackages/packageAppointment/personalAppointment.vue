@@ -61,7 +61,7 @@ export default {
 			needTimeSlotRequest: true, // 是否需要请求时间段信息
 
 			radio: '0',
-			needExplainServiceNum: 50, // 需要讲解服务的人数，后台获取
+			needExplainServiceNum: 0, // 需要讲解服务的人数，后台获取
 
 			memberList: [],
 
@@ -138,7 +138,6 @@ export default {
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
 				this.timeSlotList = res.data;
-				console.log('四个时间段的时间数据', this.timeSlotList);
 			});
 		},
 		// 处理日期选择
@@ -147,17 +146,6 @@ export default {
 			this.week = week;
 			this.selectedTimeSlot = null;
 			this.selectedTimeSlotIndex = -1;
-			// if (this.date && this.selectedTimeSlot) {
-			// 	getReservationWeekNumbers({
-			// 		dateTime: this.date,
-			// 		timeSlot: this.selectedTimeSlot
-			// 	}).then((res) => {
-			// 		console.log('DatePickerDatePickerDatePickerDatePickerDatePicker');
-			// 		if (res.code === 200 && res.message == '查询成功') {
-			// 			this.needExplainServiceNum = res.data.numbers;
-			// 		}
-			// 	});
-			// }
 		},
 		// 接收子组件返回的预约人数数据
 		updateTimeSlotNumbers(numbers) {
@@ -168,17 +156,16 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			// if (this.date && this.selectedTimeSlot) {
-			// 	getReservationWeekNumbers({
-			// 		dateTime: this.date,
-			// 		timeSlot: this.selectedTimeSlot
-			// 	}).then((res) => {
-			// 		console.log('选择讲解服务的人数', res);
-			// 		if (res.code === 200 && res.message == '查询成功') {
-			// 			this.needExplainServiceNum = res.data.numbers;
-			// 		}
-			// 	});
-			// }
+			if (this.date && this.selectedTimeSlot) {
+				getReservationWeekNumbers({
+					dateTime: this.date,
+					timeSlot: this.selectedTimeSlot
+				}).then((res) => {
+					if (res.code === 200 && res.message === '查询成功') {
+						this.needExplainServiceNum = res.data.numbers;
+					}
+				});
+			}
 		},
 		async submit() {
 			if (!this.date) {

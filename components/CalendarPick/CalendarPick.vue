@@ -27,6 +27,7 @@
 					前往报名
 				</van-button>
 
+				<!-- todo：尝试分开确认、返回、选择日期逻辑 -->
 				<van-button v-show="!isActivityDay" round size="large" type="primary" @click="closePopup">
 					确认
 				</van-button>
@@ -95,7 +96,6 @@ export default {
 		reservationConfigList: {
 			immediate: true,
 			handler(val) {
-				console.log('reservationConfigList', val);
 				reservationConfigCache = Array.isArray(val) ? val : [];
 			}
 		}

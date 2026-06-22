@@ -76,8 +76,6 @@ export default {
 				let disabled = !!slot.disabled;
 				const slotName = slot.name || '';
 
-				console.log('slotslotslot', slot);
-
 				if (Number(slot.surplusNumber) <= 0) {
 					disabled = true;
 				}
