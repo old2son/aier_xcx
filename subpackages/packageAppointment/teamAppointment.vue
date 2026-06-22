@@ -9,9 +9,9 @@
 
 		<ReservationDateTimePanel
 			:selected-cal="selectedCal"
-			:need-time-slot-request="false"
+			:need-time-slot-request="needTimeSlotRequest"
 			:date="date"
-			:timeSlotList="timeSlotList"
+			:timeSlotList="combinedTimeSlotList"
 			:selected-time-slot-index="selectedTimeSlotIndex"
 			time-tip="每时段报名满15人将自动成团，我馆提供科普讲解服务。"
 			@date-selected="handleDateSelected"
@@ -19,11 +19,13 @@
 			@select-cal="selectedCal = $event"
 		/>
 
-		<ReservationTeamPanel
-			:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
-			:errors="{ leaderNameError, phoneNumberError, unitNameError, visitorsNumberError }"
-			@change="handleTeamFormChange"
-		/>
+		<view class="team-box-anchor">
+			<ReservationTeamPanel
+				:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
+				:errors="{ leaderNameError, phoneNumberError, unitNameError, visitorsNumberError }"
+				@change="handleTeamFormChange"
+			/>
+		</view>
 
 		<ExcelUpload @getFile="handleExcelFile" />
 
@@ -40,6 +42,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
 import myData from '@/data/appointment.json';
 import { handleReservationResult } from '@/utils/reservation.js';
 import { getReservationTimeSlot, teamReservation } from '@/api/index';
@@ -50,9 +53,11 @@ export default {
 			showReservationPopup: true,
 			date: null,
 			week: null,
-			timeSlotList: [],
 			selectedTimeSlot: null,
 			selectedTimeSlotIndex: 0,
+			timeSlotList: [],
+			timeSlotNumbers: null,
+			needTimeSlotRequest: true,
 			leaderName: null,
 			phoneNumber: null,
 			unitName: null,
@@ -72,14 +77,39 @@ export default {
 			base64File: ''
 		};
 	},
-	computed: {},
+	computed: {
+		...mapState('moduleBooking', ['reservationConfigList']),
+		combinedTimeSlotList() {
+			const currentDateConfig = this.getCurrentDateConfig();
+			const currentTimeSlotList = currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
+
+			return this.timeSlotList.map((slot, index) => {
+				const numbersKey = `numbers${index + 1}`;
+				const reservationNumber = this.timeSlotNumbers ? this.timeSlotNumbers[numbersKey] || 0 : 0;
+				const slotName = this.getTimeSlotName(slot);
+				const matchedSlot = currentTimeSlotList.find((item) => this.getTimeSlotName(item) === slotName);
+
+				return {
+					...slot,
+					name: slotName,
+					configId: matchedSlot ? matchedSlot.configId : '',
+					surplusNumber: matchedSlot ? matchedSlot.surplusNumber : 0,
+					reservationNumber,
+					disabled: !matchedSlot || Number(matchedSlot.surplusNumber) <= 0
+				};
+			});
+		}
+	},
 	methods: {
+		...mapActions('moduleBooking', ['getReservationConfigList']),
 		handlePopupClose() {
 			this.showReservationPopup = false;
 		},
 		handleDateSelected({ date, week }) {
 			this.date = date;
 			this.week = week;
+			this.selectedTimeSlot = null;
+			this.selectedTimeSlotIndex = -1;
 		},
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
@@ -91,12 +121,85 @@ export default {
 		handleTeamFormChange({ field, value }) {
 			this[field] = value;
 		},
+		scrollToTeamBox() {
+			this.$nextTick(() => {
+				const query = uni.createSelectorQuery().in(this);
+				query.select('.team-box-anchor').boundingClientRect();
+				query.selectViewport().scrollOffset();
+				query.exec((res) => {
+					const rect = res && res[0];
+					const viewport = res && res[1];
+					if (!rect) {
+						return;
+					}
+
+					const scrollTop = (viewport && viewport.scrollTop) || 0;
+					uni.pageScrollTo({
+						scrollTop: Math.max(rect.top + scrollTop - 40, 0),
+						duration: 300
+					});
+				});
+			});
+		},
 		getReservationTimeSlotData() {
 			getReservationTimeSlot().then((res) => {
 				this.timeSlotList = res.data;
 			});
 		},
+		formatSelectedDate(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			return String(dateText)
+				.replace('年', '-')
+				.replace('月', '-')
+				.replace('日', '');
+		},
+		getTimeSlotName(slot) {
+			if (!slot) {
+				return '';
+			}
+
+			if (slot.name) {
+				return slot.name;
+			}
+
+			if (slot.label) {
+				return slot.label;
+			}
+
+			if (slot.startTime && slot.endTime) {
+				return `${slot.startTime}-${slot.endTime}`;
+			}
+
+			return '';
+		},
+		getCurrentDateConfig() {
+			const currentDate = this.formatSelectedDate(this.date);
+			if (!currentDate) {
+				return null;
+			}
+
+			return this.reservationConfigList.find((item) => item.dateTime === currentDate) || null;
+		},
 		submit() {
+			if (!this.date) {
+				this.$toast({
+					duration: 3000,
+					message: '请选择预约日期'
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot) {
+				this.$toast({
+					duration: 3000,
+					message: '当前日期暂无可预约时段'
+				});
+				return;
+			}
+			
 			this.leaderNameError = '';
 			this.phoneNumberError = '';
 			this.unitNameError = '';
@@ -108,33 +211,69 @@ export default {
 
 			if (!this.leaderName) {
 				this.leaderNameError = '领队者姓名不能为空';
+				this.scrollToTeamBox();
 				return;
 			} else if (!nameRegex.test(this.leaderName)) {
 				this.leaderNameError = '姓名只能包含中文或英文';
+				this.scrollToTeamBox();
 				return;
 			}
 
 			if (!this.phoneNumber) {
 				this.phoneNumberError = '手机号不能为空';
+				this.scrollToTeamBox();
 				return;
 			} else if (!phoneRegex.test(this.phoneNumber)) {
 				this.phoneNumberError = '手机号格式错误';
+				this.scrollToTeamBox();
 				return;
 			}
 
 			if (!this.unitName) {
 				this.unitNameError = '单位名称不能为空';
+				this.scrollToTeamBox();
 				return;
 			} else if (!nameRegex.test(this.unitName)) {
 				this.unitNameError = '单位名称只能包含中文或英文';
+				this.scrollToTeamBox();
 				return;
 			}
 
 			if (!this.visitorsNumber) {
 				this.visitorsNumberError = '参观人数不能为空';
+				this.scrollToTeamBox();
 				return;
 			} else if (isNaN(visitors) || visitors < 15 || visitors > 50) {
 				this.visitorsNumberError = '参观人数需在15-50之间';
+				this.scrollToTeamBox();
+				return;
+			}
+
+			const currentSlot =
+				this.selectedTimeSlotIndex > -1 ? this.combinedTimeSlotList[this.selectedTimeSlotIndex] || null : null;
+			const surplusNumber = Number(currentSlot && currentSlot.surplusNumber);
+
+			if (!this.date) {
+				uni.showToast({
+					title: '请选择预约日期',
+					icon: 'none',
+					duration: 3000
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot || !currentSlot) {
+				uni.showToast({
+					title: '请选择预约时段',
+					icon: 'none',
+					duration: 3000
+				});
+				return;
+			}
+
+			if (!Number.isNaN(surplusNumber) && visitors > surplusNumber) {
+				this.visitorsNumberError = `当前时段剩余人数仅${surplusNumber}人`;
+				this.scrollToTeamBox();
 				return;
 			}
 
@@ -179,6 +318,7 @@ export default {
 	},
 	onLoad() {
 		this.getReservationTimeSlotData();
+		this.getReservationConfigList();
 	}
 };
 </script>
