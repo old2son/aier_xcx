@@ -27,7 +27,7 @@
 					@input="handleAgeInput"
 				/>
 			</view>
-			<view class="col-2" v-if="!isMinor">
+			<view class="col-2 contact-row" :class="{ 'contact-row-hide': isMinor }">
 				<text>联系方式</text>
 				<input
 					:value="userPhone"
@@ -342,6 +342,26 @@ export default {
 	align-items: center;
 }
 
+.contact-row {
+	overflow: hidden;
+	max-height: 120rpx;
+	opacity: 1;
+	transition:
+		max-height 0.25s ease,
+		opacity 0.25s ease,
+		padding 0.25s ease,
+		border-color 0.25s ease;
+}
+
+.contact-row-hide {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	border-bottom-color: transparent !important;
+	max-height: 0;
+	opacity: 0;
+	pointer-events: none;
+}
+
 .member-box .col-2 text:nth-child(1) {
 	white-space: nowrap;
 	margin-right: 30px;
@@ -397,7 +417,9 @@ export default {
 
 .btn-wrap button {
 	width: 46%;
-	font-size: 18px;
+	height: 80rpx;
+	line-height: 80rpx;
+	font-size: 32rpx;
 	border-radius: 50rpx;
 }
 
@@ -410,5 +432,14 @@ export default {
 .confirm-btn {
 	background-color: #32579c;
 	color: #fff;
+}
+
+::v-deep .van-picker__confirm {
+	color: #21467f;
+	font-weight: 600;
+}
+
+::v-deep .van-picker__cancel {
+	color: #7c8aa5;
 }
 </style>
