@@ -90,7 +90,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['hasShownActivityPopup'])
+		...mapState('moduleActivity', ['hasShownActivityPopup', 'selectedActivity'])
 	},
 	watch: {
 		selectedCal(newVal) {
@@ -101,6 +101,36 @@ export default {
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setHasShownActivityPopup']),
+		getActivityRange() {
+			const activityStartText = this.selectedActivity && this.selectedActivity.activityTime;
+			const activityEndText = this.selectedActivity && this.selectedActivity.endDate;
+			if (!activityStartText || !activityEndText) {
+				return null;
+			}
+
+			const startDate = dayjs(String(activityStartText).replace(/[年/.]/g, '-').replace(/月/g, '-').replace(/日/g, ''));
+			const endDate = dayjs(String(activityEndText).replace(/[年/.]/g, '-').replace(/月/g, '-').replace(/日/g, ''));
+			if (!startDate.isValid() || !endDate.isValid()) {
+				return null;
+			}
+
+			return {
+				start: startDate.startOf('day'),
+				end: endDate.endOf('day')
+			};
+		},
+		isActivityDateDisabled(currentDay) {
+			if (!this.isActivity) {
+				return false;
+			}
+
+			const activityRange = this.getActivityRange();
+			if (!activityRange) {
+				return false;
+			}
+
+			return currentDay.isBefore(activityRange.start, 'day') || currentDay.isAfter(activityRange.end, 'day');
+		},
 		// 生成当天和接下来的六天的日期信息
 		generateWeekDays() {
 			const today = dayjs().startOf('day'); // 获取当前日期（精确到当天0点）
@@ -119,7 +149,7 @@ export default {
 					year: currentYear,
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
-					disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
+					disabled: this.disabledWeekdays.includes(dayOfWeek) || this.isActivityDateDisabled(currentDay),
 					hasActivity,
 					hasReservation
 				});
