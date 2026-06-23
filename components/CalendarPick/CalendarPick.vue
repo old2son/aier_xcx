@@ -65,6 +65,10 @@ export default {
 			type: Array,
 			required: true
 		},
+		isActivity: {
+			type: Boolean,
+			required: false
+		},
 		reservationConfigList: {
 			type: Array,
 			required: false
@@ -177,7 +181,7 @@ export default {
 				classNames.push('activity-day');
 			}
 
-			if (isReservationConfig) {
+			if (isReservationConfig && !isActivity) {
 				classNames.push('reservation-day');
 			}
 

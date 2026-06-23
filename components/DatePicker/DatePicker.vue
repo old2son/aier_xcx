@@ -8,7 +8,7 @@
 					disabled: day.disabled,
 					'date-selected': selectedDayIndex === index,
 					'activity-day': day.hasActivity && !day.disabled,
-					'reservation-day': day.hasReservation && !day.disabled
+					'reservation-day': day.hasReservation && !day.disabled && !isActivity
 				}"
 				class="day-item"
 				@tap="selectDay(day, index)"

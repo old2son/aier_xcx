@@ -22,6 +22,7 @@
 
 		<CalendarPick
 			v-if="Array.isArray(activeList)"
+			:isActivity="isActivity"
 			:show-popup="isShowCal"
 			:what-a-day="date"
 			:active-list="activeList"

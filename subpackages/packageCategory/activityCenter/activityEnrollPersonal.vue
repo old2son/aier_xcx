@@ -107,6 +107,7 @@ export default {
 		combinedTimeSlotList() {
 			const fixedTimeSlot = this.getFixedTimeSlotName();
 			const surplusNumber = this.getActivitySurplusNumber();
+			const isActivitySlotClosed = this.isActivitySlotClosed();
 
 			if (!fixedTimeSlot) {
 				return [];
@@ -116,7 +117,7 @@ export default {
 				{
 					name: fixedTimeSlot,
 					surplusNumber,
-					disabled: !this.date || surplusNumber <= 0
+					disabled: !this.date || surplusNumber <= 0 || isActivitySlotClosed
 				}
 			];
 		}
@@ -161,6 +162,19 @@ export default {
 
 			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
 			return dateTime.isValid() ? dateTime : null;
+		},
+		isActivitySlotClosed() {
+			if (!this.date) {
+				return false;
+			}
+
+			const slotStartAt = this.buildActivityDateTime(this.date, this.requestResult.startTime);
+
+			if (!slotStartAt) {
+				return false;
+			}
+
+			return dayjs().isAfter(slotStartAt.subtract(30, 'minute'));
 		},
 		getFixedTimeSlotName() {
 			const startTime = this.normalizeTimeText(this.requestResult.startTime);
