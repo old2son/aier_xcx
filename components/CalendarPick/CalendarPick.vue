@@ -41,12 +41,48 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import dayjs from 'dayjs';
 import { isInActivityRange, isReservationConfigRange } from '@/utils/dataRange';
 
 let activeListCache = [];
 let reservationConfigCache = [];
 let isActivityCache = false;
+let selectedActivityCache = {};
+
+function normalizeDateText(dateText) {
+	if (!dateText) {
+		return '';
+	}
+
+	const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+	if (!match) {
+		return '';
+	}
+
+	const [, year, month, day] = match;
+	return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function isInSelectedActivityRange(current) {
+	if (!isActivityCache) {
+		return true;
+	}
+
+	const startDate = normalizeDateText(selectedActivityCache && selectedActivityCache.activityTime);
+	const endDate = normalizeDateText(selectedActivityCache && selectedActivityCache.endDate);
+	if (!startDate || !endDate) {
+		return false;
+	}
+
+	const start = dayjs(startDate);
+	const end = dayjs(endDate);
+	return (
+		current.isSame(start, 'day') ||
+		current.isSame(end, 'day') ||
+		(current.isAfter(start, 'day') && current.isBefore(end, 'day'))
+	);
+}
 
 export default {
 	name: 'CalendarPick',
@@ -83,6 +119,9 @@ export default {
 			isActivityDay: false
 		};
 	},
+	computed: {
+		...mapState('moduleActivity', ['selectedActivity'])
+	},
 	watch: {
 		whatADay(newval) {
 			const timestamp = dayjs(newval.replace(/年/g, '-').replace(/月/g, '-').replace(/日/g, '')).valueOf();
@@ -108,6 +147,12 @@ export default {
 			immediate: true,
 			handler(val) {
 				isActivityCache = !!val;
+			}
+		},
+		selectedActivity: {
+			immediate: true,
+			handler(val) {
+				selectedActivityCache = val || {};
 			}
 		}
 	},
@@ -179,7 +224,10 @@ export default {
 				(current.isAfter(today) && current.isBefore(maxDay)) ||
 				current.isSame(maxDay, 'day');
 
-			const hasActivity = isWithin30Days && isInActivityRange(current, activeListCache);
+			const hasActivity =
+				isWithin30Days &&
+				isInActivityRange(current, activeListCache) &&
+				isInSelectedActivityRange(current);
 
 			const isReservationConfig = isWithin30Days && isReservationConfigRange(current, reservationConfigCache);
 
