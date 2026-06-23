@@ -247,7 +247,7 @@ export default {
 			return day;
 		},
 		goActivity() {
-			uni.navigateTo({
+			uni.redirectTo({
 				url: '/subpackages/packageCategory/activityCenter/index'
 			});
 		}

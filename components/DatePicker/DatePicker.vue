@@ -245,7 +245,7 @@ export default {
 			}
 		},
 		goActivity() {
-			uni.navigateTo({
+			uni.redirectTo({
 				url: '/subpackages/packageCategory/activityCenter/index'
 			});
 		},
