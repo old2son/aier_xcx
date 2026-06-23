@@ -76,7 +76,8 @@ export default {
 
 			memberList: [],
 
-			selectedCal: null
+			selectedCal: null,
+			isInActivityDateRange: true
 		};
 	},
 	computed: {
@@ -119,7 +120,7 @@ export default {
 				{
 					name: fixedTimeSlot,
 					surplusNumber,
-					disabled: !this.date || surplusNumber <= 0 || isActivitySlotClosed
+					disabled: !this.date || !this.isInActivityDateRange || surplusNumber <= 0 || isActivitySlotClosed
 				}
 			];
 		}
@@ -209,9 +210,10 @@ export default {
 			this.showReservationPopup = false; // 监听子组件关闭事件
 		},
 		// 处理日期选择
-		handleDateSelected({ date, week }) {
+		handleDateSelected({ date, week, isInSelectedActivityRange }) {
 			this.date = date;
 			this.week = week;
+			this.isInActivityDateRange = isInSelectedActivityRange !== false;
 			this.selectedTimeSlot = null;
 			this.selectedTimeSlotIndex = -1;
 		},

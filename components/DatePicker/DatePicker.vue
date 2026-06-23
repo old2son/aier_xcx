@@ -101,35 +101,37 @@ export default {
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setHasShownActivityPopup']),
-		getActivityRange() {
-			const activityStartText = this.selectedActivity && this.selectedActivity.activityTime;
-			const activityEndText = this.selectedActivity && this.selectedActivity.endDate;
-			if (!activityStartText || !activityEndText) {
-				return null;
+		normalizeDateText(dateText) {
+			if (!dateText) {
+				return '';
 			}
 
-			const startDate = dayjs(String(activityStartText).replace(/[年/.]/g, '-').replace(/月/g, '-').replace(/日/g, ''));
-			const endDate = dayjs(String(activityEndText).replace(/[年/.]/g, '-').replace(/月/g, '-').replace(/日/g, ''));
-			if (!startDate.isValid() || !endDate.isValid()) {
-				return null;
+			const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+			if (!match) {
+				return '';
 			}
 
-			return {
-				start: startDate.startOf('day'),
-				end: endDate.endOf('day')
-			};
+			const [, year, month, day] = match;
+			return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 		},
-		isActivityDateDisabled(currentDay) {
+		isInSelectedActivityRange(currentDay) {
 			if (!this.isActivity) {
+				return true;
+			}
+
+			const startDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.activityTime);
+			const endDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.endDate);
+			if (!startDate || !endDate) {
 				return false;
 			}
 
-			const activityRange = this.getActivityRange();
-			if (!activityRange) {
-				return false;
-			}
-
-			return currentDay.isBefore(activityRange.start, 'day') || currentDay.isAfter(activityRange.end, 'day');
+			const start = dayjs(startDate);
+			const end = dayjs(endDate);
+			return (
+				currentDay.isSame(start, 'day') ||
+				currentDay.isSame(end, 'day') ||
+				(currentDay.isAfter(start, 'day') && currentDay.isBefore(end, 'day'))
+			);
 		},
 		// 生成当天和接下来的六天的日期信息
 		generateWeekDays() {
@@ -142,14 +144,16 @@ export default {
 				const currentDay = today.add(i, 'day'); // 从当天开始依次生成
 				const dayOfWeek = currentDay.day(); // 获取星期几
 				const dateString = currentDay.format('MM-DD'); // 格式化日期为 MM-DD
-				const hasActivity = isInActivityRange(currentDay, this.activeList);
+				const hasActivity =
+					isInActivityRange(currentDay, this.activeList) &&
+					(!this.isActivity || this.isInSelectedActivityRange(currentDay));
 				const hasReservation = isReservationConfigRange(currentDay, this.reservationConfigList);
 
 				daysArray.push({
 					year: currentYear,
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
-					disabled: this.disabledWeekdays.includes(dayOfWeek) || this.isActivityDateDisabled(currentDay),
+					disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
 					hasActivity,
 					hasReservation
 				});
@@ -194,9 +198,10 @@ export default {
 					? currentDate.diff(dayjs().startOf('day'), 'day') <= 4
 					: false;
 			const formattedDate = dayjs(fullDate, 'YYYY-MM-DD').format('YYYY年MM月DD日');
+			const isInSelectedActivityRange = this.isInSelectedActivityRange(currentDate);
 			// console.log('formattedDate', formattedDate);
 			// 给父组件传递数据（子组件触发父组件方法）
-			this.$emit('date-selected', { date: formattedDate, week: day.week });
+			this.$emit('date-selected', { date: formattedDate, week: day.week, isInSelectedActivityRange });
 			// 四个时间段下的预约报名人数只有在选择了预约日子后才会查询，所以需要调用
 			if (this.needTimeSlotRequest && !this.isActivity) {
 				getReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
