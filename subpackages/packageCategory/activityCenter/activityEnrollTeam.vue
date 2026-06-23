@@ -2,8 +2,8 @@
 	<view class="team-reservation-container">
 		<view class="txt-1">{{ requestResult.activityName }}</view>
 		<view class="txt-2">
-			<text class="txt-2-1">进行中</text>
-			<text class="txt-2-2">{{ requestResult.endTime }} 结束</text>
+			<text class="txt-2-1" :class="activityStatusInfo.className">{{ activityStatusInfo.text }}</text>
+			<text class="txt-2-2">{{ requestResult.endDate }} {{ requestResult.endTime }} 结束</text>
 		</view>
 
 		<view class="tip-title-1">
@@ -16,13 +16,16 @@
 		<view class="divider" />
 		<ReservationDateTimePanel
 			theme="activity"
+			:is-activity="true"
 			:selected-cal="selectedCal"
-			:need-time-slot-request="false"
+			:need-time-slot-request="needTimeSlotRequest"
 			:date="date"
-			:timeSlotList="timeSlotList"
+			:timeSlotList="combinedTimeSlotList"
 			:selected-time-slot-index="selectedTimeSlotIndex"
-			time-tip="每时段报名满15人将自动成团，我馆提供科普讲解服务。"
+			time-title="活动时段"
+			morning-title="固定时间"
 			@date-selected="handleDateSelected"
+			@time-slot-numbers="updateTimeSlotNumbers"
 			@time-slot-selected="handleTimeSlotSelected"
 			@select-cal="selectedCal = $event"
 		/>
@@ -38,6 +41,8 @@
 
 		<OnlineAsk :askInfo="askInfo" />
 
+		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
+
 		<view class="submit-btn">
 			<button class="custom-button" @click="submit()">确认提交</button>
 		</view>
@@ -49,10 +54,11 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
 import { mapState } from 'vuex';
 import myData from '@/data/appointment.json';
 import { handleReservationResult } from '@/utils/reservation.js';
-import { getReservationTimeSlot, personalActivityTeamReservation } from '@/api/index';
+import { personalActivityTeamReservation } from '@/api/index';
 
 export default {
 	data() {
@@ -63,9 +69,9 @@ export default {
 			showReservationPopup: false,
 			date: null,
 			week: null,
-			timeSlotList: [],
+			needTimeSlotRequest: true,
 			selectedTimeSlot: null,
-			selectedTimeSlotIndex: 0,
+			selectedTimeSlotIndex: -1,
 			leaderName: null,
 			phoneNumber: null,
 			unitName: null,
@@ -82,39 +88,153 @@ export default {
 			visitorsNumberError: '',
 
 			selectedCal: null,
-			base64File: ''
+			base64File: '',
+			isInActivityDateRange: true
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['selectedActivity'])
+		...mapState('moduleActivity', ['selectedActivity']),
+		activityStatusInfo() {
+			const startAt = this.buildActivityDateTime(this.requestResult.activityTime, this.requestResult.startTime);
+			const endAt = this.buildActivityDateTime(this.requestResult.endDate, this.requestResult.endTime);
+			const now = dayjs();
+
+			if (endAt && now.isAfter(endAt)) {
+				return {
+					text: '已结束',
+					className: 'status-end'
+				};
+			}
+
+			if (startAt && now.isBefore(startAt)) {
+				return {
+					text: '即将开始',
+					className: 'status-soon'
+				};
+			}
+
+			return {
+				text: '进行中',
+				className: 'status-ing'
+			};
+		},
+		combinedTimeSlotList() {
+			const fixedTimeSlot = this.getFixedTimeSlotName();
+			const surplusNumber = this.getActivitySurplusNumber();
+			const isActivitySlotClosed = this.isActivitySlotClosed();
+
+			if (!fixedTimeSlot) {
+				return [];
+			}
+
+			return [
+				{
+					name: fixedTimeSlot,
+					surplusNumber,
+					disabled: !this.date || !this.isInActivityDateRange || surplusNumber <= 0 || isActivitySlotClosed
+				}
+			];
+		}
 	},
 	methods: {
+		padNumber(value) {
+			return String(value).padStart(2, '0');
+		},
+		normalizeDateText(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, year, month, day] = match;
+			return `${year}-${this.padNumber(month)}-${this.padNumber(day)}`;
+		},
+		normalizeTimeText(timeText) {
+			if (!timeText) {
+				return '';
+			}
+
+			const match = String(timeText).match(/(\d{1,2})[:：](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, hour, minute] = match;
+			return `${this.padNumber(hour)}:${this.padNumber(minute)}`;
+		},
+		buildActivityDateTime(dateText, timeText) {
+			const normalizedDate = this.normalizeDateText(dateText);
+			const normalizedTime = this.normalizeTimeText(timeText);
+
+			if (!normalizedDate || !normalizedTime) {
+				return null;
+			}
+
+			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
+			return dateTime.isValid() ? dateTime : null;
+		},
+		isActivitySlotClosed() {
+			if (!this.date) {
+				return false;
+			}
+
+			const slotStartAt = this.buildActivityDateTime(this.date, this.requestResult.startTime);
+			if (!slotStartAt) {
+				return false;
+			}
+
+			return dayjs().isAfter(slotStartAt.subtract(30, 'minute'));
+		},
+		getFixedTimeSlotName() {
+			const startTime = this.normalizeTimeText(this.requestResult.startTime);
+			const endTime = this.normalizeTimeText(this.requestResult.endTime);
+
+			if (!startTime || !endTime) {
+				return '';
+			}
+
+			return `${startTime}-${endTime}`;
+		},
+		getActivitySurplusNumber() {
+			const requestResult = this.requestResult || {};
+			const candidateKeys = ['surplusNumber', 'numbers', 'remainNumber', 'remainingNumber', 'residueNumber'];
+
+			for (let i = 0; i < candidateKeys.length; i++) {
+				const value = requestResult[candidateKeys[i]];
+				if (value !== undefined && value !== null && value !== '') {
+					return Number(value) || 0;
+				}
+			}
+
+			return 0;
+		},
 		async getDetailData() {
-			console.log('报名详情数据', this.selectedActivity);
 			this.requestResult = this.selectedActivity;
 		},
 		handlePopupClose() {
 			this.showReservationPopup = false;
 		},
-		handleDateSelected({ date, week }) {
+		handleDateSelected({ date, week, isInSelectedActivityRange }) {
 			this.date = date;
 			this.week = week;
+			this.isInActivityDateRange = isInSelectedActivityRange !== false;
+			this.selectedTimeSlot = null;
+			this.selectedTimeSlotIndex = -1;
 		},
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
 		},
+		updateTimeSlotNumbers() {},
 		handleExcelFile(file) {
 			this.base64File = file;
 		},
 		handleTeamFormChange({ field, value }) {
 			this[field] = value;
-		},
-		getReservationTimeSlotData() {
-			getReservationTimeSlot().then((res) => {
-				this.timeSlotList = res.data;
-				console.log('四个时间段的时间数据', this.timeSlotList);
-			});
 		},
 		submit() {
 			this.leaderNameError = '';
@@ -155,6 +275,24 @@ export default {
 				return;
 			} else if (isNaN(visitors) || visitors < 15 || visitors > 50) {
 				this.visitorsNumberError = '参观人数需在15-50之间';
+				return;
+			}
+
+			if (!this.date) {
+				uni.showToast({
+					title: '请选择预约日期',
+					icon: 'none',
+					duration: 3000
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot) {
+				uni.showToast({
+					title: '当前日期暂无可预约活动时段',
+					icon: 'none',
+					duration: 3000
+				});
 				return;
 			}
 
@@ -201,7 +339,6 @@ export default {
 	},
 	onLoad() {
 		this.getDetailData();
-		this.getReservationTimeSlotData();
 	}
 };
 </script>
@@ -228,6 +365,15 @@ export default {
 		margin-top: 8rpx;
 		.txt-2-1 {
 			color: #02c6a2;
+		}
+		.txt-2-1.status-ing {
+			color: #02c6a2;
+		}
+		.txt-2-1.status-soon {
+			color: #ff9400;
+		}
+		.txt-2-1.status-end {
+			color: #999;
 		}
 		.txt-2-2 {
 			color: #7c7e80;
@@ -256,6 +402,12 @@ export default {
 	height: 1px;
 	background-color: #eaeaea;
 	margin: 30rpx 0;
+}
+
+.tip-title {
+	margin: 60rpx 0 12rpx 0;
+	color: #999;
+	font-size: 24rpx;
 }
 
 .download-card {
@@ -378,7 +530,7 @@ export default {
 
 .submit-btn {
 	width: 100%;
-	margin: 60rpx auto 0 auto;
+	margin: 32rpx auto 0 auto;
 	padding-bottom: 60rpx;
 	box-sizing: border-box;
 

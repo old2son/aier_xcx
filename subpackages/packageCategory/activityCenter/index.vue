@@ -22,7 +22,7 @@
 						{{ inner.activityName }}
 					</view>
 					<view class="date">
-						{{ inner.endTime }}
+						{{ inner.activityTime }}
 					</view>
 				</view>
 			</van-tab>
