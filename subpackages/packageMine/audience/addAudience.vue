@@ -93,7 +93,8 @@ export default {
 			userPhone: '',
 			userAge: '',
 			idNumber: '',
-			showDocumentTypePopup: false
+			showDocumentTypePopup: false,
+			isSubmitting: false
 		};
 	},
 	computed: {
@@ -188,6 +189,10 @@ export default {
 			}
 		},
 		confirm() {
+			if (this.isSubmitting) {
+				return;
+			}
+
 			const phoneRegex = /^1[3-9]\d{9}$/;
 			const ageNumber = Number(this.userAge);
 			const certificateType = this.currentDocumentType.value;
@@ -258,6 +263,7 @@ export default {
 				return;
 			}
 
+			this.isSubmitting = true;
 			addMember({
 				name: this.memberName,
 				userPhone: this.userPhone,
@@ -266,9 +272,14 @@ export default {
 				idNumber: this.idNumber
 			}).then((res) => {
 				if (res.code === 200 && res.message === '添加成功') {
-					uni.redirectTo({
-						url: '/subpackages/packageMine/audience/audienceManage'
+					uni.showToast({
+						title: '添加成功',
+						duration: 1500
 					});
+
+					setTimeout(() => {
+						uni.navigateBack();
+					}, 1600);
 				}
 			});
 		},

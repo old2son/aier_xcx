@@ -13,6 +13,22 @@
 						<text>{{ item.name }}</text>
 					</view>
 					<view class="col-2">
+						<text>年龄</text>
+						<text>{{ item.userAge || '--' }}</text>
+					</view>
+					<view class="col-2">
+						<text>联系方式</text>
+						<text>{{ maskPhone(item.userPhone) }}</text>
+					</view>
+					<view class="col-2">
+						<text>证件类型</text>
+						<text>{{ item.documentType || '--' }}</text>
+					</view>
+					<view class="col-2">
+						<text>证件号码</text>
+						<text>{{ maskCertificate(item.idNumber) }}</text>
+					</view>
+					<!-- <view class="col-2">
 						<text>性别</text>
 						<view class="gender-value">
 							<image :src="getBoyImg(item.sex)" mode="widthFix"></image>
@@ -24,7 +40,7 @@
 					<view class="col-2">
 						<text>生日</text>
 						<text>{{ item.birthday }}</text>
-					</view>
+					</view> -->
 				</view>
 			</template>
 			<view class="add-member-btn">
@@ -39,7 +55,7 @@
 <script>
 import myData from '@/data/mine.json';
 import { mapState } from 'vuex';
-import { getMembers, deleteMember } from '@/api';
+import { getMembers, deleteMember } from '@/api/index';
 
 export default {
 	data() {
@@ -52,6 +68,8 @@ export default {
 	},
 	onLoad() {
 		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
+	},
+	onShow() {
 		this.getMemberInfo();
 	},
 	methods: {
@@ -60,6 +78,33 @@ export default {
 		},
 		getGirlImg(sex) {
 			return sex === 1 ? myData.editGenderIcon[1].girlIcon[0].url : myData.editGenderIcon[1].girlIcon[1].url;
+		},
+		maskPhone(value) {
+			if (!value) {
+				return '--';
+			}
+
+			const phone = String(value);
+			if (phone.length <= 7) {
+				return phone;
+			}
+
+			return `${phone.slice(0, 3)}****${phone.slice(-4)}`;
+		},
+		maskCertificate(value) {
+			if (!value) {
+				return '--';
+			}
+
+			const text = String(value);
+			if (text.length <= 4) {
+				return text;
+			}
+			if (text.length <= 8) {
+				return `${text.slice(0, 2)}***${text.slice(-2)}`;
+			}
+
+			return `${text.slice(0, 3)}********${text.slice(-4)}`;
 		},
 		getMemberInfo() {
 			uni.showLoading({
@@ -101,6 +146,14 @@ export default {
 			});
 		},
 		toAddmember() {
+			if (this.memberList.length >= 5) {
+				uni.showToast({
+					title: '最多添加5个成员',
+					duration: 3000,
+					icon: 'none'
+				});
+			}
+
 			uni.navigateTo({
 				url: '/subpackages/packageMine/audience/addAudience'
 			});
@@ -215,9 +268,9 @@ button::after {
 }
 
 .custom-button {
-	background-color: #fff;
-	color: #32579c;
 	width: 100%;
+	color: #32579c;
+	background-color: #fff;
 }
 
 .delete-dialog {
