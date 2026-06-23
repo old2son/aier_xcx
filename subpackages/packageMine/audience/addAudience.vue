@@ -8,78 +8,121 @@
 			<view class="col-2">
 				<text>姓名</text>
 				<input
-					v-model="memberName"
+					:value="memberName"
 					type="text"
 					placeholder="请输入添加成员姓名"
 					maxlength="10"
 					class="name-input"
+					@input="handleNameInput"
 				/>
 			</view>
 			<view class="col-2">
-				<text>性别</text>
-				<view class="gender-value">
-					<view class="boy-box" @click="chooseGender(1)">
-						<image :src="boyImg" mode="widthFix"></image>
-						<text class="boy-txt" :class="gender === 1 ? 'boy-color' : 'boy-default-color'">男</text>
-					</view>
-					<view class="girl-box" @click="chooseGender(0)">
-						<image :src="girlImg" mode="widthFix"></image>
-						<text :class="gender === 0 ? 'girl-color' : 'girl-default-color'">女</text>
-					</view>
+				<text>年龄</text>
+				<input
+					:value="userAge"
+					type="number"
+					placeholder="请输入年龄"
+					maxlength="3"
+					class="name-input"
+					@input="handleAgeInput"
+				/>
+			</view>
+			<view class="col-2" v-if="!isMinor">
+				<text>联系方式</text>
+				<input
+					:value="userPhone"
+					type="number"
+					placeholder="请输入联系方式"
+					maxlength="11"
+					class="name-input"
+					@input="handlePhoneInput"
+				/>
+			</view>
+			<view class="col-2">
+				<text>证件类型</text>
+				<view class="picker-value" @click="showDocumentTypePopup = true">
+					<text>{{ currentDocumentTypeLabel }}</text>
+					<text class="picker-arrow">></text>
 				</view>
 			</view>
-			<view class="col-2" @click="showbirthdayPopup = true">
-				<text>生日</text>
-				<text>{{ birthday }}</text>
+			<view class="col-2">
+				<text>证件号码</text>
+				<input
+					:value="idNumber"
+					:type="certificateFieldType"
+					:placeholder="certificatePlaceholder"
+					maxlength="18"
+					class="name-input"
+					@input="handleCertificateInput"
+				/>
 			</view>
 			<view class="btn-wrap">
 				<button type="default" class="cancel-btn" @click="back()">返回</button>
 				<button type="primary" class="confirm-btn" @click="confirm()">确认</button>
 			</view>
 		</view>
-		<van-popup :show="showbirthdayPopup" round @close="showbirthdayPopup = false">
-			<van-datetime-picker
-				:value="currentDate"
-				type="date"
-				title="生日"
-				:min-date="minDate"
-				:max-date="maxDate"
-				@confirm="confirmBirthday"
-				@cancel="showbirthdayPopup = false"
+		<van-popup :show="showDocumentTypePopup" round position="bottom" @close="showDocumentTypePopup = false">
+			<van-picker
+				show-toolbar
+				value-key="label"
+				:columns="documentTypeOptions"
+				@cancel="showDocumentTypePopup = false"
+				@confirm="handleDocumentTypeConfirm"
 			/>
 		</van-popup>
 	</view>
 </template>
 
 <script>
-import myData from '@/data/mine.json';
 import { mapState } from 'vuex';
-import { addMember } from '@/api';
+import { addMember } from '@/api/index';
+
+const certificateTypeSet = [
+	{ label: '身份证', value: 'idcard' },
+	{ label: '护照', value: 'passport' },
+	{ label: '港澳居民往来通行证', value: 'hkmo' },
+	{ label: '台湾居民往来内地通行证', value: 'taiwan' },
+	{ label: '军官证', value: 'military' }
+];
 
 export default {
 	data() {
-		const now = new Date();
 		return {
-			memberName: null,
-			birthday: '',
-			gender: 0,
-			showbirthdayPopup: false,
-			minDate: new Date(1945, 0, 1).getTime(),
-			maxDate: now.getTime(),
-			currentDate: now.getTime()
+			memberName: '',
+			documentTypeIndex: 0,
+			userPhone: '',
+			userAge: '',
+			idNumber: '',
+			showDocumentTypePopup: false
 		};
 	},
 	computed: {
 		...mapState('moduleLayout', ['menuInfo']),
-		boyImg() {
-			return this.gender === 0
-				? myData.editGenderIcon[0].boyIcon[0].url
-				: myData.editGenderIcon[0].boyIcon[1].url;
+		documentTypeOptions() {
+			return certificateTypeSet;
 		},
-		girlImg() {
-			return this.gender === 1
-				? myData.editGenderIcon[1].girlIcon[0].url
-				: myData.editGenderIcon[1].girlIcon[1].url;
+		currentDocumentType() {
+			return this.documentTypeOptions[this.documentTypeIndex] || this.documentTypeOptions[0];
+		},
+		currentDocumentTypeLabel() {
+			return this.currentDocumentType.label;
+		},
+		isMinor() {
+			const ageNumber = Number(this.userAge);
+			return this.userAge !== '' && !Number.isNaN(ageNumber) && ageNumber < 18;
+		},
+		certificatePlaceholder() {
+			const placeholderMap = {
+				idcard: '请输入身份证号',
+				passport: '请输入护照号码',
+				hkmo: '请输入港澳居民往来通行证号码',
+				taiwan: '请输入台湾居民往来内地通行证号码',
+				military: '请输入军官证号码'
+			};
+			return placeholderMap[this.currentDocumentType.value] || '请输入证件号码';
+		},
+		certificateFieldType() {
+			return this.currentDocumentType.value === 'idcard' ? 'idcard' : 'text';
 		}
 	},
 	onLoad() {
@@ -100,7 +143,56 @@ export default {
 				});
 			}
 		},
+		handleNameInput(event) {
+			this.validateInput('memberName', event.detail.value || '');
+		},
+		handlePhoneInput(event) {
+			this.userPhone = String(event.detail.value || '')
+				.replace(/\D/g, '')
+				.slice(0, 11);
+		},
+		handleAgeInput(event) {
+			this.userAge = String(event.detail.value || '')
+				.replace(/\D/g, '')
+				.slice(0, 3);
+			if (this.isMinor) {
+				this.userPhone = '';
+			}
+		},
+		handleCertificateInput(event) {
+			this.idNumber = String(event.detail.value || '').trim();
+		},
+		handleDocumentTypeConfirm(event) {
+			const pickedItem = Array.isArray(event.detail.value) ? event.detail.value[0] : event.detail.value;
+			const pickedIndex = this.documentTypeOptions.findIndex((item) => item.value === pickedItem.value);
+			this.documentTypeIndex = pickedIndex > -1 ? pickedIndex : 0;
+			this.idNumber = '';
+			this.showDocumentTypePopup = false;
+		},
+		validateCertificate(type, value) {
+			switch (type) {
+				case 'idcard':
+					return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
+						value
+					);
+				case 'passport':
+					return /^(?![0-9]+$)(?![A-Za-z]+$)[0-9A-Za-z]{1,16}$/.test(value);
+				case 'hkmo':
+					return /^[HM]\d{8}$/.test(value);
+				case 'taiwan':
+					return /^[0-9]{8,10}$/.test(value);
+				case 'military':
+					return /^军\d+$/.test(value);
+				default:
+					return false;
+			}
+		},
 		confirm() {
+			const phoneRegex = /^1[3-9]\d{9}$/;
+			const ageNumber = Number(this.userAge);
+			const certificateType = this.currentDocumentType.value;
+			const certificateLabel = this.currentDocumentType.label;
+
 			if (!this.memberName) {
 				uni.showToast({
 					title: '成员姓名不能为空',
@@ -109,50 +201,87 @@ export default {
 				});
 				return;
 			}
-			if (!this.birthday) {
+			if (!/^[a-zA-Z\u4e00-\u9fa5\s]*$/.test(this.memberName)) {
 				uni.showToast({
-					title: '请提交您的生日',
+					title: '成员姓名只能输入英文或中文',
 					duration: 3000,
 					icon: 'none'
 				});
 				return;
 			}
+			if (this.userAge === '' || Number.isNaN(ageNumber)) {
+				uni.showToast({
+					title: '年龄不能为空',
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+			if (!/^\d{1,3}$/.test(String(this.userAge)) || ageNumber < 0 || ageNumber > 120) {
+				uni.showToast({
+					title: '年龄需在0-120之间',
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+			if (!this.isMinor && !this.userPhone) {
+				uni.showToast({
+					title: '联系方式不能为空',
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+			if (!this.isMinor && !phoneRegex.test(this.userPhone)) {
+				uni.showToast({
+					title: '联系方式格式错误',
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+			if (!this.idNumber) {
+				uni.showToast({
+					title: `请输入${certificateLabel}号码`,
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+			if (!this.validateCertificate(certificateType, this.idNumber)) {
+				uni.showToast({
+					title: `${certificateLabel}格式不正确`,
+					duration: 3000,
+					icon: 'none'
+				});
+				return;
+			}
+
 			addMember({
 				name: this.memberName,
-				birthday: this.birthday,
-				sex: this.gender
+				userPhone: this.userPhone,
+				userAge: ageNumber,
+				documentType: certificateLabel,
+				idNumber: this.idNumber
 			}).then((res) => {
-				if (res.code === 200 && res.message == '添加成功') {
+				if (res.code === 200 && res.message === '添加成功') {
 					uni.redirectTo({
 						url: '/subpackages/packageMine/audience/audienceManage'
 					});
 				}
 			});
 		},
-		chooseGender(type) {
-			this.gender = type;
-		},
-		confirmBirthday(event) {
-			const date = new Date(event.detail);
-			const year = date.getFullYear();
-			const month = date.getMonth() + 1;
-			const day = date.getDate();
-			const formattedDate = `${year}年${month}月${day}日`;
-			this.birthday = formattedDate;
-			this.showbirthdayPopup = false;
-		},
 		validateInput(fieldName, value) {
 			const allowedRegex = /^[a-zA-Z\u4e00-\u9fa5\s]*$/;
 			if (!allowedRegex.test(value)) {
-				this[fieldName] = value.replace(/[^a-zA-Z\u4e00-\u9fa5\s]/g, '');
 				uni.showToast({
 					title: '只能输入英文或中文，不允许特殊符号或数字',
 					duration: 3000,
 					icon: 'none'
 				});
-			} else {
-				this[fieldName] = value;
 			}
+			this[fieldName] = value;
 		}
 	}
 };
@@ -218,6 +347,20 @@ export default {
 	margin-right: 30px;
 }
 
+.picker-value {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: #333;
+}
+
+.picker-arrow {
+	margin-left: 20rpx;
+	color: #999;
+	font-size: 24rpx;
+}
+
 .member-box .col-2 .gender-value {
 	display: flex;
 	align-items: center;
@@ -267,10 +410,5 @@ export default {
 .confirm-btn {
 	background-color: #32579c;
 	color: #fff;
-}
-
-/deep/ .van-popup {
-	position: fixed;
-	width: 70%;
 }
 </style>
