@@ -29,6 +29,8 @@
 			<van-dropdown-item :value="channelValue" :options="partnerOptionC" @change="handleDropdownChangeC" />
 		</van-dropdown-menu> -->
 
+		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
+
 		<view class="submit-btn">
 			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
 		</view>
@@ -337,8 +339,23 @@ export default {
 	font-size: 32rpx;
 	margin: 40rpx 0 20rpx 0;
 }
+.submit-tip {
+	margin-top: 48rpx;
+	padding: 24rpx 28rpx;
+	border-radius: 16rpx;
+	background-color: #f3f7ff;
+	color: #5c6f91;
+	font-size: 26rpx;
+	line-height: 1.7;
+}
 .submit-btn {
-	margin-top: 80rpx;
+	margin-top: 32rpx;
+}
+
+.tip-title {
+	margin: 60rpx 0 12rpx 0;
+	color: #999;
+	font-size: 24rpx;
 }
 
 ::v-deep .van-radio {

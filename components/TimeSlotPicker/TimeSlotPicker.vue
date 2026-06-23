@@ -1,11 +1,17 @@
 <template>
-	<view class="time-slot-picker">
-		<view class="time-slot-item" v-for="(item, index) in processedTimeSlotList" :key="index">
+	<view class="time-slot-picker" :class="{ 'single-slot': isSingleSlot }">
+		<view
+			class="time-slot-item"
+			:class="{ 'single-slot-item': isSingleSlot }"
+			v-for="(item, index) in processedTimeSlotList"
+			:key="index"
+		>
 			<view
 				class="time-slot-wrap"
 				:class="{
 					disabled: item.disabled,
-					'time-slot-selected': selectedTimeSlotIndex === index && !item.disabled
+					'time-slot-selected': !isSingleSlot && selectedTimeSlotIndex === index && !item.disabled,
+					'fixed-slot-wrap': isSingleSlot && !item.disabled
 				}"
 				@tap="selectTimeSlot(item, index)"
 			>
@@ -54,6 +60,9 @@ export default {
 		}
 	},
 	computed: {
+		isSingleSlot() {
+			return this.processedTimeSlotList.length === 1;
+		},
 		// 原始合并人数
 		combinedTimeSlotList() {
 			return this.timeSlotList.map((slot, index) => {
@@ -157,6 +166,11 @@ export default {
 		text-align: center;
 		margin: 0 32rpx 140rpx 0;
 	}
+
+	.time-slot-item.single-slot-item {
+		width: 100%;
+		margin: 0;
+	}
 	.time-slot-item:nth-last-child(1),
 	.time-slot-item:nth-last-child(2) {
 		margin-bottom: 0;
@@ -176,6 +190,35 @@ export default {
 		.reservation-num {
 			margin-top: 21rpx;
 			font-size: 30rpx;
+		}
+	}
+
+	&.single-slot {
+		margin-top: 28rpx;
+
+		.time-slot-wrap {
+			padding: 36rpx 24rpx;
+			border-radius: 20rpx;
+			background-color: #f3f7ff;
+			border: 2rpx solid #d7e5ff;
+		}
+
+		.time-slot-part {
+			font-size: 32rpx;
+			font-weight: 600;
+		}
+
+		.reservation-num {
+			margin-top: 16rpx;
+			font-size: 28rpx;
+		}
+	}
+
+	.fixed-slot-wrap {
+		color: #32579c;
+
+		.reservation-num {
+			color: #32579c;
 		}
 	}
 

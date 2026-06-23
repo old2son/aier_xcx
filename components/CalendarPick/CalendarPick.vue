@@ -46,6 +46,7 @@ import { isInActivityRange, isReservationConfigRange } from '@/utils/dataRange';
 
 let activeListCache = [];
 let reservationConfigCache = [];
+let isActivityCache = false;
 
 export default {
 	name: 'CalendarPick',
@@ -101,6 +102,12 @@ export default {
 			immediate: true,
 			handler(val) {
 				reservationConfigCache = Array.isArray(val) ? val : [];
+			}
+		},
+		isActivity: {
+			immediate: true,
+			handler(val) {
+				isActivityCache = !!val;
 			}
 		}
 	},
@@ -181,7 +188,7 @@ export default {
 				classNames.push('activity-day');
 			}
 
-			if (isReservationConfig && !isActivity) {
+			if (isReservationConfig && !isActivityCache) {
 				classNames.push('reservation-day');
 			}
 
