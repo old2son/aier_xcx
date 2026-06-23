@@ -204,7 +204,6 @@ export default {
 		},
 		async getDetailData() {
 			this.requestResult = this.selectedActivity;
-			console.log('报名详情数据', this.selectedActivity);
 		},
 		handlePopupClose() {
 			this.showReservationPopup = false; // 监听子组件关闭事件
