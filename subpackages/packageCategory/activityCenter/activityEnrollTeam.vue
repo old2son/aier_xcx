@@ -324,7 +324,7 @@ export default {
 					colleagues: this.visitorsNumber,
 					dateTime: this.date,
 					week: this.week,
-					timeSlot: this.selectedTimeSlot,
+					// timeSlot: this.selectedTimeSlot,
 					excelUrl: this.base64File
 				}),
 				delayPromise

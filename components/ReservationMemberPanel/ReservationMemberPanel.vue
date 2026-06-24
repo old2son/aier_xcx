@@ -235,6 +235,7 @@ export default {
 		mergedMemberList: {
 			deep: true,
 			handler(nextList) {
+				
 				if (this.isSameMemberList(this.memberList, nextList)) {
 					return;
 				}
@@ -282,7 +283,7 @@ export default {
 			return false;
 		},
 		showAddMemberPopup(type) {
-			if (this.memberList.length >= this.maxMembers) {
+			if (this.memberList.length >= this.maxMembers && type !== 2) {
 				this.$toast({
 					duration: 3000,
 					message: `最多可添加 ${this.maxMembers} 人`
@@ -308,7 +309,7 @@ export default {
 
 			if (type === 2) {
 				uni.navigateTo({
-					url: '/subpackages/packageMine/audience/audienceManage'
+					url: `/subpackages/packageMine/audience/audienceManage?type=${type}&memberLen=${this.memberList.length}`
 				});
 			}
 		},

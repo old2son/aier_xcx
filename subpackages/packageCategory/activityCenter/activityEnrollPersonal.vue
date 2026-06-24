@@ -43,7 +43,7 @@
 
 <script>
 import dayjs from 'dayjs';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation.js';
 import { personalActivityReservation } from '@/api/index';
 
@@ -126,6 +126,7 @@ export default {
 		}
 	},
 	methods: {
+		...mapMutations('moduleAudience', ['clearSelectedAudienceList']),
 		padNumber(value) {
 			return String(value).padStart(2, '0');
 		},
@@ -271,7 +272,7 @@ export default {
 					activityName: this.requestResult.activityName,
 					// channel: this.channel,
 					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot,
+					// timeSlot: this.selectedTimeSlot,
 					week: this.week,
 					members: this.memberList
 				}),
@@ -287,6 +288,9 @@ export default {
 	},
 	onLoad() {
 		this.getDetailData();
+	},
+	destroyed() {
+		this.clearSelectedAudienceList();
 	}
 };
 </script>

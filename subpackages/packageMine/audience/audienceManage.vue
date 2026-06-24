@@ -5,7 +5,7 @@
 			<template v-if="memberList && memberList.length > 0">
 				<view
 					class="member-item"
-					:class="{ 'member-item-selected': isSelected(item) }"
+					:class="{ 'member-item-selected': isImportMode && isSelected(item) }"
 					v-for="(item, index) in memberList"
 					:key="item.id"
 					@click="toggleSelect(item)"
@@ -13,8 +13,10 @@
 					<view class="col-1">
 						<text>成员</text>
 						<view class="col-act">
-							<text class="select-txt">{{ isSelected(item) ? '已选择' : '点击选择' }}</text>
-							<text @click.stop="deleteMember(item.id)">删除成员</text>
+							<text class="select-txt" v-if="isImportMode">{{
+								isSelected(item) ? '已选择' : '点击选择'
+							}}</text>
+							<text class="delete-txt" @click.stop="deleteMember(item.id)">删除成员</text>
 						</view>
 					</view>
 					<view class="col-2">
@@ -57,7 +59,7 @@
 					+ 添加成员
 				</button>
 
-				<button class="back-button" @click="back()">确认导入所选成员</button>
+				<button v-if="isImportMode" class="back-button" @click="back()">确认导入所选成员</button>
 			</view>
 		</view>
 	</view>
@@ -72,12 +74,17 @@ import { normalizeAudienceList } from '@/store/modules/moduleAudience';
 export default {
 	data() {
 		return {
-			memberList: []
+			memberList: [],
+			type: null,
+			memberLen: 0
 		};
 	},
 	computed: {
 		...mapState('moduleLayout', ['menuInfo']),
-		...mapState('moduleAudience', ['selectedAudienceList'])
+		...mapState('moduleAudience', ['selectedAudienceList']),
+		isImportMode() {
+			return Number(this.type) === 2;
+		}
 	},
 	methods: {
 		...mapMutations('moduleAudience', ['setSelectedAudienceList']),
@@ -123,13 +130,28 @@ export default {
 			return this.selectedAudienceList.some((selectedItem) => selectedItem.id === item.id);
 		},
 		toggleSelect(item) {
+			if (!this.isImportMode) {
+				return;
+			}
+
 			const nextList = [...this.selectedAudienceList];
 			const currentIndex = nextList.findIndex((selectedItem) => selectedItem.id === item.id);
+
 			if (currentIndex > -1) {
 				nextList.splice(currentIndex, 1);
+				this.memberLen -= 1;
 			} else {
+				if (this.memberLen >= 5) {
+					uni.showToast({
+						title: `最多可添加 5 人`,
+						icon: 'none'
+					});
+					return;
+				}
+				this.memberLen += 1;
 				nextList.push({ ...item });
 			}
+
 			this.setSelectedAudienceList(nextList);
 		},
 		getMemberInfo() {
@@ -182,7 +204,7 @@ export default {
 		toAddmember() {
 			if (this.memberList.length >= 5) {
 				uni.showToast({
-					title: '最多添加5个成员',
+					title: '最多可添加 5 个成员',
 					duration: 3000,
 					icon: 'none'
 				});
@@ -193,12 +215,18 @@ export default {
 			});
 		}
 	},
-	onLoad() {
+	onLoad(data) {
 		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
+
+		if (data?.type) {
+			console.log('data', data);
+			this.type = data.type;
+			this.memberLen = Number(data.memberLen);
+		}
 	},
 	onShow() {
 		this.getMemberInfo();
-	},
+	}
 };
 </script>
 
@@ -251,10 +279,6 @@ export default {
 	color: #32579c;
 }
 
-.member-item .col-1 text:nth-child(2) {
-	color: #fd7d7d;
-}
-
 .col-act {
 	display: flex;
 	align-items: center;
@@ -263,6 +287,10 @@ export default {
 
 .select-txt {
 	color: #32579c !important;
+}
+
+.delete-txt {
+	color: #fd7d7d !important;
 }
 
 .boy-color {

@@ -192,6 +192,15 @@ export default {
 			return '';
 		},
 		openSignupPopup() {
+			if (this.activityStatusInfo.className === 'status-end') {
+				uni.showToast({
+					title: '活动已结束',
+					icon: 'none',
+					duration: 3000
+				})
+				return;
+			}
+
 			this.showSignupPopup = true;
 		},
 		closeSignupPopup() {

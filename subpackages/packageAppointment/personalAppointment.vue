@@ -94,6 +94,7 @@ export default {
 	},
 	methods: {
 		...mapActions('moduleBooking', ['getReservationConfigList']),
+		...mapActions('moduleAudience', ['clearSelectedAudienceList']),
 		formatSelectedDate(dateText) {
 			if (!dateText) {
 				return '';
@@ -209,7 +210,7 @@ export default {
 			});
 			// 包装请求和定时器为一个 Promise
 			const delayPromise = new Promise((resolve) => {
-				setTimeout(resolve, 1500); // 至少展示 1500 毫秒
+				setTimeout(resolve, 800); // 延迟 loading 展示时间
 			});
 			Promise.all([
 				personalReservation({
@@ -232,6 +233,9 @@ export default {
 	mounted() {
 		this.getReservationTimeSlotData();
 		this.getReservationConfigList();
+	},
+	destroyed() {
+		this.clearSelectedAudienceList();
 	}
 };
 </script>
