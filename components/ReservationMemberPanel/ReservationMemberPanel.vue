@@ -142,6 +142,8 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
+
 const certificateTypeSet = [
 	{ label: '身份证', value: 'idcard' },
 	{ label: '护照', value: 'passport' },
@@ -194,6 +196,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapState('moduleAudience', ['selectedAudienceList']),
 		certificateType() {
 			const idTypeMap = {
 				1: 'idcard',
@@ -222,13 +225,61 @@ export default {
 		},
 		adultAgePlaceholder() {
 			return `请输入${this.adultAgeMin}-${this.adultAgeMax}岁`;
+		},
+		mergedMemberList() {
+			const manualMemberList = this.memberList.filter((item) => !this.isAudienceMember(item));
+			return [...manualMemberList, ...this.selectedAudienceList.map((item) => ({ ...item }))];
+		}
+	},
+	watch: {
+		mergedMemberList: {
+			deep: true,
+			handler(nextList) {
+				if (this.isSameMemberList(this.memberList, nextList)) {
+					return;
+				}
+
+				this.emitMemberList(nextList);
+			}
 		}
 	},
 	methods: {
+		...mapMutations('moduleAudience', ['setSelectedAudienceList']),
 		emitMemberList(list) {
 			const nextList = list.map((item) => ({ ...item }));
 			this.$emit('change', nextList);
-			this.$emit('update:memberList', nextList);
+			// this.$emit('update:memberList', nextList);
+		},
+		isAudienceMember(item = {}) {
+			return !!item.id;
+		},
+		getMemberCompareKey(item = {}) {
+			return [
+				item.id || '',
+				item.userName || '',
+				item.userPhone || '',
+				item.userAge ?? '',
+				item.idNumber || '',
+				item.documentType || ''
+			].join('|');
+		},
+		isSameMemberList(sourceList = [], targetList = []) {
+			if (sourceList.length !== targetList.length) {
+				return false;
+			}
+
+			return sourceList.every((item, index) => this.getMemberCompareKey(item) === this.getMemberCompareKey(targetList[index]));
+		},
+		isSameSelectedAudience(sourceItem = {}, targetItem = {}) {
+			if (sourceItem.id && targetItem.id) {
+				return sourceItem.id === targetItem.id;
+			}
+
+			if (sourceItem.idNumber && targetItem.idNumber) {
+				return sourceItem.idNumber === targetItem.idNumber;
+			}
+
+			return false;
 		},
 		showAddMemberPopup(type) {
 			if (this.memberList.length >= this.maxMembers) {
@@ -250,8 +301,16 @@ export default {
 				}
 			}
 
-			this.memberType = type;
-			this.isShowAdd = true;
+			if (type === 0 || type === 1) {
+				this.memberType = type;
+				this.isShowAdd = true;
+			}
+
+			if (type === 2) {
+				uni.navigateTo({
+					url: '/subpackages/packageMine/audience/audienceManage'
+				});
+			}
 		},
 		closeAddMemberPopup() {
 			this.isShowAdd = false;
@@ -388,7 +447,12 @@ export default {
 			this.closeAddMemberPopup();
 		},
 		deleteMember(index) {
+			const currentItem = this.memberList[index] || {};
 			const nextList = this.memberList.filter((_, itemIndex) => itemIndex !== index);
+			const nextSelectedAudienceList = this.selectedAudienceList.filter(
+				(item) => !this.isSameSelectedAudience(item, currentItem)
+			);
+			this.setSelectedAudienceList(nextSelectedAudienceList);
 			this.emitMemberList(nextList);
 		}
 	}

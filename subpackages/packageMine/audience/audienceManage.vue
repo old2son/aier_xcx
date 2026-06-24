@@ -3,14 +3,23 @@
 		<CustomNavInner title="常用观众" />
 		<view class="member-manage-main" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
 			<template v-if="memberList && memberList.length > 0">
-				<view class="member-item" v-for="(item, index) in memberList" :key="item.id">
+				<view
+					class="member-item"
+					:class="{ 'member-item-selected': isSelected(item) }"
+					v-for="(item, index) in memberList"
+					:key="item.id"
+					@click="toggleSelect(item)"
+				>
 					<view class="col-1">
 						<text>成员</text>
-						<text @click="deleteMember(item.id)">删除成员</text>
+						<view class="col-act">
+							<text class="select-txt">{{ isSelected(item) ? '已选择' : '点击选择' }}</text>
+							<text @click.stop="deleteMember(item.id)">删除成员</text>
+						</view>
 					</view>
 					<view class="col-2">
 						<text>姓名</text>
-						<text>{{ item.name }}</text>
+						<text>{{ item.userName || '--' }}</text>
 					</view>
 					<view class="col-2">
 						<text>年龄</text>
@@ -43,10 +52,12 @@
 					</view> -->
 				</view>
 			</template>
-			<view class="add-member-btn">
+			<view class="member-btn">
 				<button class="custom-button" :disabled="memberList && memberList.length >= 5" @click="toAddmember()">
 					+ 添加成员
 				</button>
+
+				<button class="back-button" @click="back()">确认导入所选成员</button>
 			</view>
 		</view>
 	</view>
@@ -54,8 +65,9 @@
 
 <script>
 import myData from '@/data/mine.json';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 import { getMembers, deleteMember } from '@/api/index';
+import { normalizeAudienceList } from '@/store/modules/moduleAudience';
 
 export default {
 	data() {
@@ -64,15 +76,16 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleLayout', ['menuInfo'])
-	},
-	onLoad() {
-		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
-	},
-	onShow() {
-		this.getMemberInfo();
+		...mapState('moduleLayout', ['menuInfo']),
+		...mapState('moduleAudience', ['selectedAudienceList'])
 	},
 	methods: {
+		...mapMutations('moduleAudience', ['setSelectedAudienceList']),
+		back() {
+			uni.navigateBack({
+				delta: 1
+			});
+		},
 		getBoyImg(sex) {
 			return sex === 0 ? myData.editGenderIcon[0].boyIcon[0].url : myData.editGenderIcon[0].boyIcon[1].url;
 		},
@@ -106,16 +119,35 @@ export default {
 
 			return `${text.slice(0, 3)}********${text.slice(-4)}`;
 		},
+		isSelected(item) {
+			return this.selectedAudienceList.some((selectedItem) => selectedItem.id === item.id);
+		},
+		toggleSelect(item) {
+			const nextList = [...this.selectedAudienceList];
+			const currentIndex = nextList.findIndex((selectedItem) => selectedItem.id === item.id);
+			if (currentIndex > -1) {
+				nextList.splice(currentIndex, 1);
+			} else {
+				nextList.push({ ...item });
+			}
+			this.setSelectedAudienceList(nextList);
+		},
 		getMemberInfo() {
 			uni.showLoading({
 				title: '加载中'
 			});
 			getMembers()
 				.then((res) => {
-					this.memberList = res.data;
+					this.memberList = normalizeAudienceList(res.data);
+					const nextSelectedList = this.selectedAudienceList
+						.map((selectedItem) => this.memberList.find((item) => item.id === selectedItem.id))
+						.filter(Boolean);
+					this.setSelectedAudienceList(nextSelectedList);
 				})
 				.finally(() => {
-					uni.hideLoading();
+					setTimeout(() => {
+						uni.hideLoading();
+					}, 800);
 				});
 		},
 		deleteMember(id) {
@@ -132,7 +164,9 @@ export default {
 						deleteMember({
 							id: id
 						}).then((res) => {
-							if (res.code === 200 && res.message == '删除成功') {
+							if (res.code === 200 && res.message === '删除成功') {
+								const nextSelectedList = this.selectedAudienceList.filter((item) => item.id !== id);
+								this.setSelectedAudienceList(nextSelectedList);
 								this.getMemberInfo();
 								uni.showToast({
 									title: '删除成功',
@@ -158,7 +192,13 @@ export default {
 				url: '/subpackages/packageMine/audience/addAudience'
 			});
 		}
-	}
+	},
+	onLoad() {
+		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
+	},
+	onShow() {
+		this.getMemberInfo();
+	},
 };
 </script>
 
@@ -188,6 +228,15 @@ export default {
 	padding: 0 24px;
 	box-sizing: border-box;
 	margin: 30px auto;
+	border: 2rpx solid transparent;
+	transition:
+		border-color 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.member-item-selected {
+	border-color: #8fb8ff;
+	box-shadow: 0 10rpx 24rpx rgba(50, 87, 156, 0.08);
 }
 
 .member-item .col-1 {
@@ -204,6 +253,16 @@ export default {
 
 .member-item .col-1 text:nth-child(2) {
 	color: #fd7d7d;
+}
+
+.col-act {
+	display: flex;
+	align-items: center;
+	gap: 20rpx;
+}
+
+.select-txt {
+	color: #32579c !important;
 }
 
 .boy-color {
@@ -253,15 +312,11 @@ export default {
 	border: none;
 }
 
-.add-member-btn {
+.member-btn {
 	margin-top: 30px;
-	font-size: 14px;
 	box-sizing: border-box;
-	border-radius: 6px;
 	text-align: center;
 	font-weight: 550;
-	border-radius: 12px;
-	overflow: hidden;
 }
 button::after {
 	display: none;
@@ -269,8 +324,19 @@ button::after {
 
 .custom-button {
 	width: 100%;
+	overflow: hidden;
+	border-radius: 12px;
 	color: #32579c;
 	background-color: #fff;
+}
+
+.back-button {
+	width: 100%;
+	margin: 30rpx 0;
+	overflow: hidden;
+	border-radius: 12px;
+	color: #fff;
+	background-color: #32579c;
 }
 
 .delete-dialog {
