@@ -89,13 +89,15 @@ export default {
 					disabled = true;
 				}
 
-				// 当前时间超过该时段的结束时间
+				// 当前时间进入时段开始前30分钟后，关闭该时段入口
 				if (isToday && slotName.includes('-')) {
-					const [start, end] = slotName.split('-');
-					const endTimeToday = dayjs()
-						.hour(Number(end.split(':')[0]))
-						.minute(Number(end.split(':')[1]));
-					if (now.isAfter(endTimeToday)) {
+					const [start] = slotName.split('-');
+					const startTimeToday = dayjs()
+						.hour(Number(start.split(':')[0]))
+						.minute(Number(start.split(':')[1]))
+						.second(0)
+						.millisecond(0);
+					if (now.isAfter(startTimeToday.subtract(30, 'minute'))) {
 						disabled = true;
 					}
 				}
