@@ -65,7 +65,6 @@ export default {
 		},
 		// 原始合并人数
 		combinedTimeSlotList() {
-			console.log('this.timeSlotList', this.timeSlotList);
 			return this.timeSlotList.map((slot, index) => {
 				return {
 					...slot,

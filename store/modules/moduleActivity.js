@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api/index';
 
 function formatFutureList(startingList, futureList) {
@@ -11,6 +12,24 @@ function formatFutureList(startingList, futureList) {
 	return formatList.filter((item, index, self) => {
 		return index === self.findIndex((v) => v.startDate === item.startDate && v.endDate === item.endDate);
 	});
+}
+
+function splitActivityListByToday(list = []) {
+	return list.reduce(
+		(result, item) => {
+			if (dayjs(item.activityTime).isSame(dayjs(), 'day') || dayjs(item.activityTime).isBefore(dayjs(), 'day')) {
+				result.starting.push(item);
+			} else {
+				result.future.push(item);
+			}
+
+			return result;
+		},
+		{
+			starting: [],
+			future: []
+		}
+	);
 }
 
 export default {
@@ -65,13 +84,15 @@ export default {
 			try {
 				commit('SET_ERROR', false);
 
-				const { data: startingList } = await getScienceActivityInProgress();
+				const { data: rawStartingList = [] } = await getScienceActivityInProgress();
+				const { starting: startingList, future: pendingFutureList } = splitActivityListByToday(rawStartingList);
 				commit('SET_STARTING', startingList);
 
-				const { data: futureList } = await getScienceActivityEvents();
-				commit('SET_FUTURE', futureList);
+				const { data: futureList = [] } = await getScienceActivityEvents();
+				const mergedFutureList = [...pendingFutureList, ...futureList];
+				commit('SET_FUTURE', mergedFutureList);
 
-				const futureListDate = formatFutureList(startingList, futureList);
+				const futureListDate = formatFutureList(startingList, mergedFutureList);
 				commit('SET_FUTURE_LIST', futureListDate);
 			} catch (e) {
 				console.error(e);
