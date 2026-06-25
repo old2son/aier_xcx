@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation';
 import {
 	getReservationTimeSlot,
@@ -96,7 +96,7 @@ export default {
 	},
 	methods: {
 		...mapActions('moduleBooking', ['getReservationConfigList']),
-		...mapActions('moduleAudience', ['clearSelectedAudienceList']),
+		...mapMutations('moduleAudience', ['clearSelectedAudienceList']),
 		formatSelectedDate(dateText) {
 			if (!dateText) {
 				return '';
@@ -195,6 +195,18 @@ export default {
 				this.$toast({
 					duration: 3000,
 					message: '至少需要添加一位成年人'
+				});
+				return;
+			}
+
+			const currentSlot =
+				this.selectedTimeSlotIndex > -1 ? this.combinedTimeSlotList[this.selectedTimeSlotIndex] || null : null;
+			const surplusNumber = Number(currentSlot && currentSlot.surplusNumber);
+
+			if (!Number.isNaN(surplusNumber) && this.memberList.length > surplusNumber) {
+				this.$toast({
+					duration: 3000,
+					message: `最多可预约 ${surplusNumber} 人`
 				});
 				return;
 			}

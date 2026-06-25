@@ -273,7 +273,12 @@ export default {
 			}
 
 			if (!Number.isNaN(surplusNumber) && visitors > surplusNumber) {
-				this.visitorsNumberError = `当前时段剩余人数仅${surplusNumber}人`;
+				this.visitorsNumberError = `最多可预约 ${surplusNumber} 人`;
+				uni.showToast({
+					title: `最多可预约 ${surplusNumber} 人`,
+					icon: 'none',
+					duration: 3000
+				});
 				this.scrollToTeamBox();
 				return;
 			}

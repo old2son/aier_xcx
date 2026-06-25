@@ -296,6 +296,17 @@ export default {
 				return;
 			}
 
+			const surplusNumber = this.getActivitySurplusNumber();
+			if (!Number.isNaN(surplusNumber) && visitors > surplusNumber) {
+				this.visitorsNumberError = `最多可预约 ${surplusNumber} 人`;
+				uni.showToast({
+					title: `最多可预约 ${surplusNumber} 人`,
+					icon: 'none',
+					duration: 3000
+				});
+				return;
+			}
+
 			if (!this.base64File) {
 				uni.showToast({
 					title: '请上传预约文件',

@@ -175,8 +175,7 @@ export default {
 		},
 		handletimeSlotExpound(expound) {
 			this.$emit('time-slot-expound', expound);
-		}
-		
+		},
 	},
 	mounted() {
 		this.getActivityData();

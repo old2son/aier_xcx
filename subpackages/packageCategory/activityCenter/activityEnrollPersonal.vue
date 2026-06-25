@@ -255,6 +255,15 @@ export default {
 				return;
 			}
 
+			const surplusNumber = this.getActivitySurplusNumber();
+			if (!Number.isNaN(surplusNumber) && this.memberList.length > surplusNumber) {
+				this.$toast({
+					duration: 3000,
+					message: `最多可预约 ${surplusNumber} 人`
+				});
+				return;
+			}
+
 			await requestSubscribe();
 
 			uni.showLoading({

@@ -142,6 +142,24 @@ export default {
 			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
 			return dateTime.isValid() ? dateTime : null;
 		},
+		isInNext30Days(dateText) {
+			const normalizedDate = this.normalizeDateText(dateText);
+			if (!normalizedDate) {
+				return false;
+			}
+
+			const activityDate = dayjs(normalizedDate);
+			if (!activityDate.isValid()) {
+				return false;
+			}
+
+			const today = dayjs().startOf('day');
+			const limitDate = today.add(30, 'day');
+			return (
+				activityDate.isSame(today, 'day') ||
+				(activityDate.isAfter(today, 'day') && (activityDate.isSame(limitDate, 'day') || activityDate.isBefore(limitDate, 'day')))
+			);
+		},
 		// 抽离分享配置
 		getShareConfig() {
 			return {
@@ -195,6 +213,15 @@ export default {
 			if (this.activityStatusInfo.className === 'status-end') {
 				uni.showToast({
 					title: '活动已结束',
+					icon: 'none',
+					duration: 3000
+				})
+				return;
+			}
+
+			if (this.activityStatusInfo.className === 'status-soon' && !this.isInNext30Days(this.requestResult.activityTime)) {
+				uni.showToast({
+					title: '报名还未开始',
 					icon: 'none',
 					duration: 3000
 				})
