@@ -65,6 +65,7 @@ export default {
 		},
 		// 原始合并人数
 		combinedTimeSlotList() {
+			console.log('this.timeSlotList', this.timeSlotList);
 			return this.timeSlotList.map((slot, index) => {
 				return {
 					...slot,
@@ -132,6 +133,7 @@ export default {
 			if (item && !this.processedTimeSlotList[index].disabled) {
 				// 禁用状态不能选择
 				this.$emit('timeSlotSelected', item.name, index);
+				this.$emit('timeSlotExpound', item.expound);
 			}
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {

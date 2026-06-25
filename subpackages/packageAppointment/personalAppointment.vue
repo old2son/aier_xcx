@@ -10,6 +10,7 @@
 			@date-selected="handleDateSelected"
 			@time-slot-numbers="updateTimeSlotNumbers"
 			@time-slot-selected="handleTimeSlotSelected"
+			@time-slot-expound="handleTimeSlotSelectedExpound"
 			@select-cal="selectedCal = $event"
 		/>
 
@@ -86,6 +87,7 @@ export default {
 					name: slotName,
 					configId: matchedSlot ? matchedSlot.configId : '',
 					surplusNumber: matchedSlot ? matchedSlot.surplusNumber : 0,
+					expound: matchedSlot ? matchedSlot.expound : 0,
 					reservationNumber,
 					disabled: !matchedSlot || Number(matchedSlot.surplusNumber) <= 0
 				};
@@ -157,16 +159,19 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			if (this.date && this.selectedTimeSlot) {
-				getReservationWeekNumbers({
-					dateTime: this.date,
-					timeSlot: this.selectedTimeSlot
-				}).then((res) => {
-					if (res.code === 200 && res.message === '查询成功') {
-						this.needExplainServiceNum = res.data.numbers;
-					}
-				});
-			}
+			// if (this.date && this.selectedTimeSlot) {
+			// 	getReservationWeekNumbers({
+			// 		dateTime: this.date,
+			// 		timeSlot: this.selectedTimeSlot
+			// 	}).then((res) => {
+			// 		if (res.code === 200 && res.message === '查询成功') {
+			// 			this.needExplainServiceNum = res.data.numbers;
+			// 		}
+			// 	});
+			// }
+		},
+		handleTimeSlotSelectedExpound(expound) {
+			this.needExplainServiceNum = expound;
 		},
 		async submit() {
 			if (!this.date) {

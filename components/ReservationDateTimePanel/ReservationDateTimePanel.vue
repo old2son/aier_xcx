@@ -44,6 +44,7 @@
 			:needTimeSlotRequest="needTimeSlotRequest"
 			:select-day="date"
 			@timeSlotSelected="handleTimeSlotSelected"
+			@timeSlotExpound="handletimeSlotExpound"
 		/>
 	</view>
 </template>
@@ -171,7 +172,11 @@ export default {
 		},
 		handleTimeSlotSelected(slot, index) {
 			this.$emit('time-slot-selected', slot, index);
+		},
+		handletimeSlotExpound(expound) {
+			this.$emit('time-slot-expound', expound);
 		}
+		
 	},
 	mounted() {
 		this.getActivityData();
