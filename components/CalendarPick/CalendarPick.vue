@@ -84,6 +84,16 @@ function isInSelectedActivityRange(current) {
 	);
 }
 
+function hasScheduleConfig(current) {
+	const hasActivity = isInActivityRange(current, activeListCache) && isInSelectedActivityRange(current);
+	const hasReservationConfig = isReservationConfigRange(current, reservationConfigCache);
+	return hasActivity || hasReservationConfig;
+}
+
+function isClosedMonday(current) {
+	return current.day() === 1 && !hasScheduleConfig(current);
+}
+
 export default {
 	name: 'CalendarPick',
 	options: {
@@ -176,7 +186,7 @@ export default {
 
 			const week = weekMap[current.day()];
 
-			const disabled = current.day() === 1;
+			const disabled = isClosedMonday(current);
 
 			// 距离今天第几天
 			const index = current.diff(dayjs().startOf('day'), 'day');
@@ -203,16 +213,19 @@ export default {
 		},
 		formatter(day) {
 			const date = day.date;
-
-			// 周一闭馆
-			if (date.getDay() === 1) {
-				day.type = 'disabled';
-				day.bottomInfo = '闭馆';
-
-				return day;
-			}
-
 			const current = dayjs(date);
+
+			/** 
+			 * todo: 周一闭馆逻辑不清晰
+			 * 有活动是否禁用
+			 * 节假日是否禁用
+			 */
+			// if (isClosedMonday(current)) {
+			// 	day.type = 'disabled';
+			// 	day.bottomInfo = '闭馆';
+
+			// 	return day;
+			// }
 
 			// 只允许未来30天
 			const today = dayjs().startOf('day');

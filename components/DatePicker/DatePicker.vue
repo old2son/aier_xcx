@@ -149,11 +149,16 @@ export default {
 					(!this.isActivity || this.isInSelectedActivityRange(currentDay));
 				const hasReservation = isReservationConfigRange(currentDay, this.reservationConfigList);
 
+				/**
+				 * todo: 周一闭馆逻辑不清晰
+				 * 有活动是否禁用
+				 * 节假日是否禁用
+				 */
 				daysArray.push({
 					year: currentYear,
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
-					disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
+					// disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
 					hasActivity,
 					hasReservation
 				});

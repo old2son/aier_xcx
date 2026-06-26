@@ -157,7 +157,8 @@ export default {
 			const limitDate = today.add(30, 'day');
 			return (
 				activityDate.isSame(today, 'day') ||
-				(activityDate.isAfter(today, 'day') && (activityDate.isSame(limitDate, 'day') || activityDate.isBefore(limitDate, 'day')))
+				(activityDate.isAfter(today, 'day') &&
+					(activityDate.isSame(limitDate, 'day') || activityDate.isBefore(limitDate, 'day')))
 			);
 		},
 		// 抽离分享配置
@@ -215,16 +216,19 @@ export default {
 					title: '活动已结束',
 					icon: 'none',
 					duration: 3000
-				})
+				});
 				return;
 			}
 
-			if (this.activityStatusInfo.className === 'status-soon' && !this.isInNext30Days(this.requestResult.activityTime)) {
+			if (
+				this.activityStatusInfo.className === 'status-soon' &&
+				!this.isInNext30Days(this.requestResult.activityTime)
+			) {
 				uni.showToast({
-					title: '报名还未开始',
+					title: '活动开始前30天开放报名',
 					icon: 'none',
 					duration: 3000
-				})
+				});
 				return;
 			}
 
