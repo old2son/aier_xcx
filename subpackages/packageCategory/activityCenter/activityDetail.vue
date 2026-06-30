@@ -3,16 +3,16 @@
 		<view class="banner">
 			<image :src="requestResult.activityCoverUrl" mode="widthFix"></image>
 		</view>
-		<view class="txt-1">{{ requestResult.activityName }}</view>
+		<view class="txt-1">{{ requestResult.activityName || '' }}</view>
 		<view class="txt-2">
-			<text class="txt-2-1" :class="activityStatusInfo.className">{{ activityStatusInfo.text }}</text>
-			<text class="txt-2-2">{{ requestResult.endDate }} {{ requestResult.endTime }} 结束</text>
+			<text class="txt-2-1" :class="activityStatusInfo.className">{{ activityStatusInfo.text || '' }}</text>
+			<text class="txt-2-2">{{ requestResult.endDate || '' }} {{ requestResult.endTime || '' }} 结束</text>
 		</view>
 		<view class="txt-3">
-			<view class="txt-3-1">活动背景：{{ requestResult.theBackground }}</view>
-			<view class="txt-3-2">活动地点：{{ requestResult.place }}</view>
-			<view class="txt-3-3">活动日期：{{ requestResult.activityTime }} - {{ requestResult.endDate }}</view>
-			<view class="txt-3-4">活动时间：{{ requestResult.startTime }} - {{ requestResult.endTime }} </view>
+			<view class="txt-3-1">活动背景：{{ requestResult.theBackground || '' }}</view>
+			<view class="txt-3-2">活动地点：{{ requestResult.place || '' }}</view>
+			<view class="txt-3-3">活动日期：{{ requestResult.activityTime || '' }} - {{ requestResult.endDate || '' }}</view>
+			<view class="txt-3-4">活动时间：{{ requestResult.startTime || '' }} - {{ requestResult.endTime || '' }} </view>
 		</view>
 		<view class="bottom-box">
 			<van-button
@@ -61,7 +61,7 @@
 
 <script>
 import dayjs from 'dayjs';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapActions, mapMutations } from 'vuex';
 import categoryData from '@/data/category.json';
 
 export default {
@@ -74,7 +74,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['selectedActivity']),
+		...mapState('moduleActivity', ['starting', 'future', 'selectedActivity']),
 		activityStatusInfo() {
 			const startAt = this.buildActivityDateTime(this.requestResult.activityTime, this.requestResult.startTime);
 			const endAt = this.buildActivityDateTime(this.requestResult.endDate, this.requestResult.endTime);
@@ -102,6 +102,7 @@ export default {
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setSelectedActivity']),
+		...mapActions('moduleActivity', ['fetchActivities']),
 		padNumber(value) {
 			return String(value).padStart(2, '0');
 		},
@@ -165,13 +166,19 @@ export default {
 		getShareConfig() {
 			return {
 				title: this.requestResult.activityName,
-				path: `/subpackages/packageCategory/activityCenter/activityDetail?activityItem=${JSON.stringify(this.selectedActivity)}`,
+				path: `/subpackages/packageCategory/activityCenter/activityDetail?activityId=${this.requestResult.activityId}`,
 				imageUrl: this.requestResult.activityCoverUrl
 			};
 		},
-		async getDetailData(options) {
-			if (options?.activityItem) {
-				const activityItem = JSON.parse(options.activityItem);
+		async getDetailData(activityId) {
+			if (activityId) {
+				await this.fetchActivities();
+				const activityItem = [...this.starting, ...this.future].find(
+					(item) => {
+						return item.activityId === activityId;
+					}
+				);
+				console.log('activityItem', activityItem);
 				this.requestResult = activityItem;
 				this.setSelectedActivity(activityItem);
 			} else {
@@ -252,7 +259,7 @@ export default {
 		}
 	},
 	onLoad(options) {
-		this.getDetailData(options);
+		this.getDetailData(Number(options?.activityId || 0));
 	},
 	// 分享到微信好友
 	onShareAppMessage() {
