@@ -178,7 +178,6 @@ export default {
 						return item.activityId === activityId;
 					}
 				);
-				console.log('activityItem', activityItem);
 				this.requestResult = activityItem;
 				this.setSelectedActivity(activityItem);
 			} else {

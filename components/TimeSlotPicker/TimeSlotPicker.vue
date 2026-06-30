@@ -10,7 +10,7 @@
 				class="time-slot-wrap"
 				:class="{
 					disabled: item.disabled,
-					'time-slot-selected': !isSingleSlot && selectedTimeSlotIndex === index && !item.disabled,
+					'time-slot-selected': !isSingleSlot && displaySelectedTimeSlotIndex === index && !item.disabled,
 					'fixed-slot-wrap': isSingleSlot && !item.disabled
 				}"
 				@tap="selectTimeSlot(item, index)"
@@ -59,7 +59,15 @@ export default {
 			default: ''
 		}
 	},
+	data() {
+		return {
+			pendingSelectedTimeSlotIndex: -1
+		};
+	},
 	computed: {
+		displaySelectedTimeSlotIndex() {
+			return this.pendingSelectedTimeSlotIndex > -1 ? this.pendingSelectedTimeSlotIndex : this.selectedTimeSlotIndex;
+		},
 		isSingleSlot() {
 			return this.processedTimeSlotList.length === 1;
 		},
@@ -85,7 +93,7 @@ export default {
 				let disabled = !!slot.disabled;
 				const slotName = slot.name || '';
 
-				if (Number(slot.surplusNumber) <= 0) {
+				if (!slot?.surplusNumber && Number(slot.surplusNumber) <= 0) {
 					disabled = true;
 				}
 
@@ -110,36 +118,44 @@ export default {
 		}
 	},
 	watch: {
+		selectDay() {
+			this.pendingSelectedTimeSlotIndex = -1;
+		},
+		selectedTimeSlotIndex(newVal) {
+			if (newVal === this.pendingSelectedTimeSlotIndex) {
+				this.pendingSelectedTimeSlotIndex = -1;
+			}
+		},
 		processedTimeSlotList: {
 			immediate: true,
 			handler(newVal) {
 				if (Array.isArray(newVal) && newVal.length > 0) {
-					this.$nextTick(() => {
-						this.renderSlotTimeList(newVal);
-					});
+					this.renderSlotTimeList(newVal);
 				}
 			}
 		}
 	},
 	methods: {
 		selectTimeSlot(item, index) {
-			if (!item || this.processedTimeSlotList[index].disabled) {
+			if (!item || item.disabled || this.processedTimeSlotList[index].disabled) {
 				return;
 			}
 
-			if (this.selectedTimeSlotIndex === index) {
+			if (this.displaySelectedTimeSlotIndex === index) {
 				return;
 			}
 
 			if (item && !this.processedTimeSlotList[index].disabled) {
+				this.pendingSelectedTimeSlotIndex = index;
 				// 禁用状态不能选择
 				this.$emit('timeSlotSelected', item.name, index);
 				this.$emit('timeSlotExpound', item.expound);
 			}
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {
+			const currentSelectedIndex = this.displaySelectedTimeSlotIndex;
 			const currentSelectedSlot =
-				this.selectedTimeSlotIndex > -1 ? slotList[this.selectedTimeSlotIndex] || null : null;
+				currentSelectedIndex > -1 ? slotList[currentSelectedIndex] || null : null;
 
 			if (currentSelectedSlot && !currentSelectedSlot.disabled) {
 				return;
@@ -149,6 +165,8 @@ export default {
 			const availableIndex = slotList.findIndex((slot) => !slot.disabled);
 			if (availableIndex !== -1) {
 				this.selectTimeSlot(slotList[availableIndex], availableIndex);
+			} else {
+				this.pendingSelectedTimeSlotIndex = -1;
 			}
 		}
 	}
