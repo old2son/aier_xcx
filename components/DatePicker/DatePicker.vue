@@ -209,11 +209,11 @@ export default {
 			this.$emit('date-selected', { date: formattedDate, week: day.week, isInSelectedActivityRange });
 			// 四个时间段下的预约报名人数只有在选择了预约日子后才会查询，所以需要调用
 			if (this.needTimeSlotRequest && !this.isActivity) {
-				getReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
-					if (res.code === 200 && res.message === '查询成功') {
-						this.$emit('time-slot-numbers', res.data[0]);
-					}
-				});
+				// getReservationTimeSlotNumbers({ dateTime: formattedDate }).then((res) => {
+				// 	if (res.code === 200 && res.message === '查询成功') {
+				// 		this.$emit('time-slot-numbers', res.data[0]);
+				// 	}
+				// });
 			}
 			// 活动改成自定义时间
 			// else if (this.needTimeSlotRequest && this.isActivity) {
