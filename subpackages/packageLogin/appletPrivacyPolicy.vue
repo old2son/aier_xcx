@@ -7,7 +7,6 @@
 
 <script>
 	import loginData from '@/data/login.json'
-	console.log('loginData', loginData.appletPrivacyPolicyImage)
 	export default {
 		data() {
 			return {

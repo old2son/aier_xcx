@@ -103,6 +103,10 @@
 					</view>
 				</view>
 			</view>
+
+			<Popup ref="privacyPopup" :type="'center'" :maskClick="false">
+				<PrivacyPopup @closePopup="closePopup"></PrivacyPopup>
+			</Popup>
 		</view>
 	</view>
 </template>
@@ -124,6 +128,7 @@ export default {
 		};
 	},
 	computed: {
+		...mapState('moduleUser', ['showPrivacyPopup']),
 		...mapState('moduleLayout', ['menuInfo']), // 给搜索icon提供布局数据
 		...mapGetters('moduleHome', [
 			'bannerSwiperList',
@@ -149,13 +154,14 @@ export default {
 	beforeCreate() {
 		uni.hideTabBar();
 	},
-	onLoad(data) {
+	async onLoad (data) {
 		// todo: 二维码扫描获取来源
 		if (data?.source) {
 			console.log('二维码扫描获取来源', data.source);
 		}
 
-		this.requestHomeData();
+		await this.requestHomeData();
+		this.checkPrivacy();
 	},
 	onPageScroll(e) {
 		const scrollY = e.scrollTop;
@@ -228,7 +234,6 @@ export default {
 			}
 		},
 		onBannerImagesLoaded() {
-			console.log('子组件轮播图加载完毕了！');
 			this.bannerImagesLoaded = true;
 			this.tryCloseLoading();
 		},
@@ -237,6 +242,28 @@ export default {
 				this.showLoading = false;
 				uni.showTabBar();
 			}
+		},
+
+		// 检查用户是否同意过隐私协议
+		async checkPrivacy() {
+			try {
+				uni.showLoading({
+					title: '加载中'
+				});
+				await this.$store.dispatch('moduleUser/queryWeChatAppletPrivacyAuth');
+				if (this.$store.state.moduleUser.showPrivacyPopup) {
+					this.$refs.privacyPopup.open();
+					uni.hideTabBar();
+				}
+			} catch (error) {
+				console.error('查询用户是否同意隐私设置失败', error);
+			} finally {
+				uni.hideLoading();
+			}
+		},
+		closePopup() {
+			this.$refs.privacyPopup.close();
+			uni.showTabBar();
 		},
 
 		toSubpackagePage(url, index) {
