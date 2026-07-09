@@ -32,9 +32,11 @@
 
 		<OnlineAsk :askInfo="askInfo" />
 
-		<view class="submit-btn">
-			<button class="custom-button" @click="submit()">确认提交</button>
-		</view>
+		<LoginButton @successAuth="submit">
+			<view class="submit-btn">
+				<button class="custom-button">确认提交</button>
+			</view>
+		</LoginButton>
 
 		<ReservationPopup :type="1" :show="showReservationPopup" @close="handlePopupClose" />
 

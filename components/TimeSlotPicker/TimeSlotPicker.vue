@@ -100,7 +100,6 @@ export default {
 				}
 
 				// 超时关闭该时段入口
-				console.log('78978979789', slotName);
 				if (isToday && slotName.includes('-')) {
 					const [, end] = slotName.split('-');
 					const endTimeToday = dayjs()

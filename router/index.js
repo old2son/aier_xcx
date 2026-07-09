@@ -3,20 +3,20 @@ import store from '@/store';
 export default {
 	beforeEach(to, from, next) {
 		if (to.path === '/pages/tabBar/home/home') {
-			console.log('首页：', to.path);
+			// console.log('首页：', to.path);
 			uni.hideTabBar();
 		}
 		const meta = to.meta;
-		console.log('路由前置守卫meta::', meta);
+		// console.log('路由前置守卫meta::', meta);
 		if (meta.needLogin) {
 			const token = uni.getStorageSync('token');
-			console.log('路由前置守卫获取token::', token);
+			// console.log('路由前置守卫获取token::', token);
 			if (token) {
 				// 有 token，验证是否有效
 				store.dispatch('moduleUser/getUserInfo').then((resp) => {
 					if (
-						(resp.code == 0 && resp.message == '非法令牌！请携带正确的Token令牌！') ||
-						(resp.code == 401 && resp.message == '登录验证已过期，请重新登录！')
+						(resp.code === 0 && resp.message === '非法令牌！请携带正确的Token令牌！') ||
+						(resp.code === 401 && resp.message === '登录验证已过期，请重新登录！')
 					) {
 						next({
 							path: '/subpackages/packageLogin/login'
@@ -27,7 +27,7 @@ export default {
 				});
 			} else {
 				// 无 token
-				console.log('无令牌');
+				// console.log('无令牌');
 				next({
 					path: '/subpackages/packageLogin/login'
 				});

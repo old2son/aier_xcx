@@ -108,6 +108,8 @@ import loginData from '@/data/login.json';
 import { mapState } from 'vuex';
 import { sendCode } from '@/api/index';
 
+const appointmentArr = ['personalAppointment', 'teamAppointment', 'activityEnrollPersonal', 'activityEnrollTeam'];
+
 export default {
 	data() {
 		return {
@@ -123,7 +125,8 @@ export default {
 
 			checkClause: false, // 是否勾选隐私条款
 			stopRun: false, // 是否阻止继续进行
-			loginMode: 'quick'
+			loginMode: 'quick',
+			redirectUrl: ''
 		};
 	},
 	computed: {
@@ -132,7 +135,11 @@ export default {
 			return /^[1][2-9][0-9]{9}$/.test(this.verificationCodeLoginParams.phone);
 		}
 	},
-	onLoad() {
+	onLoad(data) {
+		if (data?.redirectUrl) {
+			this.redirectUrl = data.redirectUrl;
+		}
+
 		this.checkPrivacy();
 	},
 	beforeDestroy() {
@@ -289,6 +296,14 @@ export default {
 				});
 
 				if (resp.code === 200 && resp.data) {
+					if (appointmentArr.includes(this.redirectUrl)) {
+						uni.navigateBack({
+							delta: 1
+						});
+
+						return;
+					}
+
 					uni.switchTab({
 						url: '/pages/tabBar/mine/mine'
 					});
@@ -325,6 +340,14 @@ export default {
 				});
 
 				if (resp.code === 200 && resp.data) {
+					if (appointmentArr.includes(this.redirectUrl)) {
+						uni.navigateBack({
+							delta: 1
+						});
+
+						return;
+					}
+
 					uni.switchTab({
 						url: '/pages/tabBar/mine/mine'
 					});

@@ -94,24 +94,15 @@ const router = createRouter({
 		},
 		{
 			path: '/subpackages/packageAppointment/appointmentEntrance',
-			name: '预约',
-			meta: {
-				needLogin: true
-			}
+			name: '预约'
 		},
 		{
 			path: '/subpackages/packageAppointment/personalAppointment',
-			name: '个人预约',
-			meta: {
-				needLogin: true
-			}
+			name: '个人预约'
 		},
 		{
 			path: '/subpackages/packageAppointment/teamAppointment',
-			name: '团队预约',
-			meta: {
-				needLogin: true
-			}
+			name: '团队预约'
 		},
 		{
 			path: '/subpackages/packageMine/editProfile',

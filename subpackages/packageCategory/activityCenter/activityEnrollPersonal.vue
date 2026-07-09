@@ -31,9 +31,11 @@
 
 		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
 
-		<view class="submit-btn">
-			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
-		</view>
+		<LoginButton @successAuth="submit">
+			<view class="submit-btn">
+				<van-button color="#32579c" round size="large">确认提交</van-button>
+			</view>
+		</LoginButton>
 
 		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
 

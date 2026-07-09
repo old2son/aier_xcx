@@ -43,9 +43,11 @@
 
 		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
 
-		<view class="submit-btn">
-			<button class="custom-button" @click="submit()">确认提交</button>
-		</view>
+		<LoginButton @successAuth="submit">
+			<view class="submit-btn">
+				<button class="custom-button">确认提交</button>
+			</view>
+		</LoginButton>
 
 		<!-- <ReservationPopup :show="showReservationPopup" @close="handlePopupClose" /> -->
 

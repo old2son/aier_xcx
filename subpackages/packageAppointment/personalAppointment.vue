@@ -28,10 +28,12 @@
 			</van-radio>
 		</van-radio-group>
 		<view class="tip-title-2">提示：满15人将自动成团，我馆提供科普讲解服务</view>
-
-		<view class="submit-btn">
-			<van-button color="#32579c" round size="large" @click="submit">确认提交</van-button>
-		</view>
+		
+		<LoginButton @successAuth="submit">
+			<view class="submit-btn">
+				<van-button color="#32579c" round size="large"> 确认提交 </van-button>
+			</view>
+		</LoginButton>
 
 		<ReservationPopup :type="0" :show="showReservationPopup" @close="handlePopupClose" />
 
@@ -42,11 +44,7 @@
 <script>
 import { mapActions, mapMutations, mapState } from 'vuex';
 import { requestSubscribe, handleReservationResult } from '@/utils/reservation';
-import {
-	getReservationTimeSlot,
-	getReservationWeekNumbers,
-	personalReservation
-} from '@/api/index';
+import { getReservationTimeSlot, getReservationWeekNumbers, personalReservation } from '@/api/index';
 
 export default {
 	data() {
@@ -74,7 +72,8 @@ export default {
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			const currentDateConfig = this.getCurrentDateConfig();
-			const currentTimeSlotList = currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
+			const currentTimeSlotList =
+				currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
 
 			return this.timeSlotList.map((slot, index) => {
 				const numbersKey = `numbers${index + 1}`;
@@ -102,10 +101,7 @@ export default {
 				return '';
 			}
 
-			return String(dateText)
-				.replace('年', '-')
-				.replace('月', '-')
-				.replace('日', '');
+			return String(dateText).replace('年', '-').replace('月', '-').replace('日', '');
 		},
 		getTimeSlotName(slot) {
 			if (!slot) {
@@ -173,7 +169,8 @@ export default {
 		handleTimeSlotSelectedExpound(expound) {
 			this.needExplainServiceNum = expound;
 		},
-		async submit() {
+		async submit(a) {
+			console.log('submit', a);
 			if (!this.date) {
 				this.$toast({
 					duration: 3000,

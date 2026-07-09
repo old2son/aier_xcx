@@ -43,7 +43,6 @@ export default {
 	},
 	onLoad() {
 		// this.loadH5Url()
-		console.log('...', this.appointmentData);
 	},
 	methods: {
 		toSubpackagePage(url) {
