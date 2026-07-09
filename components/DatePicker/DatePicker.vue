@@ -1,6 +1,6 @@
 <template>
-	<view class="date-picker">
-		<view class="weekdays">
+	<view class="date-picker" :class="{ 'single-day': isSingleDayDisplay }">
+		<view class="weekdays" :class="{ 'weekdays-single': isSingleDayDisplay }">
 			<view
 				v-for="(day, index) in days"
 				:key="index"
@@ -90,13 +90,15 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['hasShownActivityPopup', 'selectedActivity'])
+		...mapState('moduleActivity', ['hasShownActivityPopup', 'selectedActivity']),
+		isSingleDayDisplay() {
+			return Array.isArray(this.days) && this.days.length === 1;
+		}
 	},
 	watch: {
 		selectedCal(newVal) {
 			if (!newVal) return;
-			const { index, ...day } = newVal;
-			this.selectDay(day, index);
+			this.applySelectedCal(newVal);
 		}
 	},
 	methods: {
@@ -191,6 +193,60 @@ export default {
 				this.midnightTimer = null;
 				// console.log('定时器已清除');
 			}
+		},
+		buildDayFromCalendarResult(payload) {
+			if (!payload) {
+				return null;
+			}
+
+			const year = Number(payload.year);
+			const date = payload.date || '';
+			const week = payload.week || '';
+			const disabled = !!payload.disabled;
+
+			const fullDate = `${year}-${date}`;
+			const currentDay = dayjs(fullDate, 'YYYY-MM-DD');
+			const hasActivity =
+				isInActivityRange(currentDay, this.activeList) &&
+				(!this.isActivity || this.isInSelectedActivityRange(currentDay));
+			const hasReservation = isReservationConfigRange(currentDay, this.reservationConfigList);
+
+			return {
+				year,
+				date,
+				week,
+				disabled,
+				hasActivity,
+				hasReservation
+			};
+		},
+		applySelectedCal(payload) {
+			const dayFromCal = this.buildDayFromCalendarResult(payload);
+			if (!dayFromCal) {
+				return;
+			}
+
+			const selectedIndex = Number(payload.index);
+			const isInCurrentFiveDays = !Number.isNaN(selectedIndex) && selectedIndex >= 0 && selectedIndex <= 4;
+
+			if (isInCurrentFiveDays) {
+				if (this.days.length !== 5) {
+					this.generateWeekDays();
+				}
+
+				const existingIndex = this.days.findIndex((day) => day.year === dayFromCal.year && day.date === dayFromCal.date);
+				const nextIndex = existingIndex > -1 ? existingIndex : Math.min(Math.max(selectedIndex, 0), this.days.length - 1);
+
+				this.selectedDayIndex = -1;
+				this.selectDay(this.days[nextIndex], nextIndex);
+				return;
+			}
+
+			this.days = [dayFromCal];
+			this.selectedDayIndex = -1;
+			this.$nextTick(() => {
+				this.selectDay(dayFromCal, 0);
+			});
 		},
 		selectDay(day, index) {
 			if (day.disabled) return;
@@ -287,6 +343,12 @@ export default {
 		padding-bottom: 20rpx; // 可以适当调整滚动条区域的高度
 	}
 
+	.weekdays-single {
+		justify-content: center;
+		overflow-x: hidden;
+		padding-bottom: 0;
+	}
+
 	.day-item {
 		display: flex;
 		flex-direction: column;
@@ -340,6 +402,20 @@ export default {
 
 	.day-item:last-child {
 		margin: 0;
+	}
+
+	&.single-day {
+		.day-item {
+			width: 100%;
+			margin-right: 0;
+			padding: 26rpx 40rpx;
+			border-radius: 16rpx;
+			box-shadow: 0 10rpx 24rpx rgba(50, 87, 156, 0.08);
+		}
+
+		.day-item.activity-day::after {
+			right: 18rpx;
+		}
 	}
 
 	.date-selected {
