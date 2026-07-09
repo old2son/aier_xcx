@@ -84,11 +84,14 @@ export default {
 			try {
 				commit('SET_ERROR', false);
 
-				const { data: rawStartingList = [] } = await getScienceActivityInProgress();
+				const { data: activityData } = await getScienceActivityInProgress();
+				const rawStartingList = Array.isArray(activityData) ? activityData : [];
 				const { starting: startingList, future: pendingFutureList } = splitActivityListByToday(rawStartingList);
+
 				commit('SET_STARTING', startingList);
 
-				const { data: futureList = [] } = await getScienceActivityEvents();
+				const { data: futureData } = await getScienceActivityEvents();
+				const futureList = Array.isArray(futureData) ? futureData : [];
 				const mergedFutureList = [...pendingFutureList, ...futureList];
 				commit('SET_FUTURE', mergedFutureList);
 

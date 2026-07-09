@@ -66,7 +66,9 @@ export default {
 	},
 	computed: {
 		displaySelectedTimeSlotIndex() {
-			return this.pendingSelectedTimeSlotIndex > -1 ? this.pendingSelectedTimeSlotIndex : this.selectedTimeSlotIndex;
+			return this.pendingSelectedTimeSlotIndex > -1
+				? this.pendingSelectedTimeSlotIndex
+				: this.selectedTimeSlotIndex;
 		},
 		isSingleSlot() {
 			return this.processedTimeSlotList.length === 1;
@@ -97,15 +99,22 @@ export default {
 					disabled = true;
 				}
 
-				// 当前时间进入时段开始前30分钟后，关闭该时段入口
+				// 超时关闭该时段入口
+				console.log('78978979789', slotName);
 				if (isToday && slotName.includes('-')) {
-					const [start] = slotName.split('-');
-					const startTimeToday = dayjs()
-						.hour(Number(start.split(':')[0]))
-						.minute(Number(start.split(':')[1]))
+					const [, end] = slotName.split('-');
+					const endTimeToday = dayjs()
+						.hour(Number(end.split(':')[0]))
+						.minute(Number(end.split(':')[1]))
 						.second(0)
 						.millisecond(0);
-					if (now.isAfter(startTimeToday.subtract(30, 'minute'))) {
+
+					// 开始前30分钟后，关闭该时段
+					// if (now.isAfter(startTimeToday.subtract(30, 'minute'))) {
+					// 	disabled = true;
+					// }
+
+					if (!now.isBefore(endTimeToday)) {
 						disabled = true;
 					}
 				}
@@ -154,8 +163,7 @@ export default {
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {
 			const currentSelectedIndex = this.displaySelectedTimeSlotIndex;
-			const currentSelectedSlot =
-				currentSelectedIndex > -1 ? slotList[currentSelectedIndex] || null : null;
+			const currentSelectedSlot = currentSelectedIndex > -1 ? slotList[currentSelectedIndex] || null : null;
 
 			if (currentSelectedSlot && !currentSelectedSlot.disabled) {
 				return;
