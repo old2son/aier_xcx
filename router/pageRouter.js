@@ -51,10 +51,7 @@ const router = createRouter({
 		},
 		{
 			path: '/subpackages/packageHomeDetail/imgDetail',
-			name: '详情',
-			meta: {
-				needLogin: true
-			}
+			name: '详情'
 		},
 		{
 			path: '/subpackages/packageCategory/hotScience/categoryIconInner',
