@@ -30,11 +30,11 @@ export default {
 				success: (res) => {
 					const file = res.tempFiles[0];
 
-					const maxSize = 20 * 1024 * 1024;
+					const maxSize = 5 * 1024 * 1024;
 
 					if (file.size > maxSize) {
 						this.$toast({
-							message: '文件不能超过20MB'
+							message: '文件不能超过5MB'
 						});
 
 						return;

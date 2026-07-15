@@ -11,19 +11,24 @@
 			line-height="10rpx"
 		>
 			<van-tab v-for="(item, tabIdx) in tabList" :title="item.title" :key="tabIdx">
-				<view
-					v-for="(inner, innerIdx) in item.data"
-					:key="innerIdx"
-					class="tab-item"
-					@click="toSubpackagePage(inner, tabIdx)"
-				>
-					<image :src="inner.activityBannerUrl" mode="widthFix"></image>
-					<view class="txt">
-						{{ inner.activityName }}
+				<template v-if="item.data && item.data.length">
+					<view
+						v-for="(inner, innerIdx) in item.data"
+						:key="innerIdx"
+						class="tab-item"
+						@click="toSubpackagePage(inner, tabIdx)"
+					>
+						<image :src="inner.activityBannerUrl" mode="widthFix"></image>
+						<view class="txt">
+							{{ inner.activityName }}
+						</view>
+						<view class="date">
+							{{ inner.activityTime }}
+						</view>
 					</view>
-					<view class="date">
-						{{ inner.activityTime }}
-					</view>
+				</template>
+				<view v-else class="empty-box">
+					<view class="empty-txt">暂无数据</view>
 				</view>
 			</van-tab>
 		</van-tabs>
@@ -108,6 +113,23 @@ export default {
 			font-size: 28rpx;
 			color: #bfc0c0;
 		}
+	}
+
+	.empty-box {
+		width: 92%;
+		margin: 40rpx auto 0;
+		padding: 80rpx 24rpx;
+		border-radius: 20rpx;
+		box-sizing: border-box;
+		background-color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.empty-txt {
+		color: #bfc0c0;
+		font-size: 28rpx;
 	}
 }
 </style>
