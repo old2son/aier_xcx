@@ -54,14 +54,21 @@ export default {
 			try {
 				await this.fetchActivities();
 
+				// this.tabList = [
+				// 	{
+				// 		title: '进行中',
+				// 		data: this.starting
+				// 	},
+				// 	{
+				// 		title: '即将开始',
+				// 		data: this.future
+				// 	}
+				// ];
+
 				this.tabList = [
 					{
-						title: '进行中',
+						title: '报名中',
 						data: this.starting
-					},
-					{
-						title: '即将开始',
-						data: this.future
 					}
 				];
 			} catch (e) {
@@ -70,7 +77,7 @@ export default {
 		},
 		toSubpackagePage(inner) {
 			this.setSelectedActivity(inner);
-				uni.navigateTo({
+			uni.navigateTo({
 				url: '/subpackages/packageCategory/activityCenter/activityDetail'
 			});
 		}

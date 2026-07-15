@@ -85,17 +85,18 @@ export default {
 				commit('SET_ERROR', false);
 
 				const { data: activityData } = await getScienceActivityInProgress();
-				const rawStartingList = Array.isArray(activityData) ? activityData : [];
-				const { starting: startingList, future: pendingFutureList } = splitActivityListByToday(rawStartingList);
+				// const rawStartingList = Array.isArray(activityData) ? activityData : [];
+				// const { starting: startingList, future: pendingFutureList } = splitActivityListByToday(rawStartingList);
+				// commit('SET_STARTING', startingList);
+				commit('SET_STARTING', activityData);
 
-				commit('SET_STARTING', startingList);
+				// const { data: futureData } = await getScienceActivityEvents();
+				// const futureList = Array.isArray(futureData) ? futureData : [];
+				// const mergedFutureList = [...pendingFutureList, ...futureList];
+				// commit('SET_FUTURE', mergedFutureList);
 
-				const { data: futureData } = await getScienceActivityEvents();
-				const futureList = Array.isArray(futureData) ? futureData : [];
-				const mergedFutureList = [...pendingFutureList, ...futureList];
-				commit('SET_FUTURE', mergedFutureList);
-
-				const futureListDate = formatFutureList(startingList, mergedFutureList);
+				// const futureListDate = formatFutureList(startingList, mergedFutureList);
+				const futureListDate = formatFutureList(activityData, []);
 				commit('SET_FUTURE_LIST', futureListDate);
 			} catch (e) {
 				console.error(e);
