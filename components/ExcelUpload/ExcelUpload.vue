@@ -2,7 +2,7 @@
 	<view class="upload-card">
 		<view class="upload-title"> 预约上传文件 </view>
 		<view class="upload-desc"> 仅支持 Excel 文件（xls、xlsx） </view>
-		<view class="upload-desc"> 文件大小不超过 20MB </view>
+		<view class="upload-desc"> 文件大小不超过 5MB </view>
 		<view v-if="!uploadedFileName" class="upload-btn" @click="chooseExcelFile"> 点击上传文件 </view>
 		<view v-if="uploadedFileName" class="file-row">
 			<view class="delete-btn" @click="removeExcelFile">删除</view>
