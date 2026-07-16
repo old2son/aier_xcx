@@ -151,33 +151,6 @@ export default {
 			});
 		}
 	},
-	beforeCreate() {
-		uni.hideTabBar();
-	},
-	async onLoad (data) {
-		// todo: 二维码扫描获取来源
-		if (data?.source) {
-			console.log('二维码扫描获取来源', data.source);
-		}
-
-		await this.requestHomeData();
-		this.checkPrivacy();
-	},
-	onPageScroll(e) {
-		const scrollY = e.scrollTop;
-		let op = 0;
-		if (scrollY == 0 || scrollY < 1) {
-			op = 0;
-		} else if (scrollY <= 20) {
-			op = 0.1 + (scrollY / 20) * 0.2; // 从 0.1 ~ 0.3 渐显
-		} else if (scrollY > 20 && scrollY <= 100) {
-			// 正常渐显范围：从 0.3 ~ 1
-			op = 0.3 + ((scrollY - 20) / 80) * 0.7;
-		} else {
-			op = 1;
-		}
-		this.opacity = op;
-	},
 	methods: {
 		...mapActions('moduleHome', ['fetchHomeData']),
 		// async requestHomeData () {
@@ -292,7 +265,40 @@ export default {
 				url: '/subpackages/packageHomeDetail/imgDetail?articleId=' + id
 			});
 		}
-	}
+	},
+	beforeCreate() {
+		uni.hideTabBar();
+	},
+	async onLoad(data) {
+		// todo: 二维码扫描获取来源
+		if (data?.source) {
+			console.log('二维码扫描获取来源', data.source);
+		}
+
+		await this.requestHomeData();
+		this.checkPrivacy();
+	},
+	onPageScroll(e) {
+		const scrollY = e.scrollTop;
+		let op = 0;
+		if (scrollY == 0 || scrollY < 1) {
+			op = 0;
+		} else if (scrollY <= 20) {
+			op = 0.1 + (scrollY / 20) * 0.2; // 从 0.1 ~ 0.3 渐显
+		} else if (scrollY > 20 && scrollY <= 100) {
+			// 正常渐显范围：从 0.3 ~ 1
+			op = 0.3 + ((scrollY - 20) / 80) * 0.7;
+		} else {
+			op = 1;
+		}
+		this.opacity = op;
+	},
+	onShareAppMessage() {
+		return {
+			imageUrl: this.bannerSwiperList[0].h5FileUrl
+		};
+	},
+	onShareTimeline() {}
 };
 </script>
 
