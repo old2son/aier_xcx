@@ -2,6 +2,7 @@ import Dialog from '@/wxcomponents/vant/dialog/dialog';
 import store from '@/store';
 
 const APPOINTMENT_SUBSCRIBE_TEMPLATE_ID = 'ILxi2vJKudqia5NL-RGhi8vBAM4P_g-OOV25tAPjvF0';
+const FEEDBACK_RESULT_SUBSCRIBE_TEMPLATE_ID = 'KaVoMk1_MmJIAk-5RH1Sm3BIpvsRJK-xoKw6huhvrMs';
 
 function getSubscribeSetting() {
 	return new Promise((resolve) => {
@@ -29,10 +30,10 @@ async function getSubscribeStatus(templateId) {
 	return itemSettings[templateId] || '';
 }
 
-function requestSubscribeMessage(templateId) {
+function requestSubscribeMessage(templateIds) {
 	return new Promise((resolve, reject) => {
 		wx.requestSubscribeMessage({
-			tmplIds: [templateId],
+			tmplIds: Array.isArray(templateIds) ? templateIds : [templateIds],
 			success: resolve,
 			fail: reject
 		});
@@ -106,6 +107,7 @@ async function openSubscribeSettingGuide(templateId) {
 // 订阅通知
 export async function requestSubscribe() {
 	const templateId = APPOINTMENT_SUBSCRIBE_TEMPLATE_ID;
+	const templateIds = [APPOINTMENT_SUBSCRIBE_TEMPLATE_ID, FEEDBACK_RESULT_SUBSCRIBE_TEMPLATE_ID];
 	const currentSubscribeStatus = await getSubscribeStatus(templateId);
 	const isGuideDismissed = store.state.moduleUser.subscribeGuideDismissed;
 
@@ -122,10 +124,10 @@ export async function requestSubscribe() {
 	store.commit('moduleUser/setSubscribeGuideDismissed', false);
 
 	try {
-		const res = await requestSubscribeMessage(templateId);
-		console.log('订阅结果', res);
+		const res = await requestSubscribeMessage(templateIds);
 
 		const subscribeStatus = res[templateId];
+		const feedbackSubscribeStatus = res[FEEDBACK_RESULT_SUBSCRIBE_TEMPLATE_ID];
 		if (subscribeStatus === 'accept') {
 			store.commit('moduleUser/setSubscribeGuideDismissed', false);
 			wx.showToast({
@@ -139,6 +141,7 @@ export async function requestSubscribe() {
 			return {
 				type: 'request-subscribe',
 				subscribeStatus,
+				feedbackSubscribeStatus,
 				detail: res,
 				guideResult
 			};
@@ -147,6 +150,7 @@ export async function requestSubscribe() {
 		return {
 			type: 'request-subscribe',
 			subscribeStatus,
+			feedbackSubscribeStatus,
 			currentSubscribeStatus,
 			detail: res
 		};
