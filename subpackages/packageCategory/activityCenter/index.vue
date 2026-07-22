@@ -36,6 +36,7 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
 import { mapState, mapMutations, mapActions } from 'vuex';
 export default {
 	data() {
@@ -50,6 +51,47 @@ export default {
 	methods: {
 		...mapMutations('moduleActivity', ['setSelectedActivity']),
 		...mapActions('moduleActivity', ['fetchActivities']),
+		normalizeDateText(dateText) {
+			if (!dateText) {
+				return '';
+			}
+
+			const match = String(dateText).match(/(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, year, month, day] = match;
+			return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+		},
+		normalizeTimeText(timeText) {
+			if (!timeText) {
+				return '';
+			}
+
+			const match = String(timeText).match(/(\d{1,2})[:：](\d{1,2})/);
+			if (!match) {
+				return '';
+			}
+
+			const [, hour, minute] = match;
+			return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+		},
+		isActivityEnded(activity) {
+			const endDate = this.normalizeDateText(activity && activity.endDate);
+			const endTime = this.normalizeTimeText(activity && activity.endTime);
+
+			if (!endDate) {
+				return false;
+			}
+
+			const endAt = dayjs(endTime ? `${endDate} ${endTime}` : `${endDate} 23:59`);
+			if (!endAt.isValid()) {
+				return false;
+			}
+
+			return dayjs().isAfter(endAt);
+		},
 		async getActivityData() {
 			try {
 				await this.fetchActivities();
@@ -65,10 +107,13 @@ export default {
 				// 	}
 				// ];
 
+				const startingList = Array.isArray(this.starting) ? this.starting : [];
+				const filteredList = startingList.filter((item) => !this.isActivityEnded(item));
+
 				this.tabList = [
 					{
 						title: '报名中',
-						data: this.starting
+						data: filteredList
 					}
 				];
 			} catch (e) {
