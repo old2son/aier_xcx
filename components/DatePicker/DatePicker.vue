@@ -45,7 +45,7 @@
 import { mapState, mapMutations } from 'vuex';
 import dayjs from 'dayjs';
 import { isInActivityRange, isReservationConfigRange } from '@/utils/dataRange';
-import { getReservationTimeSlotNumbers, getActivityReservationTimeSlotNumbers } from '@/api';
+// import { getReservationTimeSlotNumbers, getActivityReservationTimeSlotNumbers } from '@/api';
 export default {
 	name: 'DatePicker',
 	props: {
@@ -96,6 +96,19 @@ export default {
 		}
 	},
 	watch: {
+		selectedActivity: {
+			deep: true,
+			handler() {
+				if (!this.isActivity) {
+					return;
+				}
+
+				this.generateWeekDays();
+				if (this.selectedDayIndex < 0) {
+					this.getDefaultReservationTimeSlotNumbers();
+				}
+			}
+		},
 		selectedCal(newVal) {
 			if (!newVal) return;
 			this.applySelectedCal(newVal);
@@ -135,15 +148,40 @@ export default {
 				(currentDay.isAfter(start, 'day') && currentDay.isBefore(end, 'day'))
 			);
 		},
-		// 生成当天和接下来的六天的日期信息
-		generateWeekDays() {
-			const today = dayjs().startOf('day'); // 获取当前日期（精确到当天0点）
-			const daysArray = [];
-			const currentYear = today.year(); // 获取当前年份
+		getDisplayDateList() {
+			if (this.isActivity) {
+				const startDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.activityTime);
+				const endDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.endDate);
 
-			// 动态生成 5 天的日期信息
-			for (let i = 0; i < 5; i++) {
-				const currentDay = today.add(i, 'day'); // 从当天开始依次生成
+				if (startDate && endDate) {
+					const start = dayjs(startDate).startOf('day');
+					const end = dayjs(endDate).startOf('day');
+
+					if (start.isValid() && end.isValid() && !start.isAfter(end)) {
+						const dateList = [];
+						const totalDays = end.diff(start, 'day');
+
+						for (let i = 0; i <= totalDays; i++) {
+							dateList.push(start.add(i, 'day'));
+						}
+
+						return dateList;
+					}
+				}
+			}
+
+			const today = dayjs().startOf('day');
+			return Array.from({ length: 5 }, (_, index) => today.add(index, 'day'));
+		},
+		// 生成展示日期信息
+		generateWeekDays() {
+			const currentSelectedDay = this.days[this.selectedDayIndex] || null;
+			const currentSelectedKey = currentSelectedDay ? `${currentSelectedDay.year}-${currentSelectedDay.date}` : '';
+
+			const dateList = this.getDisplayDateList();
+			const daysArray = [];
+
+			dateList.forEach((currentDay) => {
 				const dayOfWeek = currentDay.day(); // 获取星期几
 				const dateString = currentDay.format('MM-DD'); // 格式化日期为 MM-DD
 				const hasActivity =
@@ -157,15 +195,23 @@ export default {
 				 * 节假日是否禁用
 				 */
 				daysArray.push({
-					year: currentYear,
+					year: currentDay.year(),
 					date: dateString,
 					week: this.getWeekDayName(dayOfWeek),
 					// disabled: this.disabledWeekdays.includes(dayOfWeek), // 如果是周一，则禁用
 					hasActivity,
 					hasReservation
 				});
-			}
+			});
+
 			this.days = daysArray; // 更新日期数组
+
+			if (!currentSelectedKey) {
+				return;
+			}
+
+			const nextIndex = this.days.findIndex((day) => `${day.year}-${day.date}` === currentSelectedKey);
+			this.selectedDayIndex = nextIndex;
 		},
 		// 获取星期几的中文名称
 		getWeekDayName(day) {
@@ -223,6 +269,32 @@ export default {
 		applySelectedCal(payload) {
 			const dayFromCal = this.buildDayFromCalendarResult(payload);
 			if (!dayFromCal) {
+				return;
+			}
+
+			if (this.isActivity) {
+				const currentDate = dayjs(`${dayFromCal.year}-${dayFromCal.date}`, 'YYYY-MM-DD');
+				const inRange = this.isInSelectedActivityRange(currentDate);
+
+				if (!inRange) {
+					this.days = [dayFromCal];
+					this.selectedDayIndex = -1;
+					this.$nextTick(() => {
+						this.selectDay(dayFromCal, 0);
+					});
+					return;
+				}
+
+				this.generateWeekDays();
+				const existingIndex = this.days.findIndex((day) => day.year === dayFromCal.year && day.date === dayFromCal.date);
+				if (existingIndex > -1) {
+					this.selectedDayIndex = -1;
+					this.selectDay(this.days[existingIndex], existingIndex);
+					return;
+				}
+
+				this.selectedDayIndex = -1;
+				this.getDefaultReservationTimeSlotNumbers();
 				return;
 			}
 
@@ -330,21 +402,21 @@ export default {
 .date-picker {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	width: 100%;
+	align-items: flex-start;
+	width: 650rpx;
 	font-size: 28rpx;
 
 	.weekdays {
 		width: 100%;
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 		overflow-x: auto; // 允许横向滚动
 		scroll-behavior: smooth; // 滚动顺滑
 		padding-bottom: 20rpx; // 可以适当调整滚动条区域的高度
 	}
 
 	.weekdays-single {
-		justify-content: center;
+		justify-content: flex-start;
 		overflow-x: hidden;
 		padding-bottom: 0;
 	}
@@ -352,9 +424,9 @@ export default {
 	.day-item {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		align-items: stretch;
 		position: relative;
-		margin-right: 20rpx;
+		margin-right: 0rpx;
 		background-color: #ebf1ff;
 		text-align: center;
 		border-radius: 12rpx;
@@ -371,6 +443,10 @@ export default {
 			display: inline-block;
 			margin-top: 20rpx;
 		}
+	}
+
+	.day-item.activity-day {
+		margin-right: 20rpx;
 	}
 
 	.day-item.activity-day::after {
@@ -406,7 +482,6 @@ export default {
 
 	&.single-day {
 		.day-item {
-			width: 100%;
 			margin-right: 0;
 			padding: 26rpx 40rpx;
 			border-radius: 16rpx;

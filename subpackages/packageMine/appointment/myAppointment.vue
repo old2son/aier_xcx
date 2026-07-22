@@ -282,7 +282,7 @@ export default {
 						duration: 3000,
 						icon: 'none'
 					});
-					if (res.code === 200 && res.message == '您已成功取消预约') {
+					if (res.code === 200 && res.message === '您已成功取消预约') {
 						this.getReservationRecord();
 						this.cancelReservationPopup = false;
 					}

@@ -186,14 +186,14 @@ export default {
 
 			const week = weekMap[current.day()];
 
-			const disabled = isClosedMonday(current);
+			// const disabled = isClosedMonday(current);
 
 			// 距离今天第几天
 			const index = current.diff(dayjs().startOf('day'), 'day');
 
 			const result = {
 				date,
-				disabled,
+				disabled: false,
 				week,
 				year,
 				index
