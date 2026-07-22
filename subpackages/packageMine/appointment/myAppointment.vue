@@ -190,7 +190,8 @@ export default {
 			tabList: tabList.myAppointmenntTabList,
 			unusedList: [], // status === 0
 			usedList: [], // status === 2
-			expiredList: [] // status === 1
+			expiredList: [], // status === 1
+			cancelList: [] // status === 3
 		};
 	},
 	mounted() {
@@ -241,7 +242,8 @@ export default {
 						const allList = res.data || [];
 						this.unusedList = allList.filter((item) => item.status === 0); // 0 待使用
 						this.usedList = allList.filter((item) => item.status === 2); // 2 已使用（目前没有，但是后期预留）
-						this.expiredList = allList.filter((item) => item.status === 1); // 1 主动取消/过期
+						this.expiredList = allList.filter((item) => item.status === 1); // 1 过期
+						// this.cancelList = allList.filter((item) => item.status === 3); // 3 取消
 					}
 				})
 				.finally(() => {

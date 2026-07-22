@@ -9,7 +9,7 @@
 						mode="heightFix"
 						src="https://geducloud0617.oss-cn-shenzhen.aliyuncs.com/h5-mobile-reservation/mine/%E5%B7%B2%E5%8F%96%E6%B6%88.svg"
 						alt=""
-						v-if="selectedReservation.status === 1"
+						v-if="selectedReservation.status === 1 || selectedReservation.status === 3"
 					/>
 				</view>
 				<view class="col-2">
