@@ -15,11 +15,19 @@
 				<view class="col-2">
 					<text>游客信息</text>
 
-					<text>{{ !selectedReservation.members.length ? selectedReservation.name : getMember(selectedReservation).userName }}</text>
+					<text>{{
+						!selectedReservation.members.length
+							? selectedReservation.name
+							: getMember(selectedReservation).userName
+					}}</text>
 				</view>
 				<view class="col-2">
 					<text>联系电话</text>
-					<text>{{ !selectedReservation.members.length ? selectedReservation.phone : getMember(selectedReservation).userPhone }}</text>
+					<text>{{
+						!selectedReservation.members.length
+							? selectedReservation.phone
+							: getMember(selectedReservation).userPhone
+					}}</text>
 				</view>
 				<view class="col-2">
 					<text>同行人数</text>
@@ -113,19 +121,23 @@ export default {
 				reId: this.selectedReservation.reId
 			})
 				.then((res) => {
-					uni.showToast({
-						title: res.message,
-						duration: 3000,
-						icon: 'none'
-					});
-					if (res.code === 200 && res.message === '您已成功取消预约') {
-						uni.navigateTo({
+					setTimeout(() => {
+						uni.showToast({
+							title: res.message,
+							duration: 3000,
+							icon: 'none'
+						});
+					}, 50);
+					if (res.code === 200 && res.message === '您已成功取消预约！') {
+						uni.redirectTo({
 							url: '/subpackages/packageMine/appointment/myAppointment'
 						});
 					}
 				})
 				.finally(() => {
-					uni.hideLoading();
+					setTimeout(() => {
+						uni.hideLoading();
+					}, 800);
 				});
 		}
 	}

@@ -279,18 +279,22 @@ export default {
 				reId: this.reId
 			})
 				.then((res) => {
-					uni.showToast({
-						title: res.message,
-						duration: 3000,
-						icon: 'none'
-					});
-					if (res.code === 200 && res.message === '您已成功取消预约') {
+					setTimeout(() => {
+						uni.showToast({
+							title: res.message,
+							duration: 3000,
+							icon: 'none'
+						});
+					}, 50);
+					if (res.code === 200 && res.message === '您已成功取消预约！') {
 						this.getReservationRecord();
 						this.cancelReservationPopup = false;
 					}
 				})
 				.finally(() => {
-					uni.hideLoading();
+					setTimeout(() => {
+						uni.hideLoading();
+					}, 800);
 				});
 		}
 	}
