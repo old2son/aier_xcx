@@ -57,7 +57,7 @@
 
 <script>
 import dayjs from 'dayjs';
-import { mapState } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
 import myData from '@/data/appointment.json';
 import { handleReservationResult } from '@/utils/reservation.js';
 import { personalActivityTeamReservation } from '@/api/index';
@@ -95,7 +95,7 @@ export default {
 		};
 	},
 	computed: {
-		...mapState('moduleActivity', ['selectedActivity']),
+		...mapState('moduleActivity', ['selectedActivity', 'starting', 'future']),
 		activityStatusInfo() {
 			const startAt = this.buildActivityDateTime(this.requestResult.activityTime, this.requestResult.startTime);
 			const endAt = this.buildActivityDateTime(this.requestResult.endDate, this.requestResult.endTime);
@@ -139,6 +139,8 @@ export default {
 		}
 	},
 	methods: {
+		...mapMutations('moduleActivity', ['setSelectedActivity']),
+		...mapActions('moduleActivity', ['fetchActivities']),
 		padNumber(value) {
 			return String(value).padStart(2, '0');
 		},
@@ -214,8 +216,94 @@ export default {
 
 			return 0;
 		},
+		formatDateForPicker(dateText) {
+			const normalizedDate = this.normalizeDateText(dateText);
+			if (!normalizedDate) {
+				return null;
+			}
+
+			const current = dayjs(normalizedDate);
+			return {
+				date: current.format('MM-DD'),
+				week: `周${['日', '一', '二', '三', '四', '五', '六'][current.day()]}`,
+				year: current.year(),
+				disabled: false,
+				index: 0
+			};
+		},
+		getSameNameActivityList(baseActivity) {
+			const currentActivity = baseActivity || {};
+			const activityName = currentActivity.activityName || '';
+			const activityId = currentActivity.activityId;
+			const activityList = [...(Array.isArray(this.starting) ? this.starting : []), ...(Array.isArray(this.future) ? this.future : [])];
+
+			const filteredList = activityList.filter((item) => {
+				if (!item) {
+					return false;
+				}
+
+				if (activityName) {
+					return item.activityName === activityName;
+				}
+
+				return activityId ? item.activityId === activityId : false;
+			});
+
+			const uniqueList = filteredList.filter((item, index, list) => {
+				return index === list.findIndex((target) => target.activityId === item.activityId);
+			});
+
+			return uniqueList.sort((prev, next) => {
+				return dayjs(this.normalizeDateText(prev.activityTime)).valueOf() - dayjs(this.normalizeDateText(next.activityTime)).valueOf();
+			});
+		},
+		findActivityByDate(dateText) {
+			const currentDate = this.normalizeDateText(dateText);
+			if (!currentDate) {
+				return null;
+			}
+
+			const activityList = Array.isArray(this.selectedActivity.sameNameActivityList)
+				? this.selectedActivity.sameNameActivityList
+				: [];
+
+			return (
+				activityList.find((item) => {
+					const startDate = this.normalizeDateText(item && item.activityTime);
+					const endDate = this.normalizeDateText((item && item.endDate) || (item && item.activityTime));
+					if (!startDate || !endDate) {
+						return false;
+					}
+
+					const current = dayjs(currentDate);
+					const start = dayjs(startDate);
+					const end = dayjs(endDate);
+					return (
+						current.isSame(start, 'day') ||
+						current.isSame(end, 'day') ||
+						(current.isAfter(start, 'day') && current.isBefore(end, 'day'))
+					);
+				}) || null
+			);
+		},
 		async getDetailData() {
-			this.requestResult = this.selectedActivity;
+			if ((!Array.isArray(this.starting) || !this.starting.length) && (!Array.isArray(this.future) || !this.future.length)) {
+				await this.fetchActivities();
+			}
+
+			const baseActivity = this.selectedActivity || {};
+			const sameNameActivityList = this.getSameNameActivityList(baseActivity);
+			const currentActivity =
+				sameNameActivityList.find((item) => item.activityId === baseActivity.activityId) ||
+				sameNameActivityList[0] ||
+				baseActivity;
+
+			this.setSelectedActivity({
+				...baseActivity,
+				sameNameActivityList
+			});
+			this.requestResult = currentActivity;
+			this.selectedCal = this.formatDateForPicker(currentActivity.activityTime);
 		},
 		handlePopupClose() {
 			this.showReservationPopup = false;
@@ -226,6 +314,13 @@ export default {
 			this.isInActivityDateRange = isInSelectedActivityRange !== false;
 			this.selectedTimeSlot = null;
 			this.selectedTimeSlotIndex = -1;
+
+			if (this.isInActivityDateRange) {
+				const matchedActivity = this.findActivityByDate(date);
+				if (matchedActivity) {
+					this.requestResult = matchedActivity;
+				}
+			}
 		},
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;

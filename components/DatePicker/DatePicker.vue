@@ -116,6 +116,14 @@ export default {
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setHasShownActivityPopup']),
+		getSelectedActivityList() {
+			const sameNameActivityList = this.selectedActivity && this.selectedActivity.sameNameActivityList;
+			if (Array.isArray(sameNameActivityList) && sameNameActivityList.length) {
+				return sameNameActivityList;
+			}
+
+			return this.selectedActivity ? [this.selectedActivity] : [];
+		},
 		normalizeDateText(dateText) {
 			if (!dateText) {
 				return '';
@@ -134,39 +142,49 @@ export default {
 				return true;
 			}
 
-			const startDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.activityTime);
-			const endDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.endDate);
-			if (!startDate || !endDate) {
-				return false;
-			}
+			return this.getSelectedActivityList().some((activity) => {
+				const startDate = this.normalizeDateText(activity && activity.activityTime);
+				const endDate = this.normalizeDateText((activity && activity.endDate) || (activity && activity.activityTime));
+				if (!startDate || !endDate) {
+					return false;
+				}
 
-			const start = dayjs(startDate);
-			const end = dayjs(endDate);
-			return (
-				currentDay.isSame(start, 'day') ||
-				currentDay.isSame(end, 'day') ||
-				(currentDay.isAfter(start, 'day') && currentDay.isBefore(end, 'day'))
-			);
+				const start = dayjs(startDate);
+				const end = dayjs(endDate);
+				return (
+					currentDay.isSame(start, 'day') ||
+					currentDay.isSame(end, 'day') ||
+					(currentDay.isAfter(start, 'day') && currentDay.isBefore(end, 'day'))
+				);
+			});
 		},
 		getDisplayDateList() {
 			if (this.isActivity) {
-				const startDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.activityTime);
-				const endDate = this.normalizeDateText(this.selectedActivity && this.selectedActivity.endDate);
+				const dateMap = new Map();
 
-				if (startDate && endDate) {
+				this.getSelectedActivityList().forEach((activity) => {
+					const startDate = this.normalizeDateText(activity && activity.activityTime);
+					const endDate = this.normalizeDateText((activity && activity.endDate) || (activity && activity.activityTime));
+					if (!startDate || !endDate) {
+						return;
+					}
+
 					const start = dayjs(startDate).startOf('day');
 					const end = dayjs(endDate).startOf('day');
-
-					if (start.isValid() && end.isValid() && !start.isAfter(end)) {
-						const dateList = [];
-						const totalDays = end.diff(start, 'day');
-
-						for (let i = 0; i <= totalDays; i++) {
-							dateList.push(start.add(i, 'day'));
-						}
-
-						return dateList;
+					if (!start.isValid() || !end.isValid() || start.isAfter(end)) {
+						return;
 					}
+
+					const totalDays = end.diff(start, 'day');
+					for (let i = 0; i <= totalDays; i++) {
+						const current = start.add(i, 'day');
+						dateMap.set(current.format('YYYY-MM-DD'), current);
+					}
+				});
+
+				const activityDateList = Array.from(dateMap.values()).sort((prev, next) => prev.valueOf() - next.valueOf());
+				if (activityDateList.length) {
+					return activityDateList;
 				}
 			}
 

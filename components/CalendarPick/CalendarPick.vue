@@ -64,24 +64,35 @@ function normalizeDateText(dateText) {
 	return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
+function getSelectedActivityList() {
+	const sameNameActivityList = selectedActivityCache && selectedActivityCache.sameNameActivityList;
+	if (Array.isArray(sameNameActivityList) && sameNameActivityList.length) {
+		return sameNameActivityList;
+	}
+
+	return selectedActivityCache ? [selectedActivityCache] : [];
+}
+
 function isInSelectedActivityRange(current) {
 	if (!isActivityCache) {
 		return true;
 	}
 
-	const startDate = normalizeDateText(selectedActivityCache && selectedActivityCache.activityTime);
-	const endDate = normalizeDateText(selectedActivityCache && selectedActivityCache.endDate);
-	if (!startDate || !endDate) {
-		return false;
-	}
+	return getSelectedActivityList().some((activity) => {
+		const startDate = normalizeDateText(activity && activity.activityTime);
+		const endDate = normalizeDateText((activity && activity.endDate) || (activity && activity.activityTime));
+		if (!startDate || !endDate) {
+			return false;
+		}
 
-	const start = dayjs(startDate);
-	const end = dayjs(endDate);
-	return (
-		current.isSame(start, 'day') ||
-		current.isSame(end, 'day') ||
-		(current.isAfter(start, 'day') && current.isBefore(end, 'day'))
-	);
+		const start = dayjs(startDate);
+		const end = dayjs(endDate);
+		return (
+			current.isSame(start, 'day') ||
+			current.isSame(end, 'day') ||
+			(current.isAfter(start, 'day') && current.isBefore(end, 'day'))
+		);
+	});
 }
 
 function hasScheduleConfig(current) {
