@@ -463,7 +463,7 @@ export default {
 		}
 	}
 
-	.day-item.activity-day {
+	.day-item {
 		margin-right: 20rpx;
 	}
 
