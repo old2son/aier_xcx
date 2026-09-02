@@ -246,6 +246,45 @@ export default {
 	},
 	methods: {
 		...mapMutations('moduleAudience', ['setSelectedAudienceList']),
+		getIdCardAge(value) {
+			const match = String(value || '').match(/^\d{6}(\d{4})(\d{2})(\d{2})\d{3}[0-9Xx]$/);
+			if (!match) {
+				return null;
+			}
+
+			const [, year, month, day] = match;
+			const today = new Date();
+			let age = today.getFullYear() - Number(year);
+			const currentMonth = today.getMonth() + 1;
+			const currentDay = today.getDate();
+
+			if (currentMonth < Number(month) || (currentMonth === Number(month) && currentDay < Number(day))) {
+				age -= 1;
+			}
+
+			return age;
+		},
+		isValidIdCardBirthday(value) {
+			const match = String(value || '').match(/^\d{6}(\d{4})(\d{2})(\d{2})\d{3}[0-9Xx]$/);
+			if (!match) {
+				return false;
+			}
+
+			const [, year, month, day] = match;
+			const birthday = new Date(Number(year), Number(month) - 1, Number(day));
+			if (
+				birthday.getFullYear() !== Number(year) ||
+				birthday.getMonth() !== Number(month) - 1 ||
+				birthday.getDate() !== Number(day)
+			) {
+				return false;
+			}
+
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			birthday.setHours(0, 0, 0, 0);
+			return birthday.getTime() <= today.getTime();
+		},
 		emitMemberList(list) {
 			const nextList = list.map((item) => ({ ...item }));
 			this.$emit('change', nextList);
@@ -337,8 +376,10 @@ export default {
 		validateCertificate(type, value) {
 			switch (type) {
 				case 'idcard':
-					return /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
-						value
+					return (
+						/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(
+							value
+						) && this.isValidIdCardBirthday(value)
 					);
 				case 'passport':
 					return /^(?![0-9]+$)(?![A-Za-z]+$)[0-9A-Za-z]{1,16}$/.test(value);
@@ -433,6 +474,13 @@ export default {
 			if (!this.validateCertificate(certificateType, this.idCard.trim())) {
 				this.idCardError = `${certificateLabel}格式不正确`;
 				return;
+			}
+			if (certificateType === 'idcard') {
+				const idCardAge = this.getIdCardAge(this.idCard.trim());
+				if (idCardAge === null || idCardAge !== ageNumber) {
+					this.ageError = '年龄需与身份证信息一致';
+					return;
+				}
 			}
 
 			this.emitMemberList([
