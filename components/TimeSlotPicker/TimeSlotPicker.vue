@@ -21,7 +21,7 @@
 			<view
 				:style="weight ? 'font-weight: bold; font-size: 32rpx;' : ''"
 				class="afternoon-title"
-				v-if="index === 1"
+				v-if="index === 1 && !isActivity"
 				>下午时段</view
 			>
 		</view>
@@ -49,6 +49,10 @@ export default {
 		needTimeSlotRequest: {
 			type: Boolean,
 			required: true
+		},
+		isActivity: {
+			type: Boolean,
+			default: false
 		},
 		weight: {
 			type: Boolean,

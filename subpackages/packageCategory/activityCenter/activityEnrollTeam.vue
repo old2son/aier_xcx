@@ -121,21 +121,23 @@ export default {
 			};
 		},
 		combinedTimeSlotList() {
-			const fixedTimeSlot = this.getFixedTimeSlotName();
-			const surplusNumber = this.getActivitySurplusNumber();
-			const isActivitySlotClosed = this.isActivitySlotClosed();
+			const currentDateActivityList = this.getCurrentDateActivityList();
 
-			if (!fixedTimeSlot) {
-				return [];
-			}
+			return currentDateActivityList.map((activityItem) => {
+				const fixedTimeSlot = this.getFixedTimeSlotName(activityItem);
+				const surplusNumber = this.getActivitySurplusNumber(activityItem);
+				const isActivitySlotClosed = this.isActivitySlotClosed(activityItem);
 
-			return [
-				{
+				return {
 					name: fixedTimeSlot,
 					surplusNumber,
-					disabled: !this.date || !this.isInActivityDateRange || surplusNumber <= 0 || isActivitySlotClosed
-				}
-			];
+					activityId: activityItem.activityId,
+					activityName: activityItem.activityName,
+					startTime: activityItem.startTime,
+					endTime: activityItem.endTime,
+					disabled: !this.date || !this.isInActivityDateRange || !fixedTimeSlot || surplusNumber <= 0 || isActivitySlotClosed
+				};
+			});
 		}
 	},
 	methods: {
@@ -181,21 +183,21 @@ export default {
 			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
 			return dateTime.isValid() ? dateTime : null;
 		},
-		isActivitySlotClosed() {
+		isActivitySlotClosed(activityItem = this.requestResult) {
 			if (!this.date) {
 				return false;
 			}
 
-			const slotStartAt = this.buildActivityDateTime(this.date, this.requestResult.startTime);
+			const slotStartAt = this.buildActivityDateTime(this.date, activityItem && activityItem.startTime);
 			if (!slotStartAt) {
 				return false;
 			}
 
 			return dayjs().isAfter(slotStartAt.subtract(30, 'minute'));
 		},
-		getFixedTimeSlotName() {
-			const startTime = this.normalizeTimeText(this.requestResult.startTime);
-			const endTime = this.normalizeTimeText(this.requestResult.endTime);
+		getFixedTimeSlotName(activityItem = this.requestResult) {
+			const startTime = this.normalizeTimeText(activityItem && activityItem.startTime);
+			const endTime = this.normalizeTimeText(activityItem && activityItem.endTime);
 
 			if (!startTime || !endTime) {
 				return '';
@@ -203,8 +205,8 @@ export default {
 
 			return `${startTime}-${endTime}`;
 		},
-		getActivitySurplusNumber() {
-			const requestResult = this.requestResult || {};
+		getActivitySurplusNumber(activityItem = this.requestResult) {
+			const requestResult = activityItem || {};
 			const candidateKeys = ['surplusNumber', 'numbers', 'remainNumber', 'remainingNumber', 'residueNumber'];
 
 			for (let i = 0; i < candidateKeys.length; i++) {
@@ -254,21 +256,23 @@ export default {
 			});
 
 			return uniqueList.sort((prev, next) => {
-				return dayjs(this.normalizeDateText(prev.activityTime)).valueOf() - dayjs(this.normalizeDateText(next.activityTime)).valueOf();
+				const prevDateTime = this.buildActivityDateTime(prev.activityTime, prev.startTime) || dayjs(this.normalizeDateText(prev.activityTime));
+				const nextDateTime = this.buildActivityDateTime(next.activityTime, next.startTime) || dayjs(this.normalizeDateText(next.activityTime));
+				return prevDateTime.valueOf() - nextDateTime.valueOf();
 			});
 		},
-		findActivityByDate(dateText) {
+		getCurrentDateActivityList(dateText = this.date) {
 			const currentDate = this.normalizeDateText(dateText);
 			if (!currentDate) {
-				return null;
+				return [];
 			}
 
 			const activityList = Array.isArray(this.selectedActivity.sameNameActivityList)
 				? this.selectedActivity.sameNameActivityList
 				: [];
 
-			return (
-				activityList.find((item) => {
+			return activityList
+				.filter((item) => {
 					const startDate = this.normalizeDateText(item && item.activityTime);
 					const endDate = this.normalizeDateText((item && item.endDate) || (item && item.activityTime));
 					if (!startDate || !endDate) {
@@ -283,8 +287,15 @@ export default {
 						current.isSame(end, 'day') ||
 						(current.isAfter(start, 'day') && current.isBefore(end, 'day'))
 					);
-				}) || null
-			);
+				})
+				.sort((prev, next) => {
+					const prevDateTime = this.buildActivityDateTime(currentDate, prev.startTime) || dayjs(currentDate);
+					const nextDateTime = this.buildActivityDateTime(currentDate, next.startTime) || dayjs(currentDate);
+					return prevDateTime.valueOf() - nextDateTime.valueOf();
+				});
+		},
+		findActivityByDate(dateText) {
+			return this.getCurrentDateActivityList(dateText)[0] || null;
 		},
 		async getDetailData() {
 			if ((!Array.isArray(this.starting) || !this.starting.length) && (!Array.isArray(this.future) || !this.future.length)) {
@@ -325,6 +336,13 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
+			const currentSlot = this.combinedTimeSlotList[index];
+			if (currentSlot && currentSlot.activityId) {
+				const matchedActivity = this.getCurrentDateActivityList().find((item) => item.activityId === currentSlot.activityId);
+				if (matchedActivity) {
+					this.requestResult = matchedActivity;
+				}
+			}
 		},
 		updateTimeSlotNumbers() {},
 		handleExcelFile(file) {
@@ -393,7 +411,9 @@ export default {
 				return;
 			}
 
-			const surplusNumber = this.getActivitySurplusNumber();
+			const currentSlot =
+				this.selectedTimeSlotIndex > -1 ? this.combinedTimeSlotList[this.selectedTimeSlotIndex] || null : null;
+			const surplusNumber = Number(currentSlot && currentSlot.surplusNumber);
 			if (!Number.isNaN(surplusNumber) && visitors > surplusNumber) {
 				this.visitorsNumberError = `最多可预约 ${surplusNumber} 人`;
 				uni.showToast({

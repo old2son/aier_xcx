@@ -38,6 +38,7 @@
 		<view v-if="!isActivity" class="morning-title">{{ morningTitle }}</view>
 
 		<TimeSlotPicker
+			:is-activity="isActivity"
 			:weight="weight"
 			:timeSlotList="timeSlotList"
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
