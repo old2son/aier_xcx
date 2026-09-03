@@ -194,10 +194,6 @@ export default {
 			cancelList: [] // status === 3
 		};
 	},
-	mounted() {
-		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
-		this.getReservationRecord();
-	},
 	computed: {
 		...mapState('moduleLayout', ['menuInfo']),
 		selectedReservation() {
@@ -258,7 +254,7 @@ export default {
 		},
 		toCredentials(item) {
 			this.$store.commit('moduleAppointment/setSelectedAppointment', item);
-			uni.navigateTo({ url: '/subpackages/packageMine/appointment/credentials' });
+			uni.navigateTo({ url: `/subpackages/packageMine/appointment/credentials?id=${item.reId}` });
 		},
 		cancelReservationOperate(id) {
 			this.reId = id;
@@ -297,6 +293,12 @@ export default {
 					}, 800);
 				});
 		}
+	},
+	onShow() {
+		this.getReservationRecord();
+	},
+	mounted() {
+		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
 	}
 };
 </script>

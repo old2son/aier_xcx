@@ -96,9 +96,6 @@ export default {
 			return this.$store.getters['moduleAppointment/selectedAppointment'];
 		}
 	},
-	onLoad(options) {
-		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
-	},
 	methods: {
 		getMember(item) {
 			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
@@ -140,6 +137,9 @@ export default {
 					}, 800);
 				});
 		}
+	},
+	onLoad(options) {
+		this.$store.dispatch('moduleLayout/getNavigationBarStyle');
 	}
 };
 </script>
