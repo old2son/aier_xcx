@@ -2,7 +2,7 @@
 	<view class="credentials">
 		<CustomNavInner title="入场凭证" />
 
-		<view class="details-main" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
+		<view class="details-main" v-if="selectedReservation" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
 			<view class="details-content" :class="cardClass">
 				<view class="details-tl">{{ reservationType.replace(/（个人）|（团队）/g, '') }}成功</view>
 
@@ -383,7 +383,11 @@ export default {
 			myReservation()
 				.then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
-						let resData = res.data.find((item) => Number(item.reId) === this.selectedReservation.reId);
+						let resData = res.data.find((item) => item.reId === Number(this.id));
+						if (!this.selectedReservation) {
+							this.$store.commit('moduleAppointment/setSelectedAppointment', resData);
+						}
+
 						if (resData.status !== 0) {
 							uni.navigateBack({
 								delta: 1
@@ -400,7 +404,7 @@ export default {
 		this.id = options.id;
 
 		// 立即执行一次查询预约状态，确保预约状态及时更新
-		// this.checkReservationStatus();
+		this.checkReservationStatus();
 
 		if (!this.pollTimer) {
 			// 轮序查询预约状态
@@ -408,15 +412,6 @@ export default {
 				this.checkReservationStatus();
 			}, 30000);
 		}
-	},
-	mounted() {
-		let text = '';
-		if (this.selectedReservation.members?.length > 0) {
-			text = JSON.stringify(this.selectedReservation.members);
-		} else {
-			text = JSON.stringify(this.selectedReservation);
-		}
-		this.qrcodeData = text;
 	},
 	onUnload() {
 		clearInterval(this.pollTimer);
