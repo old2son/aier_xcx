@@ -121,6 +121,7 @@ export default {
 					name: fixedTimeSlot,
 					surplusNumber,
 					activityId: activityItem.activityId,
+					activityKey: this.getActivityUniqueKey(activityItem),
 					activityName: activityItem.activityName,
 					startTime: activityItem.startTime,
 					endTime: activityItem.endTime,
@@ -173,18 +174,17 @@ export default {
 			const dateTime = dayjs(`${normalizedDate} ${normalizedTime}`);
 			return dateTime.isValid() ? dateTime : null;
 		},
-		isActivitySlotClosed(activityItem = this.requestResult) {
-			if (!this.date) {
+		isActivitySlotClosed(activityItem = this.requestResult, dateText = this.date) {
+			if (!dateText) {
 				return false;
 			}
 
-			const slotStartAt = this.buildActivityDateTime(this.date, activityItem && activityItem.startTime);
-
-			if (!slotStartAt) {
+			const slotEndAt = this.buildActivityDateTime(dateText, activityItem && activityItem.endTime);
+			if (!slotEndAt) {
 				return false;
 			}
 
-			return dayjs().isAfter(slotStartAt.subtract(30, 'minute'));
+			return !dayjs().isBefore(slotEndAt);
 		},
 		getFixedTimeSlotName(activityItem = this.requestResult) {
 			const startTime = this.normalizeTimeText(activityItem && activityItem.startTime);
@@ -208,6 +208,15 @@ export default {
 			}
 
 			return 0;
+		},
+		getActivityUniqueKey(activityItem = {}) {
+			return [
+				activityItem.activityId || '',
+				this.normalizeDateText(activityItem.activityTime) || '',
+				this.normalizeDateText(activityItem.endDate || activityItem.activityTime) || '',
+				this.normalizeTimeText(activityItem.startTime) || '',
+				this.normalizeTimeText(activityItem.endTime) || ''
+			].join('|');
 		},
 		formatDateForPicker(dateText) {
 			const normalizedDate = this.normalizeDateText(dateText);
@@ -243,7 +252,8 @@ export default {
 			});
 
 			const uniqueList = filteredList.filter((item, index, list) => {
-				return index === list.findIndex((target) => target.activityId === item.activityId);
+				const currentKey = this.getActivityUniqueKey(item);
+				return index === list.findIndex((target) => this.getActivityUniqueKey(target) === currentKey);
 			});
 
 			return uniqueList.sort((prev, next) => {
@@ -252,15 +262,17 @@ export default {
 				return prevDateTime.valueOf() - nextDateTime.valueOf();
 			});
 		},
-		getCurrentDateActivityList(dateText = this.date) {
+		getCurrentDateActivityList(dateText = this.date, customActivityList) {
 			const currentDate = this.normalizeDateText(dateText);
 			if (!currentDate) {
 				return [];
 			}
 
-			const activityList = Array.isArray(this.selectedActivity.sameNameActivityList)
-				? this.selectedActivity.sameNameActivityList
-				: [];
+			const activityList = Array.isArray(customActivityList)
+				? customActivityList
+				: Array.isArray(this.selectedActivity.sameNameActivityList)
+					? this.selectedActivity.sameNameActivityList
+					: [];
 
 			return activityList
 				.filter((item) => {
@@ -285,8 +297,20 @@ export default {
 					return prevDateTime.valueOf() - nextDateTime.valueOf();
 				});
 		},
+		getFirstAvailableActivity(activityList = [], dateText = this.date) {
+			return (
+				activityList.find((item) => {
+					const fixedTimeSlot = this.getFixedTimeSlotName(item);
+					const surplusNumber = this.getActivitySurplusNumber(item);
+					const isActivitySlotClosed = this.isActivitySlotClosed(item, dateText);
+
+					return !!fixedTimeSlot && Number(surplusNumber) > 0 && !isActivitySlotClosed;
+				}) || activityList[0] || null
+			);
+		},
 		findActivityByDate(dateText) {
-			return this.getCurrentDateActivityList(dateText)[0] || null;
+			const activityList = this.getCurrentDateActivityList(dateText);
+			return this.getFirstAvailableActivity(activityList, dateText);
 		},
 		async getDetailData() {
 			if ((!Array.isArray(this.starting) || !this.starting.length) && (!Array.isArray(this.future) || !this.future.length)) {
@@ -295,7 +319,9 @@ export default {
 
 			const baseActivity = this.selectedActivity || {};
 			const sameNameActivityList = this.getSameNameActivityList(baseActivity);
+			const currentDateActivityList = this.getCurrentDateActivityList(baseActivity.activityTime, sameNameActivityList);
 			const currentActivity =
+				this.getFirstAvailableActivity(currentDateActivityList, baseActivity.activityTime) ||
 				sameNameActivityList.find((item) => item.activityId === baseActivity.activityId) ||
 				sameNameActivityList[0] ||
 				baseActivity;
@@ -333,9 +359,10 @@ export default {
 		handleTimeSlotSelected(slot, index) {
 			this.selectedTimeSlot = slot;
 			this.selectedTimeSlotIndex = index;
-			const currentSlot = this.combinedTimeSlotList[index];
-			if (currentSlot && currentSlot.activityId) {
-				const matchedActivity = this.getCurrentDateActivityList().find((item) => item.activityId === currentSlot.activityId);
+			if (slot && slot.activityKey) {
+				const matchedActivity = this.getCurrentDateActivityList().find(
+					(item) => this.getActivityUniqueKey(item) === slot.activityKey
+				);
 				if (matchedActivity) {
 					this.requestResult = matchedActivity;
 				}

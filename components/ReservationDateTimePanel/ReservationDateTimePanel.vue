@@ -44,8 +44,8 @@
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
 			:needTimeSlotRequest="needTimeSlotRequest"
 			:select-day="date"
-			@timeSlotSelected="handleTimeSlotSelected"
-			@timeSlotExpound="handletimeSlotExpound"
+                        @time-slot-selected="handleTimeSlotSelected"
+                        @time-slot-expound="handletimeSlotExpound"
 		/>
 	</view>
 </template>

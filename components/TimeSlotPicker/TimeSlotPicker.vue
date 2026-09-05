@@ -160,7 +160,9 @@ export default {
 			if (item && !this.processedTimeSlotList[index].disabled) {
 				this.pendingSelectedTimeSlotIndex = index;
 				// 禁用状态不能选择
-				this.$emit('timeSlotSelected', item.name, index);
+                                this.$emit('time-slot-selected', { ...item }, index);
+                                this.$emit('timeSlotSelected', { ...item }, index);
+                                this.$emit('time-slot-expound', item.expound);
 				this.$emit('timeSlotExpound', item.expound);
 			}
 		},
