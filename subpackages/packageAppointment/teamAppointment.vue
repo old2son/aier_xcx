@@ -115,7 +115,7 @@ export default {
 			this.selectedTimeSlotIndex = -1;
 		},
 		handleTimeSlotSelected(slot, index) {
-			this.selectedTimeSlot = slot;
+			this.selectedTimeSlot = slot && typeof slot === 'object' ? slot.name || '' : slot;
 			this.selectedTimeSlotIndex = index;
 		},
 		handleExcelFile(file) {

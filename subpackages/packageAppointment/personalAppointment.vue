@@ -153,7 +153,7 @@ export default {
 		},
 		// 选择四个时间段
 		handleTimeSlotSelected(slot, index) {
-			this.selectedTimeSlot = slot;
+			this.selectedTimeSlot = slot && typeof slot === 'object' ? slot.name || '' : slot;
 			this.selectedTimeSlotIndex = index;
 			// if (this.date && this.selectedTimeSlot) {
 			// 	getReservationWeekNumbers({
