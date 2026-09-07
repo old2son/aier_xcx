@@ -111,7 +111,7 @@ export default {
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			const currentDateActivityList = this.getCurrentDateActivityList();
-
+			console.log('currentDateActivityList', currentDateActivityList);
 			return currentDateActivityList.map((activityItem) => {
 				const fixedTimeSlot = this.getFixedTimeSlotName(activityItem);
 				const surplusNumber = this.getActivitySurplusNumber(activityItem);
@@ -198,13 +198,11 @@ export default {
 		},
 		getActivitySurplusNumber(activityItem = this.requestResult) {
 			const requestResult = activityItem || {};
-			const candidateKeys = ['surplusNumber', 'numbers', 'remainNumber', 'remainingNumber', 'residueNumber'];
+			const candidateKeys = ['surplusNumber'];
 
-			for (let i = 0; i < candidateKeys.length; i++) {
-				const value = requestResult[candidateKeys[i]];
-				if (value !== undefined && value !== null && value !== '') {
-					return Number(value) || 0;
-				}
+			const value = requestResult[candidateKeys[i]];
+			if (value !== undefined && value !== null && value !== '') {
+				return Number(value) || 0;
 			}
 
 			return 0;

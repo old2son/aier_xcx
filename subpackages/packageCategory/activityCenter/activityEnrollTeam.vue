@@ -208,13 +208,11 @@ export default {
 		},
 		getActivitySurplusNumber(activityItem = this.requestResult) {
 			const requestResult = activityItem || {};
-			const candidateKeys = ['surplusNumber', 'numbers', 'remainNumber', 'remainingNumber', 'residueNumber'];
+			const candidateKeys = ['surplusNumber'];
 
-			for (let i = 0; i < candidateKeys.length; i++) {
-				const value = requestResult[candidateKeys[i]];
-				if (value !== undefined && value !== null && value !== '') {
-					return Number(value) || 0;
-				}
+			const value = requestResult[candidateKeys[i]];
+			if (value !== undefined && value !== null && value !== '') {
+				return Number(value) || 0;
 			}
 
 			return 0;
