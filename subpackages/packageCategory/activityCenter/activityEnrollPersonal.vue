@@ -200,7 +200,7 @@ export default {
 			const requestResult = activityItem || {};
 			const candidateKeys = ['surplusNumber'];
 
-			const value = requestResult[candidateKeys[i]];
+			const value = requestResult[candidateKeys[0]];
 			if (value !== undefined && value !== null && value !== '') {
 				return Number(value) || 0;
 			}
