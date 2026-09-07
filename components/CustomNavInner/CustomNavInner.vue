@@ -18,7 +18,7 @@
 				<image
 					:src="returnIcon"
 					:style="{ left: menuInfo.fromLeft + 'px' }"
-					@touchstart="goBackOrToHome"
+					@tap="goBackOrToHome"
 				></image>
 				<text>{{ title }}</text>
 			</view>
