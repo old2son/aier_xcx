@@ -2,22 +2,34 @@
 	<view class="credentials">
 		<CustomNavInner title="入场凭证" />
 
-		<view class="details-main" v-if="selectedReservation" :style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }">
+		<view
+			class="details-main"
+			v-if="selectedReservation"
+			:style="{ top: menuInfo.menuHeight + menuInfo.menuHeightFromTop + 20 + 'px' }"
+		>
 			<view class="details-content" :class="cardClass">
 				<view class="details-tl">{{ reservationType.replace(/（个人）|（团队）/g, '') }}成功</view>
 
 				<view class="qrcode-box">
-					<view class="qrcode" :style="{ width: selectedReservation.qrCodeBase64 ? 'auto' : '300rpx' }">
-						<view v-if="!selectedReservation.qrCodeBase64" class="qrcode-loading">
+					<view class="qrcode" :style="{ width: qrcodeImgBase64 ? 'auto' : '300rpx' }">
+						<view v-if="!qrcodeImgBase64" class="qrcode-loading">
 							<view class="loading-ring"></view>
 							<text class="loading-text">二维码生成中...</text>
 						</view>
 						<image
-							v-if="selectedReservation.qrCodeBase64"
-							:src="`data:image/png;base64,${selectedReservation.qrCodeBase64}`"
-							style="width: 380rpx"
+							v-if="qrcodeImgBase64"
+							:src="qrcodeImgBase64"
+							style="width: 340rpx; padding: 20rpx"
 							mode="widthFix"
 						></image>
+						<l-qrcode
+							style="display: none"
+							v-if="!!qrcodeData"
+							ref="qrcodeRef"
+							useCanvasToTempFilePath
+							@success="qrcodeToBase64"
+							:value="qrcodeData"
+						/>
 					</view>
 				</view>
 				<view class="row" v-if="selectedReservation.activityName">
@@ -55,6 +67,8 @@
 				</view>
 			</view>
 		</view>
+		
+		<!-- 入场凭证画布 -->
 		<canvas
 			canvas-id="credentialCanvas"
 			class="save-canvas"
@@ -73,6 +87,7 @@ export default {
 		return {
 			id: null,
 			qrcodeData: '',
+			qrcodeImgBase64: '',
 			canvasWidth: 335,
 			canvasHeight: 560,
 			isSaving: false,
@@ -122,6 +137,12 @@ export default {
 		}
 	},
 	methods: {
+		initQrcodeData(reservation) {
+			this.qrcodeData = reservation && reservation.qrCode ? reservation.qrCode : '';
+			if (!this.qrcodeData) {
+				this.qrcodeImgBase64 = '';
+			}
+		},
 		getMember(item) {
 			return item.members?.find((v) => v.idNumber) || item.members?.[0] || {};
 		},
@@ -213,7 +234,8 @@ export default {
 			const { windowWidth } = uni.getSystemInfoSync();
 
 			// PNG Base64  JPEG Base64
-			const str = String(qrcodePath);
+			const str = String(qrcodePath).includes(',') ? String(qrcodePath).split(',')[1] : String(qrcodePath);
+
 			if (str.startsWith('iVBORw0KGgo') || str.startsWith('/9j/')) {
 				qrcodePath = await this.base64ToLocalPath(qrcodePath);
 			}
@@ -361,7 +383,7 @@ export default {
 			});
 
 			try {
-				const tempFilePath = await this.drawCredentialCanvas(this.selectedReservation.qrCodeBase64);
+				const tempFilePath = await this.drawCredentialCanvas(this.qrcodeImgBase64);
 				await this.saveImageToAlbum(tempFilePath);
 				uni.showToast({
 					title: '已保存到相册',
@@ -379,7 +401,7 @@ export default {
 				uni.hideLoading();
 			}
 		},
-		checkReservationStatus() {
+		async checkReservationStatus() {
 			myReservation()
 				.then((res) => {
 					if (res.code === 200 && res.message === '查询成功') {
@@ -387,6 +409,7 @@ export default {
 						if (!this.selectedReservation) {
 							this.$store.commit('moduleAppointment/setSelectedAppointment', resData);
 						}
+						this.initQrcodeData(resData);
 
 						if (resData.status !== 0) {
 							uni.navigateBack({
@@ -398,10 +421,14 @@ export default {
 					}
 				})
 				.finally(() => {});
+		},
+		qrcodeToBase64(img) {
+			this.qrcodeImgBase64 = img;
 		}
 	},
 	onLoad(options) {
 		this.id = options.id;
+		this.initQrcodeData(this.selectedReservation);
 
 		// 立即执行一次查询预约状态，确保预约状态及时更新
 		this.checkReservationStatus();

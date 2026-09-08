@@ -112,7 +112,7 @@ export default {
 						.second(0)
 						.millisecond(0);
 
-					// 开始前30分钟后，关闭该时段
+					// 开始前30分钟后，关闭该时段，暂时不需要，用户要求能一直预约直到结束时间
 					// if (now.isAfter(startTimeToday.subtract(30, 'minute'))) {
 					// 	disabled = true;
 					// }
@@ -160,10 +160,8 @@ export default {
 			if (item && !this.processedTimeSlotList[index].disabled) {
 				this.pendingSelectedTimeSlotIndex = index;
 				// 禁用状态不能选择
-                                this.$emit('time-slot-selected', { ...item }, index);
-                                this.$emit('timeSlotSelected', { ...item }, index);
-                                this.$emit('time-slot-expound', item.expound);
-				this.$emit('timeSlotExpound', item.expound);
+				this.$emit('time-slot-selected', { ...item }, index);
+				this.$emit('time-slot-expound', item.expound);
 			}
 		},
 		renderSlotTimeList(slotList = this.processedTimeSlotList) {
