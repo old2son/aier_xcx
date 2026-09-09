@@ -230,8 +230,6 @@ export default {
 			}
 		},
 		confirm() {
-			console.log(7777)
-			console.log(this.currentDocumentType.value)
 			if (this.isSubmitting) {
 				return;
 			}
@@ -305,13 +303,9 @@ export default {
 				});
 				return;
 			}
-				console.log(1111111)
-				console.log(certificateType)
 
 			if (certificateType === 'idcard') {
-				console.log(231313123)
 				const idCardAge = this.getIdCardAge(this.idNumber);
-				console.log(idCardAge)
 				if (idCardAge === null || idCardAge !== ageNumber) {
 					uni.showToast({
 						title: '年龄需与身份证信息一致',
