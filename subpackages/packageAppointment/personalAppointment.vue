@@ -187,7 +187,7 @@ export default {
 				return;
 			}
 
-			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
+			const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
@@ -226,12 +226,20 @@ export default {
 			const delayPromise = new Promise((resolve) => {
 				setTimeout(resolve, 800); // 延迟 loading 展示时间
 			});
+
+			const submitMemberList = [...this.memberList];
+			const firstAdultIndex = submitMemberList.findIndex((item) => item.userAge >= 18);
+			if (firstAdultIndex > 0) {
+				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
+				submitMemberList.unshift(firstAdultMember);
+			}
+
 			Promise.all([
 				personalReservation({
 					dateTime: this.date,
 					week: this.week,
 					timeSlot: this.selectedTimeSlot,
-					members: this.memberList,
+					members: submitMemberList,
 					expound: this.radio === '1' ? 0 : 1 // √ 是 传0，× 是 传 1
 				}),
 				delayPromise

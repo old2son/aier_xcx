@@ -331,7 +331,7 @@ export default {
 			}
 
 			if (this.memberList.length >= this.maxMembers - 1) {
-				const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
+				const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
 				if (!hasAdultMember && type === 0) {
 					this.$toast({
 						duration: 3000,

@@ -386,7 +386,7 @@ export default {
 				return;
 			}
 
-			const hasAdultMember = this.memberList.some((item) => !!item.userPhone);
+			const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
@@ -416,6 +416,13 @@ export default {
 			const delayPromise = new Promise((resolve) => {
 				setTimeout(resolve, 1500); // 至少展示 1500 毫秒
 			});
+
+			const submitMemberList = [...this.memberList];
+			const firstAdultIndex = submitMemberList.findIndex((item) => item.userAge >= 18);
+			if (firstAdultIndex > 0) {
+				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
+				submitMemberList.unshift(firstAdultMember);
+			}
 
 			Promise.all([
 				personalActivityReservation({
