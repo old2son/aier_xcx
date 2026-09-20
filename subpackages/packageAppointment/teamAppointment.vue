@@ -84,7 +84,8 @@ export default {
 		...mapState('moduleBooking', ['reservationConfigList']),
 		combinedTimeSlotList() {
 			const currentDateConfig = this.getCurrentDateConfig();
-			const currentTimeSlotList = currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
+			const currentTimeSlotList =
+				currentDateConfig && Array.isArray(currentDateConfig.timeSlots) ? currentDateConfig.timeSlots : [];
 
 			return this.timeSlotList.map((slot, index) => {
 				const numbersKey = `numbers${index + 1}`;
@@ -154,10 +155,7 @@ export default {
 				return '';
 			}
 
-			return String(dateText)
-				.replace('年', '-')
-				.replace('月', '-')
-				.replace('日', '');
+			return String(dateText).replace('年', '-').replace('月', '-').replace('日', '');
 		},
 		getTimeSlotName(slot) {
 			if (!slot) {
@@ -187,22 +185,6 @@ export default {
 			return this.reservationConfigList.find((item) => item.dateTime === currentDate) || null;
 		},
 		submit() {
-			if (!this.date) {
-				this.$toast({
-					duration: 3000,
-					message: '请选择预约日期'
-				});
-				return;
-			}
-
-			if (!this.selectedTimeSlot) {
-				this.$toast({
-					duration: 3000,
-					message: '当前日期暂无可预约时段'
-				});
-				return;
-			}
-
 			this.leaderNameError = '';
 			this.phoneNumberError = '';
 			this.unitNameError = '';
@@ -212,7 +194,7 @@ export default {
 			const phoneRegex = /^1[3-9]\d{9}$/;
 			const visitors = Number(this.visitorsNumber);
 
-			if (!this.leaderName) {
+			if (!this.leaderName?.trim()) {
 				this.leaderNameError = '领队者姓名不能为空';
 				this.scrollToTeamBox();
 				return;
@@ -222,7 +204,7 @@ export default {
 				return;
 			}
 
-			if (!this.phoneNumber) {
+			if (!this.phoneNumber?.trim()) {
 				this.phoneNumberError = '手机号不能为空';
 				this.scrollToTeamBox();
 				return;
@@ -232,7 +214,7 @@ export default {
 				return;
 			}
 
-			if (!this.unitName) {
+			if (!this.unitName?.trim()) {
 				this.unitNameError = '单位名称不能为空';
 				this.scrollToTeamBox();
 				return;
@@ -242,7 +224,7 @@ export default {
 				return;
 			}
 
-			if (!this.visitorsNumber) {
+			if (!this.visitorsNumber?.trim()) {
 				this.visitorsNumberError = '参观人数不能为空';
 				this.scrollToTeamBox();
 				return;
@@ -252,28 +234,27 @@ export default {
 				return;
 			}
 
+			if (!this.date) {
+				this.$toast({
+					duration: 3000,
+					icon: 'none',
+					message: '请选择预约日期'
+				});
+				return;
+			}
+
+			if (!this.selectedTimeSlot) {
+				this.$toast({
+					duration: 3000,
+					icon: 'none',
+					message: '当前日期暂无可预约时段'
+				});
+				return;
+			}
+
 			const currentSlot =
 				this.selectedTimeSlotIndex > -1 ? this.combinedTimeSlotList[this.selectedTimeSlotIndex] || null : null;
 			const surplusNumber = Number(currentSlot && currentSlot.surplusNumber);
-
-			if (!this.date) {
-				uni.showToast({
-					title: '请选择预约日期',
-					icon: 'none',
-					duration: 3000
-				});
-				return;
-			}
-
-			if (!this.selectedTimeSlot || !currentSlot) {
-				uni.showToast({
-					title: '请选择预约时段',
-					icon: 'none',
-					duration: 3000
-				});
-				return;
-			}
-
 			if (!Number.isNaN(surplusNumber) && visitors > surplusNumber) {
 				this.visitorsNumberError = `最多可预约 ${surplusNumber} 人`;
 				uni.showToast({

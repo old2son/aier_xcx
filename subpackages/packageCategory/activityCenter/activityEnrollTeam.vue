@@ -30,6 +30,7 @@
 			@select-cal="selectedCal = $event"
 		/>
 
+		<!-- todo：优化表单错误提示；优化滚动封装 -->
 		<ReservationTeamPanel
 			theme="activity"
 			:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
@@ -387,7 +388,7 @@ export default {
 			const phoneRegex = /^1[3-9]\d{9}$/;
 			const visitors = Number(this.visitorsNumber);
 
-			if (!this.leaderName) {
+			if (!this.leaderName?.trim()) {
 				this.leaderNameError = '领队者姓名不能为空';
 				return;
 			} else if (!nameRegex.test(this.leaderName)) {
@@ -395,7 +396,7 @@ export default {
 				return;
 			}
 
-			if (!this.phoneNumber) {
+			if (!this.phoneNumber?.trim()) {
 				this.phoneNumberError = '手机号不能为空';
 				return;
 			} else if (!phoneRegex.test(this.phoneNumber)) {
@@ -403,7 +404,7 @@ export default {
 				return;
 			}
 
-			if (!this.unitName) {
+			if (!this.unitName?.trim()) {
 				this.unitNameError = '单位名称不能为空';
 				return;
 			} else if (!nameRegex.test(this.unitName)) {
@@ -411,7 +412,7 @@ export default {
 				return;
 			}
 
-			if (!this.visitorsNumber) {
+			if (!this.visitorsNumber?.trim()) {
 				this.visitorsNumberError = '参观人数不能为空';
 				return;
 			} else if (isNaN(visitors) || visitors < 15 || visitors > 50) {
