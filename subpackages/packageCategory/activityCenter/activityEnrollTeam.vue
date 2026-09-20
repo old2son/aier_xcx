@@ -36,6 +36,7 @@
 			:form-data="{ leaderName, phoneNumber, unitName, visitorsNumber }"
 			:errors="{ leaderNameError, phoneNumberError, unitNameError, visitorsNumberError }"
 			@change="handleTeamFormChange"
+			@clear-error="clearTeamFieldError"
 		/>
 
 		<ExcelUpload @getFile="handleExcelFile" />
@@ -377,6 +378,11 @@ export default {
 		},
 		handleTeamFormChange({ field, value }) {
 			this[field] = value;
+		},
+		clearTeamFieldError(field) {
+			if (field && Object.prototype.hasOwnProperty.call(this, field)) {
+				this[field] = '';
+			}
 		},
 		submit() {
 			this.leaderNameError = '';

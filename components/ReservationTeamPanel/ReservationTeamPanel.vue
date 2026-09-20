@@ -5,7 +5,7 @@
 			type="text"
 			maxlength="8"
 			placeholder="请输入领队者姓名"
-			:value="formData.leaderName"
+			:value="localFormData.leaderName"
 			:error-message="errors.leaderNameError"
 			@input="validateInput('leaderName', $event)"
 		/>
@@ -14,7 +14,7 @@
 			type="tel"
 			maxlength="11"
 			placeholder="请输入联系手机号码"
-			:value="formData.phoneNumber"
+			:value="localFormData.phoneNumber"
 			:error-message="errors.phoneNumberError"
 			@input="updateField('phoneNumber', $event.detail)"
 		/>
@@ -23,7 +23,7 @@
 			type="text"
 			maxlength="20"
 			placeholder="请输入单位名称"
-			:value="formData.unitName"
+			:value="localFormData.unitName"
 			:error-message="errors.unitNameError"
 			@input="validateInput('unitName', $event)"
 		/>
@@ -32,7 +32,7 @@
 			type="digit"
 			maxlength="5"
 			placeholder="参观人数宜在15-50之间"
-			:value="formData.visitorsNumber"
+			:value="localFormData.visitorsNumber"
 			:error-message="errors.visitorsNumberError"
 			@input="updateField('visitorsNumber', $event.detail)"
 		/>
@@ -66,23 +66,57 @@ export default {
 			})
 		}
 	},
+	data() {
+		return {
+			localFormData: {
+				leaderName: '',
+				phoneNumber: '',
+				unitName: '',
+				visitorsNumber: ''
+			}
+		};
+	},
+	watch: {
+		formData: {
+			immediate: true,
+			deep: true,
+			handler(val) {
+				this.localFormData = {
+					leaderName: val && val.leaderName ? val.leaderName : '',
+					phoneNumber: val && val.phoneNumber ? val.phoneNumber : '',
+					unitName: val && val.unitName ? val.unitName : '',
+					visitorsNumber: val && val.visitorsNumber ? val.visitorsNumber : ''
+				};
+			}
+		}
+	},
 	methods: {
+		emitClearError(field) {
+			this.$emit('clear-error', `${field}Error`);
+		},
 		updateField(field, value) {
+			this.localFormData = {
+				...this.localFormData,
+				[field]: value
+			};
 			this.$emit('change', { field, value });
+			if (String(value || '').trim()) {
+				this.emitClearError(field);
+			}
 		},
 		validateInput(field, event) {
-			const value = event.detail;
-			const allowedRegex = /^[a-zA-Z\u4e00-\u9fa5\s]*$/;
-			if (!allowedRegex.test(value)) {
-				this.updateField(field, value.replace(/[^a-zA-Z\u4e00-\u9fa5\s]/g, ''));
+			const value = String(event.detail || '');
+			const nextValue = String(value || '').replace(/[^a-zA-Z\u4e00-\u9fa5\s]/g, '');
+
+			if (nextValue !== value) {
 				uni.showToast({
 					title: '只能输入英文或中文，不允许特殊符号或数字',
 					icon: 'none',
 					duration: 3000
 				});
-				return;
 			}
-			this.updateField(field, value);
+
+			this.updateField(field, nextValue);
 		}
 	}
 };
