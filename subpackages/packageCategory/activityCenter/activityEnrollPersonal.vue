@@ -22,7 +22,7 @@
 			@select-cal="selectedCal = $event"
 		/>
 
-		<ReservationMemberPanel :member-list="memberList" :child-age-max="17" @change="memberList = $event" />
+		<ReservationMemberPanel :member-list="memberList" @change="memberList = $event" />
 
 		<!-- <view class="partner-title">您了解本次活动的渠道</view>
 		<van-dropdown-menu>
@@ -76,6 +76,8 @@ export default {
 			// ],
 			// channel: '人人通',
 
+			adultAge: 18,
+
 			memberList: [],
 
 			selectedCal: null,
@@ -111,7 +113,7 @@ export default {
 		// 合并时段数据和预约人数
 		combinedTimeSlotList() {
 			const currentDateActivityList = this.getCurrentDateActivityList();
-			console.log('currentDateActivityList', currentDateActivityList);
+			
 			return currentDateActivityList.map((activityItem) => {
 				const fixedTimeSlot = this.getFixedTimeSlotName(activityItem);
 				const surplusNumber = this.getActivitySurplusNumber(activityItem);
@@ -386,7 +388,7 @@ export default {
 				return;
 			}
 
-			const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
+			const hasAdultMember = this.memberList.some((item) => Number(item.userAge) >= this.adultAge);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
@@ -418,7 +420,7 @@ export default {
 			});
 
 			const submitMemberList = [...this.memberList];
-			const firstAdultIndex = submitMemberList.findIndex((item) => item.userAge >= 18);
+			const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
 			if (firstAdultIndex > 0) {
 				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
 				submitMemberList.unshift(firstAdultMember);

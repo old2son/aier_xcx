@@ -169,7 +169,7 @@ export default {
 		},
 		childAgeMax: {
 			type: Number,
-			default: 18
+			default: 17
 		},
 		adultAgeMin: {
 			type: Number,
@@ -331,7 +331,7 @@ export default {
 			}
 
 			if (this.memberList.length >= this.maxMembers - 1) {
-				const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
+				const hasAdultMember = this.memberList.some((item) => item.userAge >= this.adultAgeMin);
 				if (!hasAdultMember && type === 0) {
 					this.$toast({
 						duration: 3000,

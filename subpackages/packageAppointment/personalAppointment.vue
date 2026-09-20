@@ -14,7 +14,7 @@
 			@select-cal="selectedCal = $event"
 		/>
 
-		<ReservationMemberPanel :member-list="memberList" :child-age-max="17" @change="memberList = $event" />
+		<ReservationMemberPanel :member-list="memberList" @change="memberList = $event" />
 
 		<view class="explain-service-title">是否需要讲解服务</view>
 
@@ -61,6 +61,8 @@ export default {
 
 			radio: '0',
 			needExplainServiceNum: 0, // 需要讲解服务的人数，后台获取
+
+			adultAge: 18,
 
 			memberList: [],
 
@@ -187,7 +189,7 @@ export default {
 				return;
 			}
 
-			const hasAdultMember = this.memberList.some((item) => item.userAge >= 18);
+			const hasAdultMember = this.memberList.some((item) => Number(item.userAge)  >= this.adultAge);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
@@ -228,7 +230,7 @@ export default {
 			});
 
 			const submitMemberList = [...this.memberList];
-			const firstAdultIndex = submitMemberList.findIndex((item) => item.userAge >= 18);
+			const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
 			if (firstAdultIndex > 0) {
 				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
 				submitMemberList.unshift(firstAdultMember);
