@@ -16,7 +16,7 @@
 					<text>游客信息</text>
 
 					<text>{{
-						!selectedReservation.members.length
+						selectedReservation.type === 2 || selectedReservation.type === 4
 							? selectedReservation.name
 							: getMember(selectedReservation).userName
 					}}</text>
@@ -24,7 +24,7 @@
 				<view class="col-2">
 					<text>联系电话</text>
 					<text>{{
-						!selectedReservation.members.length
+						selectedReservation.type === 2 || selectedReservation.type === 4
 							? selectedReservation.phone
 							: getMember(selectedReservation).userPhone
 					}}</text>

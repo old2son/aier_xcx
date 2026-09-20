@@ -51,7 +51,7 @@
 				<view class="row">
 					<text class="row-title">预约人：</text>
 					<text class="row-cont">{{
-						!selectedReservation.members || !selectedReservation.members.length
+						selectedReservation.type === 2 || selectedReservation.type === 4
 							? selectedReservation.name
 							: getMember(selectedReservation).userName
 					}}</text>
@@ -67,7 +67,7 @@
 				</view>
 			</view>
 		</view>
-		
+
 		<!-- 入场凭证画布 -->
 		<canvas
 			canvas-id="credentialCanvas"
@@ -104,23 +104,23 @@ export default {
 		reservationType() {
 			const item = this.selectedReservation || {};
 
-			const isActivity = Number(item.activityId) !== 0;
-
-			const isPersonal = Array.isArray(item.members) && item.members.length > 0;
-
-			if (isActivity && isPersonal) {
-				return '活动预约（个人）';
-			}
-
-			if (isActivity && !isPersonal) {
-				return '活动预约（团队）';
-			}
-
-			if (!isActivity && isPersonal) {
+			if (item.type === 1) {
 				return '个人预约';
 			}
 
-			return '团队预约';
+			if (item.type === 2) {
+				return '团队预约';
+			}
+
+			if (item.type === 3) {
+				return '活动预约（个人）';
+			}
+
+			if (item.type === 4) {
+				return '活动预约（团队）';
+			}
+
+			return '';
 		},
 		cardClass() {
 			const type = this.reservationType;

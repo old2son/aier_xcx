@@ -30,11 +30,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getDisplayName(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.name : getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ getDisplayPhone(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.phone : getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -78,11 +78,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getDisplayName(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.name : getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ getDisplayPhone(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.phone : getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
@@ -121,11 +121,11 @@
 									<view @click="toApppintmentDetail(item)">
 										<view class="col-2">
 											<text>游客信息</text>
-											<text>{{ getDisplayName(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.name : getDisplayName(item) }}</text>
 										</view>
 										<view class="col-3">
 											<text>联系电话</text>
-											<text>{{ getDisplayPhone(item) }}</text>
+											<text>{{ item.type === 2 || item.type === 4 ? item.phone : getDisplayPhone(item) }}</text>
 										</view>
 										<view class="col-4">
 											<text>同行人数</text>
