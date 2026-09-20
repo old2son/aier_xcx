@@ -1,9 +1,16 @@
 <template>
 	<view class="date-picker" :class="{ 'single-day': isSingleDayDisplay }">
-		<view class="weekdays" :class="{ 'weekdays-single': isSingleDayDisplay }">
+		<scroll-view
+			class="weekdays"
+			:class="{ 'weekdays-single': isSingleDayDisplay }"
+			scroll-x
+			scroll-with-animation
+			:scroll-into-view="scrollIntoViewTarget"
+		>
 			<view
 				v-for="(day, index) in days"
 				:key="index"
+				:id="getDayItemId(index)"
 				:class="{
 					disabled: day.disabled,
 					'date-selected': selectedDayIndex === index,
@@ -16,7 +23,7 @@
 				<text>{{ day.week }}</text>
 				<text>{{ day.date }}</text>
 			</view>
-		</view>
+		</scroll-view>
 
 		<van-popup
 			:show="showActivityPopup"
@@ -86,7 +93,8 @@ export default {
 			days: [],
 			midnightTimer: null, // 用于每天自动更新的计时器
 			selectedDayIndex: -1, // 选中的日期
-			showActivityPopup: false
+			showActivityPopup: false,
+			scrollIntoViewTarget: ''
 		};
 	},
 	computed: {
@@ -112,10 +120,28 @@ export default {
 		selectedCal(newVal) {
 			if (!newVal) return;
 			this.applySelectedCal(newVal);
+		},
+		selectedDayIndex(newVal) {
+			this.updateScrollIntoView(newVal);
 		}
 	},
 	methods: {
 		...mapMutations('moduleActivity', ['setHasShownActivityPopup']),
+		getDayItemId(index) {
+			return `date-day-item-${index}`;
+		},
+		updateScrollIntoView(index) {
+			if (index < 0) {
+				this.scrollIntoViewTarget = '';
+				return;
+			}
+
+			const nextTarget = this.getDayItemId(index);
+			this.scrollIntoViewTarget = '';
+			this.$nextTick(() => {
+				this.scrollIntoViewTarget = nextTarget;
+			});
+		},
 		getSelectedActivityList() {
 			const sameNameActivityList = this.selectedActivity && this.selectedActivity.sameNameActivityList;
 			if (Array.isArray(sameNameActivityList) && sameNameActivityList.length) {
@@ -144,7 +170,9 @@ export default {
 
 			return this.getSelectedActivityList().some((activity) => {
 				const startDate = this.normalizeDateText(activity && activity.activityTime);
-				const endDate = this.normalizeDateText((activity && activity.endDate) || (activity && activity.activityTime));
+				const endDate = this.normalizeDateText(
+					(activity && activity.endDate) || (activity && activity.activityTime)
+				);
 				if (!startDate || !endDate) {
 					return false;
 				}
@@ -164,7 +192,9 @@ export default {
 
 				this.getSelectedActivityList().forEach((activity) => {
 					const startDate = this.normalizeDateText(activity && activity.activityTime);
-					const endDate = this.normalizeDateText((activity && activity.endDate) || (activity && activity.activityTime));
+					const endDate = this.normalizeDateText(
+						(activity && activity.endDate) || (activity && activity.activityTime)
+					);
 					if (!startDate || !endDate) {
 						return;
 					}
@@ -182,7 +212,9 @@ export default {
 					}
 				});
 
-				const activityDateList = Array.from(dateMap.values()).sort((prev, next) => prev.valueOf() - next.valueOf());
+				const activityDateList = Array.from(dateMap.values()).sort(
+					(prev, next) => prev.valueOf() - next.valueOf()
+				);
 				if (activityDateList.length) {
 					return activityDateList;
 				}
@@ -194,7 +226,9 @@ export default {
 		// 生成展示日期信息
 		generateWeekDays() {
 			const currentSelectedDay = this.days[this.selectedDayIndex] || null;
-			const currentSelectedKey = currentSelectedDay ? `${currentSelectedDay.year}-${currentSelectedDay.date}` : '';
+			const currentSelectedKey = currentSelectedDay
+				? `${currentSelectedDay.year}-${currentSelectedDay.date}`
+				: '';
 
 			const dateList = this.getDisplayDateList();
 			const daysArray = [];
@@ -230,6 +264,9 @@ export default {
 
 			const nextIndex = this.days.findIndex((day) => `${day.year}-${day.date}` === currentSelectedKey);
 			this.selectedDayIndex = nextIndex;
+			if (nextIndex > -1) {
+				this.updateScrollIntoView(nextIndex);
+			}
 		},
 		// 获取星期几的中文名称
 		getWeekDayName(day) {
@@ -304,7 +341,9 @@ export default {
 				}
 
 				this.generateWeekDays();
-				const existingIndex = this.days.findIndex((day) => day.year === dayFromCal.year && day.date === dayFromCal.date);
+				const existingIndex = this.days.findIndex(
+					(day) => day.year === dayFromCal.year && day.date === dayFromCal.date
+				);
 				if (existingIndex > -1) {
 					this.selectedDayIndex = -1;
 					this.selectDay(this.days[existingIndex], existingIndex);
@@ -324,8 +363,11 @@ export default {
 					this.generateWeekDays();
 				}
 
-				const existingIndex = this.days.findIndex((day) => day.year === dayFromCal.year && day.date === dayFromCal.date);
-				const nextIndex = existingIndex > -1 ? existingIndex : Math.min(Math.max(selectedIndex, 0), this.days.length - 1);
+				const existingIndex = this.days.findIndex(
+					(day) => day.year === dayFromCal.year && day.date === dayFromCal.date
+				);
+				const nextIndex =
+					existingIndex > -1 ? existingIndex : Math.min(Math.max(selectedIndex, 0), this.days.length - 1);
 
 				this.selectedDayIndex = -1;
 				this.selectDay(this.days[nextIndex], nextIndex);
@@ -426,27 +468,23 @@ export default {
 
 	.weekdays {
 		width: 100%;
-		display: flex;
-		justify-content: flex-start;
-		overflow-x: auto; // 允许横向滚动
-		scroll-behavior: smooth; // 滚动顺滑
 		padding-bottom: 20rpx; // 可以适当调整滚动条区域的高度
+		white-space: nowrap;
 	}
 
 	.weekdays-single {
-		justify-content: flex-start;
-		overflow-x: hidden;
 		padding-bottom: 0;
 	}
 
 	.day-item {
-		display: flex;
+		display: inline-flex;
 		flex-direction: column;
 		align-items: stretch;
 		position: relative;
 		margin-right: 0rpx;
 		background-color: #ebf1ff;
 		text-align: center;
+		vertical-align: top;
 		border-radius: 12rpx;
 		padding: 20rpx;
 		box-sizing: border-box;

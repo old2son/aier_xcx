@@ -44,8 +44,8 @@
 			:selectedTimeSlotIndex="selectedTimeSlotIndex"
 			:needTimeSlotRequest="needTimeSlotRequest"
 			:select-day="date"
-                        @time-slot-selected="handleTimeSlotSelected"
-                        @time-slot-expound="handletimeSlotExpound"
+			@time-slot-selected="handleTimeSlotSelected"
+			@time-slot-expound="handletimeSlotExpound"
 		/>
 	</view>
 </template>
@@ -176,7 +176,7 @@ export default {
 		},
 		handletimeSlotExpound(expound) {
 			this.$emit('time-slot-expound', expound);
-		},
+		}
 	},
 	mounted() {
 		this.getActivityData();
