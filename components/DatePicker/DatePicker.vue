@@ -412,18 +412,19 @@ export default {
 			// 	});
 			// }
 
-			this.isActivityDay = isInActivityRange(currentDate, this.activeList);
-			if (this.isActivityDay && isInCurrentFiveDays && !this.hasShownActivityPopup) {
-				const pages = getCurrentPages();
-				const currentPage = pages[pages.length - 1];
+			const isActivityDay = isInActivityRange(currentDate, this.activeList);
+			const shouldCheckPopup = isActivityDay && isInCurrentFiveDays && !this.hasShownActivityPopup;
 
-				if (currentPage.route.includes('activityCenter')) {
-					this.showActivityPopup = false;
-					return;
-				}
-
-				this.showActivityPopup = true;
+			if (!shouldCheckPopup) {
+				this.showActivityPopup = false;
+				return;
 			}
+
+			const pages = getCurrentPages();
+			const currentPage = pages[pages.length - 1];
+			const isActivityCenterPage = currentPage && currentPage.route.includes('activityCenter');
+
+			this.showActivityPopup = !isActivityCenterPage;
 		},
 		getDefaultReservationTimeSlotNumbers() {
 			// 找到第一个没有禁用的日期
@@ -468,12 +469,12 @@ export default {
 
 	.weekdays {
 		width: 100%;
-		padding-bottom: 20rpx; // 可以适当调整滚动条区域的高度
+		padding-bottom: 8rpx; // 可以适当调整滚动条区域的高度
 		white-space: nowrap;
 	}
 
 	.weekdays-single {
-		padding-bottom: 0;
+		// padding-bottom: 0;
 	}
 
 	.day-item {
