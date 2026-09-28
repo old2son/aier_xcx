@@ -2,10 +2,13 @@
 	<view class="date-time-panel" :class="[`theme-${theme}`]">
 		<view class="date-title">{{ dateTitle }}</view>
 
-		<view class="date-wrap">
+		<view class="date-wrap" :class="{ 'date-wrap-loading': isDateLoading }">
 			<view v-if="isDateLoading" class="date-loading">
-				<view class="date-loading-spinner"></view>
-				<text class="date-loading-text">日期加载中...</text>
+				<view class="date-loading-main">
+					<view class="date-loading-spinner"></view>
+					<text class="date-loading-text">日期加载中...</text>
+				</view>
+				<text class="date-loading-tip">活动日期较多，正在整理可预约日期</text>
 			</view>
 			<template v-else>
 				<DatePicker
@@ -25,10 +28,6 @@
 				</view>
 			</template>
 		</view>
-		<view v-if="isDateLoading" class="date-loading-tip">
-			活动日期较多，正在整理可预约日期
-		</view>
-
 		<CalendarPick
 			v-if="!isDateLoading && Array.isArray(activeList)"
 			:isActivity="isActivity"
@@ -217,15 +216,26 @@ export default {
 	min-height: 124rpx;
 }
 
+.date-wrap-loading {
+	height: 124rpx;
+}
+
 .date-loading {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
 	flex: 1;
-	min-height: 124rpx;
+	height: 100%;
 	padding: 0 28rpx;
 	border-radius: 16rpx;
 	background: linear-gradient(90deg, #f4f8ff 0%, #eef5ff 100%);
 	box-sizing: border-box;
+}
+
+.date-loading-main {
+	display: flex;
+	align-items: center;
 }
 
 .date-loading-spinner {
@@ -244,11 +254,10 @@ export default {
 }
 
 .date-loading-tip {
-	min-height: 34rpx;
-	line-height: 34rpx;
-	margin-top: 12rpx;
+	line-height: 1.4;
+	margin-top: 10rpx;
 	color: #8aa3c9;
-	font-size: 24rpx;
+	font-size: 22rpx;
 }
 
 .calendar-trigger {
