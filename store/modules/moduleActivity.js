@@ -3,6 +3,8 @@ import { getScienceActivityInProgress, getScienceActivityEvents } from '@/api/in
 
 function formatFutureList(startingList, futureList) {
 	const allList = [...startingList, ...futureList];
+	const today = dayjs().startOf('day');
+	const maxDate = today.add(30, 'day');
 
 	const formatList = allList.map((item) => ({
 		startDate: item.activityTime || '',
@@ -10,7 +12,15 @@ function formatFutureList(startingList, futureList) {
 	}));
 
 	return formatList.filter((item, index, self) => {
-		return index === self.findIndex((v) => v.startDate === item.startDate && v.endDate === item.endDate);
+		// 日期相同，只显示一个
+		const isSameDateRange = index === self.findIndex((v) => v.startDate === item.startDate && v.endDate === item.endDate);
+
+		const startDate = dayjs(item.startDate).startOf('day');
+		const endDate = dayjs(item.endDate).startOf('day');
+		// 活动日期区间与今天到未来30天有交集时才保留
+		const hasDateInRange = !endDate.isBefore(today, 'day') && !startDate.isAfter(maxDate, 'day');
+
+		return isSameDateRange && hasDateInRange;
 	});
 }
 
