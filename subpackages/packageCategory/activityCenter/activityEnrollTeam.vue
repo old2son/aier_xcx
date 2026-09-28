@@ -45,9 +45,11 @@
 
 		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
 
-		<LoginButton @successAuth="submit">
+		<LoginButton :loading="isSubmitting" @successAuth="submit">
 			<view class="submit-btn">
-				<button class="custom-button">确认提交</button>
+				<button class="custom-button" :disabled="isSubmitting">
+					{{ isSubmitting ? '提交中...' : '确认提交' }}
+				</button>
 			</view>
 		</LoginButton>
 
@@ -93,7 +95,8 @@ export default {
 
 			selectedCal: null,
 			base64File: '',
-			isInActivityDateRange: true
+			isInActivityDateRange: true,
+			isSubmitting: false
 		};
 	},
 	computed: {
@@ -385,6 +388,10 @@ export default {
 			}
 		},
 		submit() {
+			if (this.isSubmitting) {
+				return;
+			}
+
 			this.leaderNameError = '';
 			this.phoneNumberError = '';
 			this.unitNameError = '';
@@ -466,6 +473,8 @@ export default {
 				return;
 			}
 
+			this.isSubmitting = true;
+
 			uni.showLoading({
 				title: '提交中...',
 				mask: true
@@ -495,6 +504,7 @@ export default {
 				})
 				.finally(() => {
 					uni.hideLoading();
+					this.isSubmitting = false;
 				});
 		}
 	},
@@ -701,7 +711,12 @@ export default {
 		font-size: 40rpx;
 		border-radius: 50rpx;
 		color: #fff;
+		opacity: 1;
 		background-color: #32579c;
+	}
+
+	.custom-button[disabled] {
+		opacity: 0.7;
 	}
 }
 

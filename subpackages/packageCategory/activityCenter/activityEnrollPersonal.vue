@@ -31,9 +31,11 @@
 
 		<view class="tip-title">提示：活动时段固定，名额有限，报满即止。</view>
 
-		<LoginButton @successAuth="submit">
+		<LoginButton :loading="isSubmitting" @successAuth="submit">
 			<view class="submit-btn">
-				<van-button color="#32579c" round size="large">确认提交</van-button>
+				<van-button :loading="isSubmitting" color="#32579c" round size="large">
+					{{ isSubmitting ? '提交中...' : '确认提交' }}
+				</van-button>
 			</view>
 		</LoginButton>
 
@@ -77,6 +79,7 @@ export default {
 			// channel: '人人通',
 
 			adultAge: 18,
+			isSubmitting: false,
 
 			memberList: [],
 
@@ -372,6 +375,10 @@ export default {
 		// 	this.channel = this.partnerOptionC[value.detail].text;
 		// },
 		async submit() {
+			if (this.isSubmitting) {
+				return;
+			}
+
 			if (!this.date) {
 				this.$toast({
 					duration: 3000,
@@ -408,42 +415,45 @@ export default {
 				return;
 			}
 
-			await requestSubscribe();
+			this.isSubmitting = true;
 
-			uni.showLoading({
-				title: '提交中...',
-				mask: true
-			});
-			// 包装请求和定时器为一个 Promise
-			const delayPromise = new Promise((resolve) => {
-				setTimeout(resolve, 1500); // 至少展示 1500 毫秒
-			});
+			try {
+				await requestSubscribe();
 
-			const submitMemberList = [...this.memberList];
-			const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
-			if (firstAdultIndex > 0) {
-				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
-				submitMemberList.unshift(firstAdultMember);
-			}
-
-			Promise.all([
-				personalActivityReservation({
-					activityId: this.requestResult.activityId,
-					activityName: this.requestResult.activityName,
-					// channel: this.channel,
-					dateTime: this.date,
-					// timeSlot: this.selectedTimeSlot,
-					week: this.week,
-					members: this.memberList
-				}),
-				delayPromise
-			])
-				.then(([res]) => {
-					handleReservationResult(this, res);
-				})
-				.finally(() => {
-					uni.hideLoading();
+				uni.showLoading({
+					title: '提交中...',
+					mask: true
 				});
+				// 包装请求和定时器为一个 Promise
+				const delayPromise = new Promise((resolve) => {
+					setTimeout(resolve, 1500); // 至少展示 1500 毫秒
+				});
+
+				const submitMemberList = [...this.memberList];
+				const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
+				if (firstAdultIndex > 0) {
+					const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
+					submitMemberList.unshift(firstAdultMember);
+				}
+
+				const [res] = await Promise.all([
+					personalActivityReservation({
+						activityId: this.requestResult.activityId,
+						activityName: this.requestResult.activityName,
+						// channel: this.channel,
+						dateTime: this.date,
+						// timeSlot: this.selectedTimeSlot,
+						week: this.week,
+						members: this.memberList
+					}),
+					delayPromise
+				]);
+
+				handleReservationResult(this, res);
+			} finally {
+				uni.hideLoading();
+				this.isSubmitting = false;
+			}
 		}
 	},
 	onLoad() {

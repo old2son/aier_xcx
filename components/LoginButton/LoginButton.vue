@@ -1,5 +1,5 @@
 <template>
-	<view @click="handleClick">
+	<view class="login-button" :class="{ 'is-loading': loading }" @click="handleClick">
 		<slot></slot>
 	</view>
 </template>
@@ -8,12 +8,22 @@
 import store from '@/store';
 
 export default {
+	props: {
+		loading: {
+			type: Boolean,
+			default: false
+		}
+	},
 	methods: {
 		async handleClick() {
+			if (this.loading) {
+				return;
+			}
+
 			const token = uni.getStorageSync('token');
-            const pages = getCurrentPages();
+			const pages = getCurrentPages();
 			const currentPage = pages[pages.length - 1];
-            const url = currentPage.route.split('/').pop();
+			const url = currentPage.route.split('/').pop();
 
 			if (token) {
 				store.dispatch('moduleUser/getUserInfo').then((resp) => {
@@ -30,10 +40,16 @@ export default {
 				});
 			} else {
 				uni.navigateTo({
-                    url: `/subpackages/packageLogin/login?redirectUrl=${url}`
+					url: `/subpackages/packageLogin/login?redirectUrl=${url}`
 				});
 			}
 		}
 	}
 };
 </script>
+
+<style scoped>
+.login-button.is-loading {
+	pointer-events: none;
+}
+</style>

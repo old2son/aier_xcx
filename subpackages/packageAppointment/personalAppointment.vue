@@ -28,10 +28,12 @@
 			</van-radio>
 		</van-radio-group>
 		<view class="tip-title-2">提示：满15人将自动成团，我馆提供科普讲解服务</view>
-		
-		<LoginButton @successAuth="submit">
+
+		<LoginButton :loading="isSubmitting" @successAuth="submit">
 			<view class="submit-btn">
-				<van-button color="#32579c" round size="large"> 确认提交 </van-button>
+				<van-button :loading="isSubmitting" color="#32579c" round size="large">
+					{{ isSubmitting ? '提交中...' : '确认提交' }}
+				</van-button>
 			</view>
 		</LoginButton>
 
@@ -63,6 +65,7 @@ export default {
 			needExplainServiceNum: 0, // 需要讲解服务的人数，后台获取
 
 			adultAge: 18,
+			isSubmitting: false,
 
 			memberList: [],
 
@@ -172,7 +175,10 @@ export default {
 			this.needExplainServiceNum = expound;
 		},
 		async submit(a) {
-			console.log('submit', a);
+			if (this.isSubmitting) {
+				return;
+			}
+
 			if (!this.date) {
 				this.$toast({
 					duration: 3000,
@@ -189,7 +195,7 @@ export default {
 				return;
 			}
 
-			const hasAdultMember = this.memberList.some((item) => Number(item.userAge)  >= this.adultAge);
+			const hasAdultMember = this.memberList.some((item) => Number(item.userAge) >= this.adultAge);
 			if (this.memberList.length === 0 || !hasAdultMember) {
 				this.$toast({
 					duration: 3000,
@@ -218,40 +224,43 @@ export default {
 				return;
 			}
 
-			await requestSubscribe();
+			this.isSubmitting = true;
 
-			uni.showLoading({
-				title: '提交中...',
-				mask: true
-			});
-			// 包装请求和定时器为一个 Promise
-			const delayPromise = new Promise((resolve) => {
-				setTimeout(resolve, 800); // 延迟 loading 展示时间
-			});
+			try {
+				await requestSubscribe();
 
-			const submitMemberList = [...this.memberList];
-			const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
-			if (firstAdultIndex > 0) {
-				const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
-				submitMemberList.unshift(firstAdultMember);
-			}
-
-			Promise.all([
-				personalReservation({
-					dateTime: this.date,
-					week: this.week,
-					timeSlot: this.selectedTimeSlot,
-					members: submitMemberList,
-					expound: this.radio === '1' ? 0 : 1 // √ 是 传0，× 是 传 1
-				}),
-				delayPromise
-			])
-				.then(([res]) => {
-					handleReservationResult(this, res);
-				})
-				.finally(() => {
-					uni.hideLoading();
+				uni.showLoading({
+					title: '提交中...',
+					mask: true
 				});
+				// 包装请求和定时器为一个 Promise
+				const delayPromise = new Promise((resolve) => {
+					setTimeout(resolve, 800); // 延迟 loading 展示时间
+				});
+
+				const submitMemberList = [...this.memberList];
+				const firstAdultIndex = submitMemberList.findIndex((item) => Number(item.userAge) >= this.adultAge);
+				if (firstAdultIndex > 0) {
+					const [firstAdultMember] = submitMemberList.splice(firstAdultIndex, 1);
+					submitMemberList.unshift(firstAdultMember);
+				}
+
+				const [res] = await Promise.all([
+					personalReservation({
+						dateTime: this.date,
+						week: this.week,
+						timeSlot: this.selectedTimeSlot,
+						members: submitMemberList,
+						expound: this.radio === '1' ? 0 : 1 // √ 是 传0，× 是 传 1
+					}),
+					delayPromise
+				]);
+
+				handleReservationResult(this, res);
+			} finally {
+				uni.hideLoading();
+				this.isSubmitting = false;
+			}
 		}
 	},
 	mounted() {

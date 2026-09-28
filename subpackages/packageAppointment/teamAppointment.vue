@@ -33,9 +33,11 @@
 
 		<OnlineAsk :askInfo="askInfo" />
 
-		<LoginButton @successAuth="submit">
+		<LoginButton :loading="isSubmitting" @successAuth="submit">
 			<view class="submit-btn">
-				<button class="custom-button">确认提交</button>
+				<button class="custom-button" :disabled="isSubmitting">
+					{{ isSubmitting ? '提交中...' : '确认提交' }}
+				</button>
 			</view>
 		</LoginButton>
 
@@ -78,7 +80,8 @@ export default {
 			visitorsNumberError: '',
 
 			selectedCal: null,
-			base64File: ''
+			base64File: '',
+			isSubmitting: false
 		};
 	},
 	computed: {
@@ -191,6 +194,10 @@ export default {
 			return this.reservationConfigList.find((item) => item.dateTime === currentDate) || null;
 		},
 		submit() {
+			if (this.isSubmitting) {
+				return;
+			}
+
 			this.leaderNameError = '';
 			this.phoneNumberError = '';
 			this.unitNameError = '';
@@ -281,6 +288,8 @@ export default {
 				return;
 			}
 
+			this.isSubmitting = true;
+
 			uni.showLoading({
 				title: '提交中...',
 				mask: true
@@ -308,6 +317,7 @@ export default {
 				})
 				.finally(() => {
 					uni.hideLoading();
+					this.isSubmitting = false;
 				});
 		}
 	},
@@ -351,10 +361,15 @@ export default {
 	.custom-button {
 		background-color: #32579c;
 		color: #fff;
+		opacity: 1;
 		border-radius: 50rpx;
 		font-size: 40rpx;
 		height: 88rpx;
 		line-height: 88rpx;
+	}
+
+	.custom-button[disabled] {
+		opacity: 0.7;
 	}
 }
 
