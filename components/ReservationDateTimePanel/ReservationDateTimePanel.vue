@@ -3,25 +3,34 @@
 		<view class="date-title">{{ dateTitle }}</view>
 
 		<view class="date-wrap">
-			<DatePicker
-				v-if="Array.isArray(activeList)"
-				:isActivity="isActivity"
-				:disabled-weekdays="disabledWeekdays"
-				:selected-cal="selectedCal"
-				:needTimeSlotRequest="needTimeSlotRequest"
-				:active-list="activeList"
-				:reservation-config-list="reservationConfigList"
-				@date-selected="handleDateSelected"
-				@time-slot-numbers="handleTimeSlotNumbers"
-			/>
-			<view class="calendar-trigger" @click="isShowCal = true">
-				<van-icon name="calendar-o" :color="calendarIconColor" />
-				<van-icon name="arrow-down" :color="calendarIconColor" />
+			<view v-if="isDateLoading" class="date-loading">
+				<view class="date-loading-spinner"></view>
+				<text class="date-loading-text">日期加载中...</text>
 			</view>
+			<template v-else>
+				<DatePicker
+					v-if="Array.isArray(activeList)"
+					:isActivity="isActivity"
+					:disabled-weekdays="disabledWeekdays"
+					:selected-cal="selectedCal"
+					:needTimeSlotRequest="needTimeSlotRequest"
+					:active-list="activeList"
+					:reservation-config-list="reservationConfigList"
+					@date-selected="handleDateSelected"
+					@time-slot-numbers="handleTimeSlotNumbers"
+				/>
+				<view class="calendar-trigger" @click="isShowCal = true">
+					<van-icon name="calendar-o" :color="calendarIconColor" />
+					<van-icon name="arrow-down" :color="calendarIconColor" />
+				</view>
+			</template>
+		</view>
+		<view v-if="isDateLoading" class="date-loading-tip">
+			活动日期较多，正在整理可预约日期
 		</view>
 
 		<CalendarPick
-			v-if="Array.isArray(activeList)"
+			v-if="!isDateLoading && Array.isArray(activeList)"
 			:isActivity="isActivity"
 			:show-popup="isShowCal"
 			:what-a-day="date"
@@ -115,7 +124,8 @@ export default {
 	data() {
 		return {
 			isShowCal: false,
-			activeList: null
+			activeList: null,
+			isDateLoading: true
 		};
 	},
 	computed: {
@@ -133,6 +143,9 @@ export default {
 				this.activeList = this.futureList;
 			} catch (e) {
 				console.error('接口获取失败', e);
+				this.activeList = [];
+			} finally {
+				this.isDateLoading = false;
 			}
 		},
 		parseDateText(dateText) {
@@ -201,6 +214,41 @@ export default {
 	align-items: center;
 	width: 100%;
 	gap: 20rpx;
+	min-height: 124rpx;
+}
+
+.date-loading {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-height: 124rpx;
+	padding: 0 28rpx;
+	border-radius: 16rpx;
+	background: linear-gradient(90deg, #f4f8ff 0%, #eef5ff 100%);
+	box-sizing: border-box;
+}
+
+.date-loading-spinner {
+	width: 32rpx;
+	height: 32rpx;
+	border: 4rpx solid rgba(96, 162, 254, 0.18);
+	border-top-color: #60a2fe;
+	border-radius: 50%;
+	animation: date-loading-spin 0.8s linear infinite;
+}
+
+.date-loading-text {
+	margin-left: 16rpx;
+	color: #5c84c7;
+	font-size: 26rpx;
+}
+
+.date-loading-tip {
+	min-height: 34rpx;
+	line-height: 34rpx;
+	margin-top: 12rpx;
+	color: #8aa3c9;
+	font-size: 24rpx;
 }
 
 .calendar-trigger {
@@ -245,7 +293,6 @@ export default {
 
 	.date-title {
 		margin-top: 56rpx;
-		margin-bottom: 6rpx;
 	}
 
 	.time-title {
@@ -258,6 +305,16 @@ export default {
 		color: #32579c;
 		font-size: 28rpx;
 		line-height: 1.5;
+	}
+}
+
+@keyframes date-loading-spin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
 	}
 }
 </style>
