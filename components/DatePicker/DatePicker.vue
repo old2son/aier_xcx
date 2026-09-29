@@ -189,6 +189,7 @@ export default {
 		getDisplayDateList() {
 			if (this.isActivity) {
 				const dateMap = new Map();
+				const today = dayjs().startOf('day');
 
 				this.getSelectedActivityList().forEach((activity) => {
 					const startDate = this.normalizeDateText(activity && activity.activityTime);
@@ -205,9 +206,14 @@ export default {
 						return;
 					}
 
-					const totalDays = end.diff(start, 'day');
+					const visibleStart = start.isBefore(today) ? today : start;
+					if (visibleStart.isAfter(end, 'day')) {
+						return;
+					}
+
+					const totalDays = end.diff(visibleStart, 'day');
 					for (let i = 0; i <= totalDays; i++) {
-						const current = start.add(i, 'day');
+						const current = visibleStart.add(i, 'day');
 						dateMap.set(current.format('YYYY-MM-DD'), current);
 					}
 				});
