@@ -1,4 +1,6 @@
 <template>
+	<page-meta :page-style="'overflow:' + (showReservationPopup ? 'hidden' : 'visible')"></page-meta>
+
 	<view class="team-reservation-container">
 		<view class="tip-title-1">
 			<view>预约说明：</view>

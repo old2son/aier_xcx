@@ -1,4 +1,6 @@
 <template>
+	<page-meta :page-style="'overflow:' + (showReservationPopup ? 'hidden' : 'visible')"></page-meta>
+
 	<view class="personal-appointment-container">
 		<ReservationDateTimePanel
 			:selected-cal="selectedCal"

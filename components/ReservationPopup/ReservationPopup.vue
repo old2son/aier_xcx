@@ -2,6 +2,7 @@
 	<van-popup
 		round
 		position="center"
+		overlay-style="overflow: hidden"
 		:show="showPopup"
 		:close-on-click-overlay="false"
 		custom-style="width:85%;height:90%"
