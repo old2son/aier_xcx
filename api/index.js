@@ -19,6 +19,13 @@ export const getScienceHomeBaseDynamics = () =>
 		url: baseUrl + '/api/user/getScienceHomeBaseDynamics'
 	});
 
+// 搜索
+export const getSearchSuggestions = (params) =>
+	request({
+		url: baseUrl + '/api/user/searchScience',
+		data: params,
+	});
+
 /* ———— 登录页面接口 ———— */
 // 小程序登录
 export const miniProgramLogin = (params) =>

@@ -21,7 +21,8 @@ export default {
 		return {
 			articleId: '',
 			pageTitle: '详情',
-			imageUrl: ''
+			imageUrl: '',
+			webviewUrl: ''
 		};
 	},
 	computed: {
@@ -29,10 +30,23 @@ export default {
 	},
 	methods: {
 		initDetail() {
-            scienceArticleInformation({ specialId: this.articleId }).then(res => {
-                this.imageUrl = res.data.videoUrl
-                this.pageTitle = res.data.specialName
-            })
+			scienceArticleInformation({ specialId: this.articleId }).then((res) => {
+				this.imageUrl = res.data.videoUrl;
+				this.pageTitle = res.data.specialName;
+				this.webviewUrl = res.data.projectFile;
+
+				// 科普馆搜索用， 微信文章
+				if (this.webviewUrl) {
+					uni.showLoading({
+						title: '请稍后',
+					});
+					setTimeout(() => {
+						uni.redirectTo({
+							url: `/subpackages/webview/webview?url=${this.webviewUrl}`
+						});
+					}, 800);
+				}
+			});
 		},
 		previewImage() {
 			if (!this.imageUrl) {

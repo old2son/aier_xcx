@@ -17,11 +17,23 @@
 		//      wx.hideHomeButton()
 		//   }
 		// },
-		onLoad() {
-			this.loadH5Url()
+		onLoad(data) {
+			if (data?.url) {
+				this.loadH5Url(decodeURIComponent(data.url))
+1			}
+			else {
+				this.loadH5Url()
+			}
+			
 		},
 		methods: {
-			loadH5Url() {
+			loadH5Url(url) {
+				if (url) {
+					this.h5Url = url
+					console.log('微信小程序中的读取到的h5Url:', this.h5Url)
+					return
+				}
+
 				uni.getStorage({ // 异步读取 h5Url
 					key: 'h5Url',
 					success: (res) => {
